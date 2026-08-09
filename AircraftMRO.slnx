@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AircraftMRO.Application/AircraftMRO.Application.csproj" />
+    <Project Path="src/AircraftMRO.Domain/AircraftMRO.Domain.csproj" />
+    <Project Path="src/AircraftMRO.Infrastructure/AircraftMRO.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AircraftMRO.Tests/AircraftMRO.Tests.csproj" />
+  </Folder>
+  <Project Path="src/AircraftMRO.Api/AircraftMRO.Api.csproj" />
+  <Project Path="src/AircraftMRO.Web/AircraftMRO.Web.csproj" />
+</Solution>

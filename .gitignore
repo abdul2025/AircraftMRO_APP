@@ -1,0 +1,84 @@
+
+# Visual Studio / Rider / VS Code
+
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+
+bin/
+obj/
+
+# Node/npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+
+# Eng Standers 
+dotnet10-engineering-standards/
+
+# NuGet packages
+
+*.nupkg
+packages/
+.nuget/
+*.snupkg
+
+# Dotnet temporary files
+
+*.pidb
+*.svclog
+*.pdb
+*.mdb
+
+# Rider / ReSharper
+
+_ReSharper*/
+*.DotSettings.user
+
+# ASP.NET Core files
+
+wwwroot/node_modules/
+node_modules/
+
+# Logs
+
+*.log
+logs/
+
+# Publish output
+
+publish/
+*.pubxml.user
+
+
+
+# Coverage
+
+coverage/
+*.coverage
+*.coveragexml
+*.testresults
+
+# JetBrains Rider
+
+.idea/
+
+# VS Code
+
+.vscode/
+
+# Others
+
+*.DS_Store
+*.sublime-workspace
+*.sublime-project
+Properties/launchSettings.json
+*.sh
