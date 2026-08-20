@@ -1,8 +1,40 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model HomeIndexViewModel
+@{
+    ViewData["Title"] = "Maintenance Operations";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">sss Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="landing-hero" aria-labelledby="landing-title">
+    <div>
+        <p class="eyebrow">Aircraft maintenance, repair, and overhaul</p>
+        <h1 id="landing-title">Keep every aircraft mission-ready</h1>
+        <p class="landing-lead">
+            One operational workspace for fleet records, maintenance planning, work execution,
+            and continuing airworthiness.
+        </p>
+    </div>
+    <partial name="_LoginPanel" />
+</section>
+
+<section class="module-section" aria-labelledby="modules-title">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Operations workspace</p>
+            <h2 id="modules-title">MRO modules</h2>
+        </div>
+        <p>Purpose-built areas will become available as each operational workflow is delivered.</p>
+    </div>
+
+    @if (Model.Features.Count > 0)
+    {
+        <div class="module-grid">
+            @foreach (var feature in Model.Features)
+            {
+                <partial name="_FeatureCard" model="feature" />
+            }
+        </div>
+    }
+    else
+    {
+        <p class="empty-state" role="status">No modules are currently available.</p>
+    }
+</section>

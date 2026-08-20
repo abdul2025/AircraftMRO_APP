@@ -1,62 +1,81 @@
 ---
 name: plan-dotnet-feature
-description: Plan .NET features from repository evidence and the repository's normative .NET 10 engineering handbook. Use for feature analysis, scoping, design, or implementation planning when production code must not be changed.
+description: Plan repository-grounded C# and .NET 10 features without changing production code. Use before implementing ASP.NET Core MVC or API behavior, EF Core persistence, background jobs, integrations, refactors, or cross-cutting changes when scope, architecture, contracts, data flow, risks, rollout, and verification must be decided.
 ---
 
-# Plan a .NET Feature
+# Plan .NET Feature
 
-Plan only. Never modify application code, tests, configuration, projects, migrations, deployment files, or other production artifacts. Create a plan file only when explicitly requested; otherwise respond with the plan.
+Produce an implementation-ready plan from repository evidence. Do not edit production code, tests, configuration, migrations, or deployment files while using this skill. Read-only inspection and diagnostic commands are allowed.
 
-## Verify and inspect
+## Resolve the standards
 
-Treat [`dotnet10-engineering-standards/`](../../../dotnet10-engineering-standards/) as normative guidance. Before planning, verify the folder and every required or selected reference exists. If anything is missing, stop and report its exact unresolved path.
+Locate the repository root first. The standards directory MUST exist at:
 
-Always read completely:
+`<repository-root>/dotnet10-engineering-standards`
 
-- [`README.md`](../../../dotnet10-engineering-standards/README.md)
-- [`SKILL-USAGE-GUIDE.md`](../../../dotnet10-engineering-standards/SKILL-USAGE-GUIDE.md)
-- [`00-foundation/01-engineering-principles.md`](../../../dotnet10-engineering-standards/00-foundation/01-engineering-principles.md)
-- [`01-architecture/01-clean-architecture.md`](../../../dotnet10-engineering-standards/01-architecture/01-clean-architecture.md)
-- [`01-architecture/03-feature-design.md`](../../../dotnet10-engineering-standards/01-architecture/03-feature-design.md)
-- [`07-workflows/01-feature-workflow.md`](../../../dotnet10-engineering-standards/07-workflows/01-feature-workflow.md)
-- [`templates/FEATURE-PLAN.md`](../../../dotnet10-engineering-standards/templates/FEATURE-PLAN.md)
+This skill is expected at `.agents/skills/plan-dotnet-feature/SKILL.md`, so its standards links use `../../../dotnet10-engineering-standards/`.
 
-Inspect repository instructions and worktree state; solution and project files; frameworks, packages, and analyzers; relevant implementation and a comparable end-to-end feature; tests; configuration and dependency registration; ADRs and architecture decisions; CI/CD, hosting, and deployment assumptions. Trace actual call paths. Cite repository paths as evidence and distinguish facts, inferences, assumptions, and open questions.
+If the standards directory or a required reference is missing, stop and report the exact missing path. Do not silently replace the handbook with generic guidance.
 
-## Route references
+## Operating sequence
 
-Read every applicable reference completely and combine overlapping routes:
+1. Inspect repository instructions, worktree state, solution and project files, target framework, package and analyzer configuration, relevant ADRs, one comparable end-to-end feature, affected tests, and deployment assumptions.
+2. Trace the current path from request/event through presentation, application, domain, persistence/integration, response, and tests.
+3. Frame the actor, desired outcome, current behavior, expected behavior, acceptance criteria, scope, non-goals, constraints, assumptions, and unresolved decisions.
+4. Classify blast radius and risks: correctness, authorization, privacy, data integrity, compatibility, concurrency, failure recovery, performance, and operations.
+5. Read `CORE.md`, the planning reference, and only the conditional references required by the affected boundaries.
+6. Select the simplest complete design that fits sound repository conventions. Record material tradeoffs and rejected alternatives.
+7. Produce a vertical, ordered implementation plan in which every step has an observable result and verification.
 
-- **MVC:** [`hosting/DI/pipeline`](../../../dotnet10-engineering-standards/03-web/01-hosting-di-request-pipeline.md), [`MVC/Razor`](../../../dotnet10-engineering-standards/03-web/02-mvc-razor-ui.md), and [`validation/errors`](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md).
-- **API:** [`HTTP contracts`](../../../dotnet10-engineering-standards/03-web/03-web-api-http-contracts.md), [`validation/errors`](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), and [`OpenAPI/versioning`](../../../dotnet10-engineering-standards/03-web/07-openapi-versioning-compatibility.md).
-- **Authentication or authorization:** [`authentication/authorization`](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md).
-- **Security, privacy, or exposed input:** [`web/API security`](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md); add the [`threat-model template`](../../../dotnet10-engineering-standards/templates/THREAT-MODEL.md) when warranted.
-- **Persistence, EF Core, queries, schema, or migrations:** always read all four: [`modeling`](../../../dotnet10-engineering-standards/04-data/01-ef-core-modeling.md), [`querying/performance`](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), [`transactions/concurrency`](../../../dotnet10-engineering-standards/04-data/03-transactions-concurrency.md), and [`migrations/lifecycle`](../../../dotnet10-engineering-standards/04-data/04-migrations-data-lifecycle.md).
-- **Integrations:** [`integrations/resilience`](../../../dotnet10-engineering-standards/03-web/08-integrations-resilience.md), plus API, security, observability, and testing references as applicable.
-- **Background jobs, real-time work, or messaging:** [`distributed boundaries`](../../../dotnet10-engineering-standards/01-architecture/04-distributed-boundaries-messaging.md) and [`jobs/realtime`](../../../dotnet10-engineering-standards/03-web/09-background-jobs-realtime.md), plus data and observability references as applicable.
-- **Observability or health:** [`observability/health`](../../../dotnet10-engineering-standards/06-operations/02-observability-health.md).
-- **Testing:** [`testing strategy`](../../../dotnet10-engineering-standards/05-quality/01-testing-strategy.md) and [`test implementation`](../../../dotnet10-engineering-standards/05-quality/02-test-implementation.md); add [`performance/reliability testing`](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md) for non-functional risk.
-- **Configuration, deployment, release, or rollback:** [`configuration/secrets`](../../../dotnet10-engineering-standards/06-operations/01-configuration-secrets-environments.md), [`CI/CD`](../../../dotnet10-engineering-standards/06-operations/03-ci-cd-supply-chain.md), [`release/rollback`](../../../dotnet10-engineering-standards/06-operations/04-deployment-release-rollback.md), and [`production readiness`](../../../dotnet10-engineering-standards/06-operations/05-containers-hosting-production-readiness.md).
-- **Performance or capacity:** [`.NET performance`](../../../dotnet10-engineering-standards/02-csharp/04-performance-resource-management.md), [`query performance`](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), and [`performance/reliability testing`](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md). If persistence is affected, still read all four data files.
+## Mandatory references
 
-## Decide simply
+Read these files completely for every plan:
 
-Prefer the simplest design aligned with sound repository conventions. Do not introduce abstractions, CQRS, MediatR, repositories, queues, caches, events, background processing, or microservices without a concrete current problem, repository evidence, and a benefit that outweighs added ownership and failure modes. Flag material handbook/repository conflicts. Propose an ADR when changing a lasting boundary, technology, public-contract strategy, data ownership, or cross-cutting policy. Do not write implementation code.
+- [Engineering core](../../../dotnet10-engineering-standards/CORE.md)
+- [Feature design](../../../dotnet10-engineering-standards/01-architecture/03-feature-design.md)
 
-## Produce the plan
+## Conditional reference routing
 
-Follow the [`FEATURE-PLAN`](../../../dotnet10-engineering-standards/templates/FEATURE-PLAN.md) structure. Include:
+Read a reference only when its topic is materially affected. Load multiple references only when the feature genuinely crosses those boundaries:
 
-- outcome, current behavior, repository evidence, assumptions, and open questions;
-- testable acceptance criteria, scope, and explicit non-goals;
-- affected projects, boundaries, contracts, configuration, data, dependencies, and deployment surfaces;
-- data and control flow, including ownership of validation, rules, transactions, side effects, and cancellation;
-- actors, authentication, server-side authorization including object/tenant scope, privacy, and abuse cases;
-- expected and unexpected failures, concurrency, idempotency, timeouts, retries, partial failure, recovery, and observability;
-- compatibility for APIs, schemas, configuration, clients, and overlapping application versions;
-- a vertical implementation sequence whose steps leave safe, reviewable states;
-- rollout, migrations/backfills, flags, operational verification, abort thresholds, rollback or forward-fix, and cleanup;
-- meaningful rejected alternatives;
-- a risk-based test matrix for relevant actor, input, state, dependency, delivery, and output cases at the narrowest realistic levels.
+- Domain rules, aggregates, invariants, state transitions, or use cases: [Domain and application design](../../../dotnet10-engineering-standards/01-architecture/02-domain-application-design.md).
+- Module boundaries, events, queues, distributed workflows, scheduling, or multi-tenancy: [Distributed boundaries and messaging](../../../dotnet10-engineering-standards/01-architecture/04-distributed-boundaries-messaging.md).
+- MVC/Razor behavior: [MVC and Razor UI](../../../dotnet10-engineering-standards/03-web/02-mvc-razor-ui.md). Add [pipeline](../../../dotnet10-engineering-standards/03-web/01-hosting-di-request-pipeline.md), [validation](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), [authentication/authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md), or [web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md) only when that concern changes.
+- HTTP API contract: [API contracts](../../../dotnet10-engineering-standards/03-web/03-web-api-http-contracts.md). Add [validation](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), [authentication/authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md), [web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md), or [compatibility](../../../dotnet10-engineering-standards/03-web/07-openapi-versioning-compatibility.md) only when that concern changes. Use [API contract template](../../../dotnet10-engineering-standards/templates/API-CONTRACT.md) only when a formal contract artifact adds value.
+- EF Core: select only the affected data concern—[modeling](../../../dotnet10-engineering-standards/04-data/01-ef-core-modeling.md), [querying](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), [transactions/concurrency](../../../dotnet10-engineering-standards/04-data/03-transactions-concurrency.md), or [migrations/lifecycle](../../../dotnet10-engineering-standards/04-data/04-migrations-data-lifecycle.md).
+- External integrations: [Integrations and resilience](../../../dotnet10-engineering-standards/03-web/08-integrations-resilience.md), plus distributed boundaries when messaging is involved.
+- Background jobs or real-time delivery: [Background jobs and realtime](../../../dotnet10-engineering-standards/03-web/09-background-jobs-realtime.md), plus distributed boundaries.
+- Authentication or authorization: [Authentication and authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md). Add [Web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md) for sensitive data, uploads, or abuse risk; use the [Threat model template](../../../dotnet10-engineering-standards/templates/THREAT-MODEL.md) only when a written threat model is warranted.
+- Configuration, secrets, feature flags, or certificates: [Configuration, secrets, and environments](../../../dotnet10-engineering-standards/06-operations/01-configuration-secrets-environments.md).
+- Telemetry or health impact: [Observability and health](../../../dotnet10-engineering-standards/06-operations/02-observability-health.md).
+- Deployment, migration ordering, rollout, or recovery impact: [Deployment and rollback](../../../dotnet10-engineering-standards/06-operations/04-deployment-release-rollback.md).
+- Testing design: [Testing strategy](../../../dotnet10-engineering-standards/05-quality/01-testing-strategy.md); add [performance and reliability testing](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md) only when non-functional risk exists.
+- Medium/high-risk or cross-cutting change: [Governance and quality gates](../../../dotnet10-engineering-standards/00-foundation/02-governance-quality-gates.md).
+- Defect, schema, integration, authentication, contract, performance, upgrade, or hotfix plan: the applicable section of [Change playbooks](../../../dotnet10-engineering-standards/07-workflows/02-change-playbooks.md).
+- Formal plan requested: [Feature plan template](../../../dotnet10-engineering-standards/templates/FEATURE-PLAN.md).
 
-Name concrete existing paths and label new paths as proposed. End with risks, blockers, and exact checks the implementer should run. Never imply an unrun check passed.
+## Design rules
+
+- Preserve a sound local pattern; propose restructuring only for a concrete correctness, security, data-integrity, compatibility, or maintainability problem.
+- Keep business policy in the domain/application boundary and transport/infrastructure concerns at their edges.
+- Use purpose-built DTOs and ViewModels; do not bind or expose persistence entities.
+- Define authorization, validation, transaction ownership, concurrency, idempotency, cancellation, failure mapping, observability, compatibility, rollout, and recovery where applicable.
+- Do not add CQRS, MediatR, repository wrappers, events, queues, caches, service splits, or new abstractions without a stated problem and net benefit.
+- Require an ADR when changing a lasting system boundary, technology choice, public-contract strategy, data ownership, or cross-cutting policy. Use the [ADR template](../../../dotnet10-engineering-standards/templates/ADR.md).
+- Separate confirmed repository facts, reasoned inferences, assumptions, and open questions. Ask only about choices that materially change the design.
+
+## Required output
+
+Return:
+
+1. Outcome, current behavior, and acceptance criteria
+2. Scope, non-goals, assumptions, and risk classification
+3. Repository evidence with exact file and symbol locations
+4. Recommended design, boundaries, and data/control flow
+5. Contract, authorization, data, failure, compatibility, and operational decisions
+6. Ordered file-by-file implementation sequence
+7. Risk-based test matrix
+8. Deployment, migration, rollout, and recovery impact
+9. Rejected alternatives and unresolved decisions
+
+Do not claim a build, test, migration, scan, or runtime check passed unless it was actually run successfully.

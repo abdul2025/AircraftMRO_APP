@@ -21,6 +21,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AircraftMRO.Domain\AircraftMRO.Domain.csproj" />
     <ProjectReference Include="..\..\src\AircraftMRO.Application\AircraftMRO.Application.csproj" />
+    <ProjectReference Include="..\..\src\AircraftMRO.Infrastructure\AircraftMRO.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\AircraftMRO.Web\AircraftMRO.Web.csproj" />
   </ItemGroup>
 
 </Project>

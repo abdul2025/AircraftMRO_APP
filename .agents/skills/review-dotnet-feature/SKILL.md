@@ -1,69 +1,85 @@
 ---
 name: review-dotnet-feature
-description: Review .NET feature changes against repository evidence and the repository's normative .NET 10 engineering handbook. Use for evidence-based review of diffs, branches, commits, pull requests, migrations, tests, configuration, and deployment changes; do not fix code unless explicitly requested.
+description: Review C# and .NET 10 feature changes, pull requests, branches, commits, or working-tree diffs for concrete correctness, security, data-integrity, compatibility, reliability, operability, performance, architecture, and test defects. Use for ASP.NET Core MVC or APIs, EF Core, background jobs, integrations, domain/application logic, configuration, migrations, and deployment changes. Review only unless fixes are explicitly requested.
 ---
 
-# Review a .NET Feature
+# Review .NET Feature
 
-Review only. Do not modify code, tests, configuration, migrations, deployment files, or other artifacts unless the user explicitly requests fixes.
+Find evidence-backed defects that can affect users, data, security, maintainers, or operations. Prioritize behavior and risk over style. Do not edit files unless the user separately authorizes fixes.
 
-## Establish the review
+## Resolve the standards
 
-Treat [`dotnet10-engineering-standards/`](../../../dotnet10-engineering-standards/) as normative guidance. Before reviewing, verify the folder and every mandatory or selected reference exists. If anything is missing, stop and report its exact unresolved path.
+Locate the repository root first. The standards directory MUST exist at:
 
-Always read completely:
+`<repository-root>/dotnet10-engineering-standards`
 
-- [`README.md`](../../../dotnet10-engineering-standards/README.md)
-- [`SKILL-USAGE-GUIDE.md`](../../../dotnet10-engineering-standards/SKILL-USAGE-GUIDE.md)
-- [`00-foundation/01-engineering-principles.md`](../../../dotnet10-engineering-standards/00-foundation/01-engineering-principles.md)
-- [`00-foundation/02-governance-quality-gates.md`](../../../dotnet10-engineering-standards/00-foundation/02-governance-quality-gates.md)
-- [`05-quality/03-review-static-analysis.md`](../../../dotnet10-engineering-standards/05-quality/03-review-static-analysis.md)
-- [`07-workflows/01-feature-workflow.md`](../../../dotnet10-engineering-standards/07-workflows/01-feature-workflow.md)
-- [`07-workflows/03-master-checklists.md`](../../../dotnet10-engineering-standards/07-workflows/03-master-checklists.md)
+This skill is expected at `.agents/skills/review-dotnet-feature/SKILL.md`, so its standards links use `../../../dotnet10-engineering-standards/`.
 
-Determine the exact review target and comparison base. Inspect the full diff for the requested working tree, branch, commit, pull request, migration, tests, configuration, and deployment changes. Read surrounding implementation, callers, contracts, project files, ADRs, relevant tests, CI/CD, and deployment assumptions; do not review isolated lines without their execution context. Preserve unrelated user work and perform no external writes.
+If the standards directory or a required reference is missing, stop and report the exact missing path.
 
-## Route references
+## Establish review scope
 
-Read every applicable reference completely based on changed behavior; combine routes when concerns overlap:
+1. Identify the intended behavior and acceptance criteria from the request, plan, issue, tests, and repository evidence.
+2. Identify the comparison range or diff. Include modified, added, deleted, renamed, generated, migration, configuration, test, and deployment files.
+3. Inspect enough surrounding code to understand callers, dependency injection, authorization, data flow, contracts, provider behavior, runtime configuration, and existing conventions.
+4. Read `CORE.md`, the review reference, and only the topic references required by changed behavior.
+5. Run safe, non-mutating focused builds/tests/static checks when they materially increase confidence.
 
-- **Architecture/domain/application:** [`clean architecture`](../../../dotnet10-engineering-standards/01-architecture/01-clean-architecture.md), [`domain/application design`](../../../dotnet10-engineering-standards/01-architecture/02-domain-application-design.md), and [`feature design`](../../../dotnet10-engineering-standards/01-architecture/03-feature-design.md).
-- **C# and runtime behavior:** [`C# standard`](../../../dotnet10-engineering-standards/02-csharp/01-csharp14-coding-standard.md), [`async/concurrency/cancellation`](../../../dotnet10-engineering-standards/02-csharp/02-async-concurrency-cancellation.md), [`errors/nullability`](../../../dotnet10-engineering-standards/02-csharp/03-errors-results-nullability.md), and [`performance/resources`](../../../dotnet10-engineering-standards/02-csharp/04-performance-resource-management.md) as applicable.
-- **MVC:** [`hosting/DI/pipeline`](../../../dotnet10-engineering-standards/03-web/01-hosting-di-request-pipeline.md), [`MVC/Razor`](../../../dotnet10-engineering-standards/03-web/02-mvc-razor-ui.md), and [`validation/errors`](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md).
-- **API:** [`HTTP contracts`](../../../dotnet10-engineering-standards/03-web/03-web-api-http-contracts.md), [`validation/errors`](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), and [`OpenAPI/versioning/compatibility`](../../../dotnet10-engineering-standards/03-web/07-openapi-versioning-compatibility.md).
-- **Authentication, authorization, or security:** [`authentication/authorization`](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md) and [`web/API security`](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md).
-- **Persistence, EF Core, queries, schema, or migrations:** always read all four data files: [`modeling`](../../../dotnet10-engineering-standards/04-data/01-ef-core-modeling.md), [`querying/performance`](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), [`transactions/concurrency`](../../../dotnet10-engineering-standards/04-data/03-transactions-concurrency.md), and [`migrations/lifecycle`](../../../dotnet10-engineering-standards/04-data/04-migrations-data-lifecycle.md).
-- **Integrations:** [`integrations/resilience`](../../../dotnet10-engineering-standards/03-web/08-integrations-resilience.md).
-- **Messaging or background/realtime work:** [`distributed boundaries/messaging`](../../../dotnet10-engineering-standards/01-architecture/04-distributed-boundaries-messaging.md) and [`background jobs/realtime`](../../../dotnet10-engineering-standards/03-web/09-background-jobs-realtime.md).
-- **Testing:** [`testing strategy`](../../../dotnet10-engineering-standards/05-quality/01-testing-strategy.md), [`test implementation`](../../../dotnet10-engineering-standards/05-quality/02-test-implementation.md), and [`performance/reliability testing`](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md) when non-functional risk exists.
-- **Configuration and operations:** [`configuration/secrets`](../../../dotnet10-engineering-standards/06-operations/01-configuration-secrets-environments.md) and [`observability/health`](../../../dotnet10-engineering-standards/06-operations/02-observability-health.md).
-- **CI/CD, deployment, and hosting:** [`CI/CD/supply chain`](../../../dotnet10-engineering-standards/06-operations/03-ci-cd-supply-chain.md), [`deployment/release/rollback`](../../../dotnet10-engineering-standards/06-operations/04-deployment-release-rollback.md), and [`production readiness`](../../../dotnet10-engineering-standards/06-operations/05-containers-hosting-production-readiness.md).
+## Mandatory references
 
-## Review by risk
+Read these files completely for every review:
 
-Review in this order: correctness, security, authorization, data integrity, compatibility, failure handling, concurrency, tests, observability, deployment, performance, and maintainability.
+- [Engineering core](../../../dotnet10-engineering-standards/CORE.md)
+- [Review and static analysis](../../../dotnet10-engineering-standards/05-quality/03-review-static-analysis.md)
 
-Trace changed behavior through its callers and boundaries. Check success and realistic failure paths, business invariants, authentication and resource/tenant/ownership authorization, exposed fields and over-posting, constraints and transaction ownership, concurrency/idempotency/cancellation, bounded I/O and retries, safe logs/errors, contract and mixed-version compatibility, migration rollout/recovery, test quality, operational detection, and rollback. Inspect generated migrations and configuration/deployment changes as code. Avoid subjective style feedback, speculative future concerns, unjustified abstraction demands, and issues already prevented by surrounding code or framework behavior.
+## Changed-topic routing
 
-Report a finding only when evidence shows a defect or material risk with a realistic trigger. Verify the relevant path and describe the observable impact. Recommend the smallest focused remediation; do not expand scope into unrelated refactoring.
+Read the applicable references before reporting findings:
 
-Classify each finding:
+- Architecture or dependency direction: [Clean Architecture](../../../dotnet10-engineering-standards/01-architecture/01-clean-architecture.md). Add [domain/application design](../../../dotnet10-engineering-standards/01-architecture/02-domain-application-design.md) or [feature design](../../../dotnet10-engineering-standards/01-architecture/03-feature-design.md) only when those specific boundaries changed.
+- C# concern: select only [coding](../../../dotnet10-engineering-standards/02-csharp/01-csharp14-coding-standard.md), [async/concurrency](../../../dotnet10-engineering-standards/02-csharp/02-async-concurrency-cancellation.md), [errors/nullability](../../../dotnet10-engineering-standards/02-csharp/03-errors-results-nullability.md), or [performance/resources](../../../dotnet10-engineering-standards/02-csharp/04-performance-resource-management.md) as applicable.
+- MVC/Razor behavior: [MVC/Razor](../../../dotnet10-engineering-standards/03-web/02-mvc-razor-ui.md). Add [pipeline](../../../dotnet10-engineering-standards/03-web/01-hosting-di-request-pipeline.md), [validation](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), [authentication/authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md), or [web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md) only when that concern changed.
+- API/public contract: [API contracts](../../../dotnet10-engineering-standards/03-web/03-web-api-http-contracts.md). Add [validation](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), [authentication/authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md), [web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md), or [compatibility](../../../dotnet10-engineering-standards/03-web/07-openapi-versioning-compatibility.md) only when that concern changed.
+- EF Core: select only [modeling](../../../dotnet10-engineering-standards/04-data/01-ef-core-modeling.md), [querying](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), [transactions/concurrency](../../../dotnet10-engineering-standards/04-data/03-transactions-concurrency.md), or [migrations/lifecycle](../../../dotnet10-engineering-standards/04-data/04-migrations-data-lifecycle.md) as applicable.
+- Integrations: [Integration resilience](../../../dotnet10-engineering-standards/03-web/08-integrations-resilience.md).
+- Jobs, events, queues, hosted services, or SignalR: [Distributed boundaries](../../../dotnet10-engineering-standards/01-architecture/04-distributed-boundaries-messaging.md) and [Background jobs/realtime](../../../dotnet10-engineering-standards/03-web/09-background-jobs-realtime.md).
+- Test changes or missing coverage: [Testing strategy](../../../dotnet10-engineering-standards/05-quality/01-testing-strategy.md); add [test implementation](../../../dotnet10-engineering-standards/05-quality/02-test-implementation.md) or [performance/reliability testing](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md) only when that concern is under review.
+- Operations: select only [configuration/secrets](../../../dotnet10-engineering-standards/06-operations/01-configuration-secrets-environments.md), [observability/health](../../../dotnet10-engineering-standards/06-operations/02-observability-health.md), [CI/CD](../../../dotnet10-engineering-standards/06-operations/03-ci-cd-supply-chain.md), [deployment/rollback](../../../dotnet10-engineering-standards/06-operations/04-deployment-release-rollback.md), or [containers/hosting](../../../dotnet10-engineering-standards/06-operations/05-containers-hosting-production-readiness.md) as applicable.
+- Medium/high-risk or cross-cutting diff: [Governance and quality gates](../../../dotnet10-engineering-standards/00-foundation/02-governance-quality-gates.md).
+- Defect, schema, integration, authentication, contract, performance, upgrade, or hotfix diff: the applicable section of [Change playbooks](../../../dotnet10-engineering-standards/07-workflows/02-change-playbooks.md).
 
-- **Critical:** likely catastrophic security breach, irreversible data loss, safety failure, or release-wide outage requiring immediate stop.
-- **High:** exploitable security/authorization flaw, corruption, breaking compatibility, or major production failure that should block merge.
-- **Medium:** material correctness, reliability, test, observability, or deployment defect that should be fixed before merge.
-- **Low:** narrow, non-cosmetic defect with limited impact and a credible trigger.
+## Review order
 
-## Verify and report
+1. Correctness and completeness against acceptance criteria
+2. Authentication, authorization, tenant/ownership scope, input handling, secrets, and sensitive data
+3. Data integrity, migrations, transaction boundaries, concurrency, idempotency, and existing-data behavior
+4. Public contracts, serialization, schema, and backward compatibility
+5. Failure handling, cancellation, timeouts, retries, dependency injection lifetime, disposal, and shutdown
+6. Test validity and missing risk coverage
+7. Logging, metrics, diagnostics, configuration, deployment, rollback, and operational ownership
+8. Performance risks supported by a credible workload or query/resource path
+9. Maintainability and architecture fit
 
-Run read-only or non-mutating checks needed to validate suspected findings. Run builds or tests only when appropriate and permitted; never claim an unexecuted, failed, or unavailable check passed.
+## Finding threshold
 
-Put findings first, ordered by severity and then impact. For each finding provide:
+Report a finding only when all are present:
 
-1. severity and concise title;
-2. exact file and the smallest useful line range;
-3. evidence and realistic trigger;
-4. resulting impact;
-5. focused remediation.
+- a concrete failure or material engineering risk;
+- evidence in changed code and relevant context;
+- a realistic trigger or execution path; and
+- focused remediation direction.
 
-Keep summaries secondary. State reviewed scope and exact checks executed with results, distinguishing pre-existing failures and limitations. If no evidence-backed defect meets the reporting threshold, state clearly: `No findings meet the reporting threshold.`
+Do not report subjective style preferences, speculative concerns without a path to failure, or deliberate sound repository conventions merely because the handbook offers another option.
+
+Classify severity:
+
+- **Critical:** likely security breach, data loss/corruption, or severe outage.
+- **High:** incorrect core behavior, authorization failure, breaking contract, unsafe migration, or serious production regression.
+- **Medium:** meaningful edge-case defect, reliability/operability gap, or credible failure under realistic conditions.
+- **Low:** limited-impact concrete defect worth correcting; exclude cosmetic preferences.
+
+## Required output
+
+List findings first, ordered by severity. For each finding provide severity/title, exact file and smallest useful line range, why it fails, trigger/example, impact, and focused remediation.
+
+Then provide open questions, test gaps, and a short review summary. If no findings meet the threshold, state that plainly and identify remaining verification limits. Never invent findings to populate the report, and never imply an unrun check passed.

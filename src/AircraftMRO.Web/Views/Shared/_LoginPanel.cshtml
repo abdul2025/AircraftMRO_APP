@@ -1,0 +1,29 @@
+<aside class="login-panel" aria-labelledby="login-title">
+    <div class="login-panel__heading">
+        <span class="login-panel__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14Z" /></svg>
+        </span>
+        <div>
+            <h2 id="login-title">Team sign in</h2>
+            <p>Secure access will be enabled with the identity service.</p>
+        </div>
+    </div>
+
+    <fieldset disabled aria-describedby="login-status">
+        <legend class="visually-hidden">Sign-in credentials</legend>
+        <div class="form-field">
+            <label for="login-email">Work email</label>
+            <input id="login-email" type="email" autocomplete="username" placeholder="name@company.com" />
+        </div>
+        <div class="form-field">
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" autocomplete="current-password" placeholder="Enter your password" />
+        </div>
+        <label class="remember-me" for="remember-me">
+            <input id="remember-me" type="checkbox" />
+            <span>Keep me signed in</span>
+        </label>
+        <button class="button button--primary" type="button">Sign in</button>
+    </fieldset>
+    <p id="login-status" class="login-status">Authentication setup pending</p>
+</aside>

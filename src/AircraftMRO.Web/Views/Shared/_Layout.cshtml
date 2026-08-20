@@ -1,48 +1,88 @@
-﻿<!DOCTYPE html>
+@{
+    var isHome = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase)
+        && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Index", StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AircraftMRO.Web</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Aircraft MRO</title>
+    <script>
+        (() => {
+            const key = "aircraft-mro-theme";
+            try {
+                const saved = localStorage.getItem(key);
+                const theme = saved === "light" || saved === "dark"
+                    ? saved
+                    : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+                document.documentElement.dataset.theme = theme;
+            } catch {
+                document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/AircraftMRO.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AircraftMRO.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <div class="app-shell">
+        <aside class="sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="primary-navigation" aria-labelledby="navigation-title">
+            <div class="offcanvas-header sidebar__mobile-header">
+                <h2 class="offcanvas-title" id="navigation-title">Navigation</h2>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#primary-navigation" aria-label="Close navigation"></button>
+            </div>
+            <div class="offcanvas-body sidebar__body">
+                <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Aircraft MRO home">
+                    <span class="brand__mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false"><path d="M21.5 16.5 13 12V5.5a2 2 0 0 0-4 0V12L.5 16.5v2l8.5-2V21l-2 1.5V24l4-1 4 1v-1.5L13 21v-4.5l8.5 2z" /></svg>
+                    </span>
+                    <span><strong>Aircraft MRO</strong><small>Maintenance operations</small></span>
+                </a>
+
+                <nav class="sidebar-nav" aria-label="Primary navigation">
+                    <p class="sidebar-nav__label">Workspace</p>
+                    <a class="sidebar-nav__link @(isHome ? "is-active" : null)" asp-controller="Home" asp-action="Index" aria-current="@(isHome ? "page" : null)">
+                        <span aria-hidden="true">⌂</span><span>Home</span>
+                    </a>
+                    <span class="sidebar-nav__link is-disabled"><span aria-hidden="true">✈</span><span>Aircraft</span></span>
+                    <span class="sidebar-nav__link is-disabled"><span aria-hidden="true">▣</span><span>Work Orders</span></span>
+                    <span class="sidebar-nav__link is-disabled"><span aria-hidden="true">⚙</span><span>Maintenance</span></span>
+                </nav>
+
+                <div class="sidebar__footer">
+                    <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    <small>Aircraft MRO platform</small>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+        </aside>
+
+        <div class="page-column">
+            <header class="topbar">
+                <button class="menu-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#primary-navigation" aria-controls="primary-navigation" aria-label="Open navigation">
+                    <span aria-hidden="true">☰</span>
+                </button>
+                <div class="topbar__context">
+                    <span class="system-status"><span aria-hidden="true"></span> System workspace</span>
+                </div>
+                <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
+                    <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v3m0 14v3M4.9 4.9 7 7m10 10 2.1 2.1M2 12h3m14 0h3M4.9 19.1 7 17M17 7l2.1-2.1" /></svg>
+                    <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" /></svg>
+                </button>
+            </header>
+
+            <main id="main-content" class="page-content" tabindex="-1">
+                @RenderBody()
+            </main>
+
+            <footer class="site-footer">
+                <span>&copy; 2026 Aircraft MRO</span>
+                <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </footer>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - AircraftMRO.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -1,65 +1,100 @@
 ---
 name: test-dotnet-feature
-description: Design, implement, run, and assess risk-based .NET tests using repository evidence and the repository's normative .NET 10 engineering handbook. Use for testing features, fixes, contracts, persistence, integrations, security, operations, or deployment behavior at the narrowest realistic boundary.
+description: Design, implement, run, and assess risk-based tests for C# and .NET 10 features and fixes. Use for ASP.NET Core MVC or APIs, EF Core/provider behavior, domain and application logic, authentication/authorization, middleware, background jobs, integrations, contracts, migrations, performance, reliability, and regressions. Select realistic boundaries and prioritize behavioral confidence over test count or coverage percentage.
 ---
 
-# Test a .NET Feature
+# Test .NET Feature
 
-## Establish context
+Build confidence in observable behavior with the smallest test set that covers meaningful risk. Do not distort production design merely to make mocking convenient.
 
-Treat [`dotnet10-engineering-standards/`](../../../dotnet10-engineering-standards/) as normative guidance. Before acting, verify the folder and every mandatory or selected reference exists. If anything is missing, stop and report its exact unresolved path.
+## Resolve the standards
 
-Always read completely:
+Locate the repository root first. The standards directory MUST exist at:
 
-- [`README.md`](../../../dotnet10-engineering-standards/README.md)
-- [`SKILL-USAGE-GUIDE.md`](../../../dotnet10-engineering-standards/SKILL-USAGE-GUIDE.md)
-- [`00-foundation/01-engineering-principles.md`](../../../dotnet10-engineering-standards/00-foundation/01-engineering-principles.md)
-- [`05-quality/01-testing-strategy.md`](../../../dotnet10-engineering-standards/05-quality/01-testing-strategy.md)
-- [`05-quality/02-test-implementation.md`](../../../dotnet10-engineering-standards/05-quality/02-test-implementation.md)
-- [`07-workflows/01-feature-workflow.md`](../../../dotnet10-engineering-standards/07-workflows/01-feature-workflow.md)
-- [`07-workflows/03-master-checklists.md`](../../../dotnet10-engineering-standards/07-workflows/03-master-checklists.md)
-- [`templates/TEST-PLAN.md`](../../../dotnet10-engineering-standards/templates/TEST-PLAN.md)
+`<repository-root>/dotnet10-engineering-standards`
 
-Inspect acceptance criteria, changed paths and their callers, existing coverage, test projects and fixtures, CI commands, production provider/version, public boundaries, configuration, and deployment assumptions before selecting tests. Identify risk, affected behavior, test data, environment, and evidence gaps. Preserve unrelated user changes.
+This skill is expected at `.agents/skills/test-dotnet-feature/SKILL.md`, so its standards links use `../../../dotnet10-engineering-standards/`.
 
-## Route references
+If the standards directory or a required reference is missing, stop and report the exact missing path.
 
-Read every applicable reference completely; combine overlapping routes:
+## Operating sequence
 
-- **Architecture/domain/application:** [`clean architecture`](../../../dotnet10-engineering-standards/01-architecture/01-clean-architecture.md), [`domain/application design`](../../../dotnet10-engineering-standards/01-architecture/02-domain-application-design.md), and [`feature design`](../../../dotnet10-engineering-standards/01-architecture/03-feature-design.md).
-- **C# and runtime behavior:** [`C# standard`](../../../dotnet10-engineering-standards/02-csharp/01-csharp14-coding-standard.md), [`async/concurrency/cancellation`](../../../dotnet10-engineering-standards/02-csharp/02-async-concurrency-cancellation.md), and [`errors/nullability`](../../../dotnet10-engineering-standards/02-csharp/03-errors-results-nullability.md) as applicable.
-- **MVC:** [`hosting/DI/pipeline`](../../../dotnet10-engineering-standards/03-web/01-hosting-di-request-pipeline.md), [`MVC/Razor`](../../../dotnet10-engineering-standards/03-web/02-mvc-razor-ui.md), and [`validation/errors`](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md).
-- **API:** [`HTTP contracts`](../../../dotnet10-engineering-standards/03-web/03-web-api-http-contracts.md), [`validation/errors`](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), and [`OpenAPI/versioning/compatibility`](../../../dotnet10-engineering-standards/03-web/07-openapi-versioning-compatibility.md).
-- **Authentication, authorization, or security:** [`authentication/authorization`](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md) and [`web/API security`](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md).
-- **EF Core, database behavior, queries, schema, or migrations:** always read all four data files: [`modeling`](../../../dotnet10-engineering-standards/04-data/01-ef-core-modeling.md), [`querying/performance`](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), [`transactions/concurrency`](../../../dotnet10-engineering-standards/04-data/03-transactions-concurrency.md), and [`migrations/lifecycle`](../../../dotnet10-engineering-standards/04-data/04-migrations-data-lifecycle.md).
-- **Integrations:** [`integrations/resilience`](../../../dotnet10-engineering-standards/03-web/08-integrations-resilience.md).
-- **Messaging or background/realtime work:** [`distributed boundaries/messaging`](../../../dotnet10-engineering-standards/01-architecture/04-distributed-boundaries-messaging.md) and [`background jobs/realtime`](../../../dotnet10-engineering-standards/03-web/09-background-jobs-realtime.md).
-- **Configuration and observability:** [`configuration/secrets`](../../../dotnet10-engineering-standards/06-operations/01-configuration-secrets-environments.md) and [`observability/health`](../../../dotnet10-engineering-standards/06-operations/02-observability-health.md).
-- **Deployment and release:** [`CI/CD/supply chain`](../../../dotnet10-engineering-standards/06-operations/03-ci-cd-supply-chain.md), [`deployment/release/rollback`](../../../dotnet10-engineering-standards/06-operations/04-deployment-release-rollback.md), and [`production readiness`](../../../dotnet10-engineering-standards/06-operations/05-containers-hosting-production-readiness.md).
-- **Any non-functional risk:** always read [`performance/reliability testing`](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md), plus [`.NET performance/resources`](../../../dotnet10-engineering-standards/02-csharp/04-performance-resource-management.md) and [`query performance`](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md) when applicable. If persistence is involved, still read all four data files.
+1. Inspect repository instructions, feature requirements, acceptance criteria, change diff, nearby tests, test projects, fixtures, CI commands, production provider, and public/runtime boundaries.
+2. Trace each affected path and inventory risks by impact, likelihood, detectability, and reversibility.
+3. Inspect existing coverage and distinguish genuine behavioral gaps from already-proven behavior.
+4. Read `CORE.md`, the testing reference, and only the affected-topic references needed for the risks under test.
+5. Select the narrowest realistic boundary that can expose each risk without mocking away the behavior under test.
+6. Produce a prioritized test matrix before implementing substantial new coverage.
+7. When implementation is requested, add focused tests using repository conventions, then run focused and broader suites according to blast radius.
+8. Investigate unexpected passes, nondeterminism, shared-state leakage, and environment-only failures.
 
-## Build the risk matrix
+## Mandatory references
 
-Before substantial test implementation, produce a prioritized matrix with risk, scenario, level, environment/provider, setup/data, expected observable evidence, and automation status. Cover applicable success and regression paths plus validation, boundaries, malformed/oversized input, authentication, authorization, ownership, tenant isolation, missing/deleted state, conflicts, duplicates, concurrency, idempotency, cancellation, timeouts, dependency rejection, partial failure, restart, serialization, status/headers, pagination/order, data constraints, compatibility, and sensitive-data exposure. Use equivalence classes and risk; do not exhaustively combine low-value permutations or equate coverage percentage with confidence.
+Read these files completely for every testing task:
 
-Select the narrowest realistic boundary:
+- [Engineering core](../../../dotnet10-engineering-standards/CORE.md)
+- [Testing strategy](../../../dotnet10-engineering-standards/05-quality/01-testing-strategy.md)
 
-- Use **unit tests** for pure business decisions, calculations, invariants, and state transitions.
-- Use **integration tests** for EF Core and the production provider, authentication, authorization handlers, serialization, middleware, dependency injection, and infrastructure adapters.
-- Use **HTTP tests** for routing, binding, validation, status codes, headers, Problem Details, antiforgery, authentication/authorization wiring, redirects, and the complete request pipeline.
-- Use **contract tests** for public or external schemas, semantics, fixtures, consumer expectations, and compatibility.
-- Use **end-to-end tests** only for critical journeys or deployed integration behavior not proven reliably at narrower boundaries.
+Read [Performance and reliability testing](../../../dotnet10-engineering-standards/05-quality/04-performance-reliability-testing.md) when latency, throughput, memory, contention, capacity, retry storms, failover, soak behavior, or another non-functional risk exists.
 
-Avoid deep framework mocks, mocked `DbSet`/`IQueryable`, mocked middleware pipelines, and EF InMemory or SQLite as substitutes for provider-specific relational behavior. Use the real production database provider/version for translation, constraints, transactions, concurrency, and migrations. Use controlled handlers, test servers, containers, sandboxes, or narrow fakes at genuine external boundaries.
+## Affected-topic routing
 
-## Implement and execute
+- Domain invariants, calculations, state transitions, and application decisions: [Domain and application design](../../../dotnet10-engineering-standards/01-architecture/02-domain-application-design.md).
+- Nullability, errors, async, cancellation, time, culture, concurrency, or resource behavior: select only [coding](../../../dotnet10-engineering-standards/02-csharp/01-csharp14-coding-standard.md), [async/concurrency](../../../dotnet10-engineering-standards/02-csharp/02-async-concurrency-cancellation.md), [errors/nullability](../../../dotnet10-engineering-standards/02-csharp/03-errors-results-nullability.md), or [performance/resources](../../../dotnet10-engineering-standards/02-csharp/04-performance-resource-management.md) as applicable.
+- MVC/Razor behavior: [MVC and Razor UI](../../../dotnet10-engineering-standards/03-web/02-mvc-razor-ui.md). Add [validation](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), [authentication/authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md), or [web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md) only when those behaviors are under test.
+- API behavior: [API contracts](../../../dotnet10-engineering-standards/03-web/03-web-api-http-contracts.md). Add [validation](../../../dotnet10-engineering-standards/03-web/04-validation-problem-details.md), [authentication/authorization](../../../dotnet10-engineering-standards/03-web/05-authentication-authorization.md), [web security](../../../dotnet10-engineering-standards/03-web/06-web-api-security.md), or [compatibility](../../../dotnet10-engineering-standards/03-web/07-openapi-versioning-compatibility.md) only when those behaviors are under test.
+- EF Core: select only [modeling/provider mapping](../../../dotnet10-engineering-standards/04-data/01-ef-core-modeling.md), [querying](../../../dotnet10-engineering-standards/04-data/02-querying-performance.md), [transactions/concurrency](../../../dotnet10-engineering-standards/04-data/03-transactions-concurrency.md), or [migrations/lifecycle](../../../dotnet10-engineering-standards/04-data/04-migrations-data-lifecycle.md) as applicable. Use the production provider or a faithful provider boundary for provider-dependent behavior.
+- External integrations and resilience: [Integrations and resilience](../../../dotnet10-engineering-standards/03-web/08-integrations-resilience.md).
+- Events, queues, jobs, scheduling, duplicate delivery, or SignalR: [Distributed boundaries](../../../dotnet10-engineering-standards/01-architecture/04-distributed-boundaries-messaging.md) and [Background jobs/realtime](../../../dotnet10-engineering-standards/03-web/09-background-jobs-realtime.md).
+- Configuration, telemetry, CI, deployment, container, or runtime smoke tests: select only [configuration/secrets](../../../dotnet10-engineering-standards/06-operations/01-configuration-secrets-environments.md), [observability/health](../../../dotnet10-engineering-standards/06-operations/02-observability-health.md), [CI/CD](../../../dotnet10-engineering-standards/06-operations/03-ci-cd-supply-chain.md), [deployment/rollback](../../../dotnet10-engineering-standards/06-operations/04-deployment-release-rollback.md), or [containers/hosting](../../../dotnet10-engineering-standards/06-operations/05-containers-hosting-production-readiness.md) as applicable.
+- Adding or substantially restructuring tests: [Test implementation](../../../dotnet10-engineering-standards/05-quality/02-test-implementation.md).
+- Defect, schema, integration, authentication, contract, performance, upgrade, or hotfix scenario: the applicable section of [Change playbooks](../../../dotnet10-engineering-standards/07-workflows/02-change-playbooks.md).
+- Formal test plan requested: [Test plan template](../../../dotnet10-engineering-standards/templates/TEST-PLAN.md).
 
-Follow existing test framework, naming, fixtures, categories, and CI conventions. Keep tests deterministic, isolated, parallel-safe, and diagnosable. Control clocks, randomness, culture, time zones, identities, and external responses; bound waits and use explicit synchronization. Isolate and clean data/resources without hiding primary failures. Never use live production dependencies, credentials, secrets, or personal data.
+## Select the boundary
 
-Assert observable outcomes, persisted state, authorization/data exposure, durable side effects, contracts, and required telemetry rather than private methods or incidental call order. Add a failing regression test before a bug fix when practical. Do not change production behavior or introduce abstractions solely to simplify tests.
+- Use unit tests for pure domain invariants, calculations, policies, branching, and application decisions without real infrastructure behavior.
+- Use integration tests for EF Core mappings/queries/transactions, production-provider behavior, authentication, authorization, serialization, middleware, DI wiring, caching, files, and adapters.
+- Use HTTP/functional tests for routing, model binding, filters, status codes, headers, content negotiation, Problem Details, antiforgery, and end-to-end use-case wiring.
+- Use contract tests for external payloads/events/APIs whose shape and compatibility matter.
+- Use end-to-end tests sparingly for critical journeys that lower levels cannot prove.
+- Use performance/load/soak/fault tests only with an explicit risk, workload, baseline, target, and reproducible environment.
 
-Run focused commands first, then broaden by risk: affected test filters/projects, provider integration, HTTP/contract/security tests, affected builds, solution tests, analyzers, migrations, publish/container smoke, and performance/reliability checks as applicable. Never claim an unexecuted, failed, or unavailable check passed.
+Do not create a unit test merely because a class exists. Do not deep-mock EF Core, ASP.NET Core, authentication, serialization, or provider behavior when those are the risks being verified.
 
-## Assess and report
+## Risk checklist
 
-Compare results with acceptance criteria and matrix priorities. Separate change-caused failures from pre-existing or environmental failures. Report tests added or changed, exact commands and results, defects found, skipped/blocked cases, retained evidence, and residual risk. For medium/high risk, structure the report or artifact with the [`TEST-PLAN`](../../../dotnet10-engineering-standards/templates/TEST-PLAN.md) template.
+Cover only applicable risks, prioritizing high impact:
+
+- happy path and observable business completion;
+- invalid, missing, boundary, malformed, oversized, and over-posted input;
+- anonymous, invalid identity, forbidden role/policy, permitted user, wrong owner/resource, and cross-tenant access;
+- not-found, conflict, duplicate, replay, stale version, concurrency, and idempotency;
+- transaction rollback, partial side effects, cancellation, timeout, dependency failure, retry, restart, and shutdown;
+- serialization, null/omitted values, enums, dates/time zones, culture, money/precision, and compatibility;
+- deterministic pagination, filtering, sorting, large input, query count, and provider constraints;
+- background-job duplicate execution, overlap, retry exhaustion, dead-letter/replay, scope, and graceful shutdown;
+- exact regression scenario for a fixed defect.
+
+## Test implementation rules
+
+- Follow the repository's existing framework, naming, fixture, assertion, and data-isolation conventions.
+- Make tests deterministic, independent, readable, parallel-safe unless explicitly serialized, and free of real secrets/PII/live dependencies.
+- Control time, randomness, identifiers, and external I/O through appropriate seams.
+- Assert meaningful output, contract, persisted state, emitted side effect, and security outcome—not incidental call counts.
+- Use realistic builders/fixtures without hiding the scenario inside excessive abstraction.
+- Avoid arbitrary delays, shared mutable state, order dependence, and replacing production-provider behavior with an incompatible in-memory substitute.
+
+## Required output
+
+Provide:
+
+1. Acceptance-criteria and changed-path risk map
+2. Prioritized test matrix with scenario, risk, level, setup, expected result, and priority
+3. Existing coverage and genuine gaps
+4. Tests added or run with exact file names and commands
+5. Results, failures, flakiness, and environment limitations
+6. Intentionally excluded scenarios with rationale
+7. Remaining material risk
+
+Never claim a feature is fully tested because coverage percentage increased, and never claim an unrun check passed.

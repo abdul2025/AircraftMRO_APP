@@ -1,0 +1,41 @@
+@model SystemFeatureViewModel
+
+<article class="feature-card">
+    <div class="feature-icon" aria-hidden="true">
+        @switch (Model.Icon)
+        {
+            case SystemFeatureIcon.Aircraft:
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M21.5 16.5 13 12V5.5a2 2 0 0 0-4 0V12L.5 16.5v2l8.5-2V21l-2 1.5V24l4-1 4 1v-1.5L13 21v-4.5l8.5 2z" /></svg>
+                break;
+            case SystemFeatureIcon.WorkOrder:
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M16 2H8a2 2 0 0 0-2 2H4a2 2 0 0 0-2 2v16h20V6a2 2 0 0 0-2-2h-2a2 2 0 0 0-2-2Zm0 4H8V4h8v2Zm2 5H6V9h12v2Zm0 4H6v-2h12v2Zm-5 4H6v-2h7v2Z" /></svg>
+                break;
+            case SystemFeatureIcon.Maintenance:
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M22.7 19.3 14.9 11.5a7 7 0 0 0-8.4-8.8l4.2 4.2-3.8 3.8-4.2-4.2a7 7 0 0 0 8.8 8.4l7.8 7.8a2.4 2.4 0 0 0 3.4-3.4Z" /></svg>
+                break;
+            case SystemFeatureIcon.Compliance:
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M12 1 4 4v6c0 5.5 3.4 10.5 8 12 4.6-1.5 8-6.5 8-12V4l-8-3Zm-1 15-4-4 1.4-1.4 2.6 2.6 5.6-5.6L18 9l-7 7Z" /></svg>
+                break;
+
+            default:
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z" /></svg>
+                break;
+        }
+    </div>
+    <div class="feature-card__body">
+        <div class="feature-card__heading">
+            <h3>@Model.Title</h3>
+            @if (!Model.IsAvailable)
+            {
+                <span class="status-badge">@Model.Status</span>
+            }
+        </div>
+        <p>@Model.Description</p>
+        @if (Model.IsAvailable)
+        {
+            <a class="feature-link" asp-controller="@Model.Controller" asp-action="@Model.Action">
+                Open module <span aria-hidden="true">&rarr;</span>
+            </a>
+        }
+    </div>
+</article>
