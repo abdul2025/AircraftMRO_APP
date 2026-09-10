@@ -1,3 +1,5 @@
+@model LoginViewModel
+
 <aside class="login-panel" aria-labelledby="login-title">
     <div class="login-panel__heading">
         <span class="login-panel__icon" aria-hidden="true">
@@ -5,25 +7,32 @@
         </span>
         <div>
             <h2 id="login-title">Team sign in</h2>
-            <p>Secure access will be enabled with the identity service.</p>
+            <p>Use your work email and password to continue.</p>
         </div>
     </div>
 
-    <fieldset disabled aria-describedby="login-status">
-        <legend class="visually-hidden">Sign-in credentials</legend>
+    <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+        <div asp-validation-summary="ModelOnly" class="login-status" role="alert"></div>
+
         <div class="form-field">
-            <label for="login-email">Work email</label>
-            <input id="login-email" type="email" autocomplete="username" placeholder="name@company.com" />
+            <label asp-for="Email">Work email</label>
+            <input asp-for="Email" autocomplete="username" placeholder="name@company.com" />
+            <span asp-validation-for="Email"></span>
         </div>
         <div class="form-field">
-            <label for="login-password">Password</label>
-            <input id="login-password" type="password" autocomplete="current-password" placeholder="Enter your password" />
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" autocomplete="current-password" placeholder="Enter your password" />
+            <span asp-validation-for="Password"></span>
         </div>
-        <label class="remember-me" for="remember-me">
-            <input id="remember-me" type="checkbox" />
+        <label class="remember-me" asp-for="RememberMe">
+            <input asp-for="RememberMe" />
             <span>Keep me signed in</span>
         </label>
-        <button class="button button--primary" type="button">Sign in</button>
-    </fieldset>
-    <p id="login-status" class="login-status">Authentication setup pending</p>
+        <button class="button button--primary" type="submit">Sign in</button>
+    </form>
+
+    <p class="auth-switch">
+        Need an account?
+        <a asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl">Create an account</a>
+    </p>
 </aside>

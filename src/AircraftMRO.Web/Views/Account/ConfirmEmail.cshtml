@@ -1,0 +1,24 @@
+@model ConfirmEmailViewModel
+@{
+    ViewData["Title"] = "Confirm your account";
+}
+
+<section class="login-page" aria-labelledby="confirm-email-title">
+    <div class="login-page__heading">
+        <p class="eyebrow">Team access</p>
+        <h1 id="confirm-email-title">
+            @(Model.Succeeded ? "Your account is confirmed" : "We couldn't confirm your account")
+        </h1>
+        <p>
+            @(Model.Succeeded
+                ? "You can now sign in with your email and password."
+                : "The confirmation link is invalid or has expired.")
+        </p>
+    </div>
+
+    <aside class="login-panel" aria-labelledby="confirm-email-panel-title">
+        <p class="auth-switch">
+            <a asp-controller="Account" asp-action="Login">Go to sign in</a>
+        </p>
+    </aside>
+</section>

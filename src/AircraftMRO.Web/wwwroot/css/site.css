@@ -3,7 +3,7 @@
   --color-navy-900: #04090e;
   --color-navy-800: #12344d;
 
-  --color-primary: #1d4ed8;
+  --color-primary: #153387;
   --color-primary-hover: #1e40af;
   --color-primary-light: #dbeafe;
 
@@ -322,6 +322,22 @@ a.sidebar-nav__link:hover,
   fill: currentColor;
 }
 
+button.topbar-action {
+  font: inherit;
+  cursor: pointer;
+}
+
+.topbar-logout-form {
+  display: contents;
+}
+
+.topbar-user {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .theme-icon {
   width: 1.25rem;
   height: 1.25rem;
@@ -418,7 +434,7 @@ html[data-theme="dark"] .theme-icon--moon {
 
 .login-panel {
   width: 100%;
-  max-width: 25rem;
+  max-width: 35rem;
   justify-self: center;
   padding: 1.4rem;
   border: 1px solid var(--color-border);
@@ -497,11 +513,15 @@ html[data-theme="dark"] .theme-icon--moon {
 }
 
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.50rem;
   min-height: 2.75rem;
   padding: 0.65rem 1rem;
   border: 0;
   border-radius: var(--radius-sm);
-  font-weight: 700;
+  text-decoration: none;
 }
 
 .button--primary {
@@ -512,6 +532,12 @@ html[data-theme="dark"] .theme-icon--moon {
 .login-status {
   padding-top: 0.8rem;
   text-align: center;
+}
+
+.auth-switch {
+  padding-top: 0.6rem;
+  text-align: center;
+  color: var(--color-text-secondary);
 }
 
 .module-section {

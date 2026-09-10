@@ -1,0 +1,65 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create account";
+}
+
+<section class="login-page" aria-labelledby="register-page-title">
+    <div class="login-page__heading">
+        <p class="eyebrow">Team access</p>
+        <h1 id="register-page-title">Create your Aircraft MRO account</h1>
+        <p>Use your organization email to request access to the maintenance workspace.</p>
+    </div>
+
+    <aside class="login-panel" aria-labelledby="register-title">
+        <div class="login-panel__heading">
+            <div>
+                <h2 id="register-title">Create account</h2>
+            </div>
+        </div>
+
+        <form asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="login-status" role="alert"></div>
+
+            <div class="form-field">
+                <label asp-for="FirstName">First name</label>
+                <input asp-for="FirstName" autocomplete="given-name" placeholder="First name" />
+                <span asp-validation-for="FirstName"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="LastName">Last name</label>
+                <input asp-for="LastName" autocomplete="family-name" placeholder="Last name" />
+                <span asp-validation-for="LastName"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="EmployeeId">Employee ID</label>
+                <input asp-for="EmployeeId" autocomplete="off" placeholder="Employee ID" />
+                <span asp-validation-for="EmployeeId"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="Email">Work email</label>
+                <input asp-for="Email" autocomplete="username" placeholder="name@company.com" />
+                <span asp-validation-for="Email"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" autocomplete="new-password" placeholder="Choose a password" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="ConfirmPassword">Confirm password</label>
+                <input asp-for="ConfirmPassword" autocomplete="new-password" placeholder="Re-enter your password" />
+                <span asp-validation-for="ConfirmPassword"></span>
+            </div>
+            <button class="button button--primary" type="submit">Create account</button>
+        </form>
+
+        <p class="auth-switch">
+            Already have an account?
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl">Sign in</a>
+        </p>
+    </aside>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

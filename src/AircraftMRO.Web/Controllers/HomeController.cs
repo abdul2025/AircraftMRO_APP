@@ -9,7 +9,6 @@ public class HomeController() : Controller
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         return View();
-
     }
 
     public IActionResult Privacy()

@@ -1,0 +1,28 @@
+@model RegisterConfirmationViewModel
+@{
+    ViewData["Title"] = "Confirm your account";
+}
+
+<section class="login-page" aria-labelledby="register-confirmation-title">
+    <div class="login-page__heading">
+        <p class="eyebrow">Team access</p>
+        <h1 id="register-confirmation-title">Confirm your account</h1>
+        <p>We've created your account. Confirm your email address to sign in.</p>
+    </div>
+
+    <aside class="login-panel" aria-labelledby="register-confirmation-panel-title">
+        <div class="login-panel__heading">
+            <div>
+                <h2 id="register-confirmation-panel-title">Almost there</h2>
+                <p>No email delivery is configured yet, so use the link below to confirm your account.</p>
+            </div>
+        </div>
+
+        <a class="button button--primary" href="@Model.ConfirmationLink">Confirm my account</a>
+
+        <p class="auth-switch">
+            Already confirmed?
+            <a asp-controller="Account" asp-action="Login">Sign in</a>
+        </p>
+    </aside>
+</section>
