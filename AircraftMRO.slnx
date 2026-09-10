@@ -6,7 +6,4 @@
     <Project Path="src/AircraftMRO.Infrastructure/AircraftMRO.Infrastructure.csproj" />
     <Project Path="src/AircraftMRO.Web/AircraftMRO.Web.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/AircraftMRO.Tests/AircraftMRO.Tests.csproj" />
-  </Folder>
 </Solution>
