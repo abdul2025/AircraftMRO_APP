@@ -66,6 +66,11 @@
                 <div class="topbar__context">
                     <span class="system-status"><span aria-hidden="true"></span> System workspace</span>
                 </div>
+                <a class="topbar-action" asp-controller="Account" asp-action="Login" aria-label="Sign in" title="Sign in">
+                    <svg class="topbar-action__icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14Z" />
+                    </svg>
+                </a>
                 <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
                     <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v3m0 14v3M4.9 4.9 7 7m10 10 2.1 2.1M2 12h3m14 0h3M4.9 19.1 7 17M17 7l2.1-2.1" /></svg>
                     <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" /></svg>

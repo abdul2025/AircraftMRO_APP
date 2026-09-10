@@ -295,6 +295,7 @@ a.sidebar-nav__link:hover,
 }
 
 .menu-button,
+.topbar-action,
 .theme-toggle {
   display: inline-grid;
   width: 2.6rem;
@@ -305,11 +306,20 @@ a.sidebar-nav__link:hover,
   border-radius: var(--radius-sm);
   color: var(--color-text);
   background: var(--color-surface);
+  text-decoration: none;
 }
 
 .menu-button:hover,
+.topbar-action:hover,
 .theme-toggle:hover {
+  color: var(--color-text);
   background: var(--color-surface-hover);
+}
+
+.topbar-action__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
 }
 
 .theme-icon {
@@ -356,6 +366,29 @@ html[data-theme="dark"] .theme-icon--moon {
     radial-gradient(circle at 8% 5%, color-mix(in srgb, var(--color-primary-light) 75%, transparent), transparent 35%),
     var(--color-surface);
   box-shadow: var(--shadow-card);
+}
+
+.login-page {
+  display: grid;
+  gap: 2rem;
+  justify-items: center;
+  padding-block: clamp(1rem, 5vw, 4rem);
+}
+
+.login-page__heading {
+  max-width: 38rem;
+  text-align: center;
+}
+
+.login-page__heading h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.035em;
+}
+
+.login-page__heading > p:last-child {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-secondary);
 }
 
 .eyebrow {
@@ -607,9 +640,6 @@ html[data-theme="dark"] .theme-icon--moon {
     display: none;
   }
 
-  .landing-hero {
-    grid-template-columns: minmax(0, 1.3fr) minmax(20rem, 0.7fr);
-  }
 }
 
 @media (max-width: 575.98px) {
@@ -640,6 +670,7 @@ html[data-theme="dark"] .theme-icon--moon {
   .skip-link,
   .feature-card,
   .theme-toggle,
+  .topbar-action,
   .menu-button {
     transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
   }

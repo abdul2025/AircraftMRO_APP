@@ -1,4 +1,3 @@
-using AircraftMRO.Application.SystemFeatures;
 using AircraftMRO.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +23,6 @@ public static class DependencyInjection
 
         services.AddDbContext<AircraftMroDbContext>(options =>
             options.UseSqlServer(connectionString));
-        services.AddScoped<ISystemFeatureReader, SystemFeatureReader>();
 
         return services;
     }
