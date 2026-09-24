@@ -4,14 +4,9 @@ using AircraftMRO.Web.Models;
 
 namespace AircraftMRO.Web.Controllers;
 
-public class HomeController() : Controller
+public class HomeController : Controller
 {
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
-    {
-        return View();
-    }
-
-    public IActionResult Privacy()
+    public IActionResult Index()
     {
         return View();
     }

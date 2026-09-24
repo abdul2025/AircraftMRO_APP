@@ -46,13 +46,9 @@
                     <a class="sidebar-nav__link @(isHome ? "is-active" : null)" asp-controller="Home" asp-action="Index" aria-current="@(isHome ? "page" : null)">
                         <span aria-hidden="true">⌂</span><span>Home</span>
                     </a>
-                    <span class="sidebar-nav__link is-disabled"><span aria-hidden="true">✈</span><span>Aircraft</span></span>
-                    <span class="sidebar-nav__link is-disabled"><span aria-hidden="true">▣</span><span>Work Orders</span></span>
-                    <span class="sidebar-nav__link is-disabled"><span aria-hidden="true">⚙</span><span>Maintenance</span></span>
                 </nav>
 
                 <div class="sidebar__footer">
-                    <a asp-controller="Home" asp-action="Privacy">Privacy</a>
                     <small>Aircraft MRO platform</small>
                 </div>
             </div>
@@ -66,7 +62,6 @@
                 <div class="topbar__context">
                     <span class="system-status"><span aria-hidden="true"></span> System workspace</span>
                 </div>
-                <partial name="_LoginPartial" />
                 <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
                     <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v3m0 14v3M4.9 4.9 7 7m10 10 2.1 2.1M2 12h3m14 0h3M4.9 19.1 7 17M17 7l2.1-2.1" /></svg>
                     <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5a8.5 8.5 0 1 0 12 12Z" /></svg>
@@ -79,7 +74,6 @@
 
             <footer class="site-footer">
                 <span>&copy; 2026 Aircraft MRO</span>
-                <a asp-controller="Home" asp-action="Privacy">Privacy</a>
             </footer>
         </div>
     </div>
