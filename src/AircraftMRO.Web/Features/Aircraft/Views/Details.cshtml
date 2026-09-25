@@ -1,0 +1,56 @@
+@model AircraftDetailsViewModel
+@{
+    ViewData["Title"] = Model.RegistrationNumber;
+}
+
+<section class="form-card" aria-labelledby="details-title">
+    <div class="card-heading">
+        <div>
+            <p class="eyebrow">Aircraft</p>
+            <h1 id="details-title">@Model.RegistrationNumber</h1>
+        </div>
+        <partial name="_ActionIcons" model="new AircraftActionsViewModel(Model.Id, Model.RegistrationNumber)" />
+    </div>
+
+    <partial name="_StatusMessages" />
+    <partial name="_AircraftSummary" model="Model" />
+
+    <section class="audit-panel" aria-labelledby="audit-title">
+        <h2 id="audit-title" class="subheading">Audit trail</h2>
+        <dl class="detail-list detail-list--muted">
+            <div>
+                <dt>Created</dt>
+                <dd><time datetime="@AuditDisplay.MachineTimestamp(Model.CreatedAtUtc)">@AuditDisplay.Timestamp(Model.CreatedAtUtc)</time></dd>
+            </div>
+            <div>
+                <dt>Created by</dt>
+                <dd>@AuditDisplay.User(Model.CreatedBy)</dd>
+            </div>
+            <div>
+                <dt>Last updated</dt>
+                <dd>
+                    @if (Model.UpdatedAtUtc is { } updatedAt)
+                    {
+                        <time datetime="@AuditDisplay.MachineTimestamp(updatedAt)">@AuditDisplay.Timestamp(updatedAt)</time>
+                    }
+                    else
+                    {
+                        <span>Never updated</span>
+                    }
+                </dd>
+            </div>
+            <div>
+                <dt>Last updated by</dt>
+                <dd>@(Model.UpdatedAtUtc is null ? "—" : AuditDisplay.User(Model.UpdatedBy))</dd>
+            </div>
+            <div>
+                <dt>Record ID</dt>
+                <dd><code class="record-id">@Model.Id</code></dd>
+            </div>
+        </dl>
+    </section>
+
+    <div class="form-actions">
+        <a class="button button--secondary" asp-action="Index">Back to aircraft</a>
+    </div>
+</section>

@@ -1,0 +1,42 @@
+@model AircraftFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="notice notice--danger" role="alert"></div>
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="form-grid">
+    <div class="form-field">
+        <label asp-for="RegistrationNumber"></label>
+        <input asp-for="RegistrationNumber" autocomplete="off" placeholder="HZ-ABC" />
+        <span asp-validation-for="RegistrationNumber" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="Status"></label>
+        <select asp-for="Status" asp-items="AircraftStatusLabels.Options()"></select>
+        <span asp-validation-for="Status" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="Manufacturer"></label>
+        <input asp-for="Manufacturer" autocomplete="off" placeholder="Airbus" />
+        <span asp-validation-for="Manufacturer" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="Model"></label>
+        <input asp-for="Model" autocomplete="off" placeholder="A320-214" />
+        <span asp-validation-for="Model" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="SerialNumber"></label>
+        <input asp-for="SerialNumber" autocomplete="off" />
+        <span asp-validation-for="SerialNumber" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="YearOfManufacture"></label>
+        <input asp-for="YearOfManufacture" inputmode="numeric" />
+        <span asp-validation-for="YearOfManufacture" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="TotalFlightHours"></label>
+        <input asp-for="TotalFlightHours" step="0.1" min="0" inputmode="decimal" />
+        <span asp-validation-for="TotalFlightHours" class="field-error"></span>
+    </div>
+</div>

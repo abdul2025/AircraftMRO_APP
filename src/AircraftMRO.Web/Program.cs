@@ -1,10 +1,18 @@
+using System.Globalization;
 using AircraftMRO.Application;
 using AircraftMRO.Infrastructure;
+using AircraftMRO.Web.Configuration;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+    options.ViewLocationExpanders.Add(new FeatureViewLocationExpander()));
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -19,6 +27,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Browsers post numbers with a "." separator; pin the culture so binding and display
+// don't depend on the host's regional settings.
+var appCulture = new CultureInfo("en-US");
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(appCulture),
+    SupportedCultures = [appCulture],
+    SupportedUICultures = [appCulture]
+});
+
 app.UseRouting();
 
 app.UseAuthorization();

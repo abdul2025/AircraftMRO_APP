@@ -1,0 +1,21 @@
+@model AircraftFormViewModel
+@{
+    var id = ViewContext.RouteData.Values["id"];
+}
+
+<form asp-action="Edit" asp-route-id="@id" method="post" novalidate data-modal-form>
+    <div class="modal-header">
+        <div>
+            <p class="eyebrow">Fleet records</p>
+            <h2 class="modal-title" id="aircraft-form-title">Edit aircraft</h2>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <partial name="_AircraftForm" model="Model" />
+    </div>
+    <div class="modal-footer">
+        <a class="button button--secondary" asp-action="Details" asp-route-id="@id" data-bs-dismiss="modal">Cancel</a>
+        <button type="submit" class="button button--primary">Save changes</button>
+    </div>
+</form>

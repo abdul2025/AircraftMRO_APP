@@ -1,4 +1,46 @@
 @AircraftMRO.Api_HostAddress = http://localhost:5146
 
+# Interactive reference (Development only): {{AircraftMRO.Api_HostAddress}}/scalar
+# OpenAPI document: {{AircraftMRO.Api_HostAddress}}/openapi/v1.json
+
+### List aircraft
+GET {{AircraftMRO.Api_HostAddress}}/api/aircraft?page=1&pageSize=20
+Accept: application/json
+
+### Create aircraft
+POST {{AircraftMRO.Api_HostAddress}}/api/aircraft
+Content-Type: application/json
+
+{
+  "registrationNumber": "HZ-ABC",
+  "manufacturer": "Airbus",
+  "model": "A320-214",
+  "serialNumber": "5123",
+  "yearOfManufacture": 2012,
+  "totalFlightHours": 31250.5,
+  "status": "Active"
+}
+
+### Get aircraft (copy the id from the create response; the ETag header is needed for PUT/DELETE)
+GET {{AircraftMRO.Api_HostAddress}}/api/aircraft/{{id}}
+
+### Update aircraft
+PUT {{AircraftMRO.Api_HostAddress}}/api/aircraft/{{id}}
+Content-Type: application/json
+If-Match: "{{etag}}"
+
+{
+  "registrationNumber": "HZ-ABC",
+  "manufacturer": "Airbus",
+  "model": "A320-214",
+  "serialNumber": "5123",
+  "yearOfManufacture": 2012,
+  "totalFlightHours": 31300.0,
+  "status": "InMaintenance"
+}
+
+### Delete aircraft (soft delete)
+DELETE {{AircraftMRO.Api_HostAddress}}/api/aircraft/{{id}}
+If-Match: "{{etag}}"
 
 ###

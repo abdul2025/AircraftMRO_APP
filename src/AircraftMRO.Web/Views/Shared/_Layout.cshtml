@@ -1,6 +1,10 @@
+@using System.Globalization
+@inject TimeProvider Clock
 @{
+    var utcNow = Clock.GetUtcNow();
     var isHome = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Home", StringComparison.OrdinalIgnoreCase)
         && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Index", StringComparison.OrdinalIgnoreCase);
+    var isAircraft = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Aircraft", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -46,6 +50,9 @@
                     <a class="sidebar-nav__link @(isHome ? "is-active" : null)" asp-controller="Home" asp-action="Index" aria-current="@(isHome ? "page" : null)">
                         <span aria-hidden="true">⌂</span><span>Home</span>
                     </a>
+                    <a class="sidebar-nav__link @(isAircraft ? "is-active" : null)" asp-controller="Aircraft" asp-action="Index" aria-current="@(isAircraft ? "page" : null)">
+                        <span aria-hidden="true">✈</span><span>Aircraft</span>
+                    </a>
                 </nav>
 
                 <div class="sidebar__footer">
@@ -61,6 +68,12 @@
                 </button>
                 <div class="topbar__context">
                     <span class="system-status"><span aria-hidden="true"></span> System workspace</span>
+                </div>
+                @* Rendered in UTC by the server; clock.js switches the date and time to the browser's local zone. *@
+                <div class="topbar-clock" data-clock>
+                    <time class="topbar-clock__date" data-clock-date datetime="@utcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">@utcNow.ToString("ddd, d MMM yyyy", CultureInfo.InvariantCulture)</time>
+                    <time class="topbar-clock__time" data-clock-local hidden></time>
+                    <time class="topbar-clock__utc" data-clock-utc datetime="@utcNow.ToString("yyyy-MM-dd'T'HH:mm'Z'", CultureInfo.InvariantCulture)">@utcNow.ToString("HH:mm", CultureInfo.InvariantCulture) UTC</time>
                 </div>
                 <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch to dark theme" title="Switch to dark theme">
                     <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v3m0 14v3M4.9 4.9 7 7m10 10 2.1 2.1M2 12h3m14 0h3M4.9 19.1 7 17M17 7l2.1-2.1" /></svg>
@@ -78,8 +91,17 @@
         </div>
     </div>
 
+    @* Shared modal for create/edit/delete forms loaded by modal-forms.js. *@
+    <div class="modal fade app-modal" id="app-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/modal-forms.js" asp-append-version="true"></script>
+    <script src="~/js/clock.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

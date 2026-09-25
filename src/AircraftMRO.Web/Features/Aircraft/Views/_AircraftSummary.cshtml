@@ -1,0 +1,11 @@
+@model AircraftDetailsViewModel
+
+<dl class="detail-list">
+    <div><dt>Registration number</dt><dd>@Model.RegistrationNumber</dd></div>
+    <div><dt>Status</dt><dd><partial name="_StatusBadge" model="Model.Status" /></dd></div>
+    <div><dt>Manufacturer</dt><dd>@Model.Manufacturer</dd></div>
+    <div><dt>Model</dt><dd>@Model.Model</dd></div>
+    <div><dt>Serial number (MSN)</dt><dd>@Model.SerialNumber</dd></div>
+    <div><dt>Year of manufacture</dt><dd>@Model.YearOfManufacture</dd></div>
+    <div><dt>Total flight hours</dt><dd>@Model.TotalFlightHours.ToString("N1")</dd></div>
+</dl>

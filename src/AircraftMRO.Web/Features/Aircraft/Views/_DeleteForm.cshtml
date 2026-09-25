@@ -1,0 +1,21 @@
+@model AircraftDetailsViewModel
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post" data-modal-form>
+    <input type="hidden" name="rowVersion" value="@Model.RowVersion" />
+    <div class="modal-header">
+        <div>
+            <p class="eyebrow">Aircraft</p>
+            <h2 class="modal-title" id="aircraft-form-title">Delete @Model.RegistrationNumber?</h2>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <p class="lead-text">The aircraft will be removed from the fleet list. Its record is kept for audit.</p>
+        <partial name="_StatusMessages" />
+        <partial name="_AircraftSummary" model="Model" />
+    </div>
+    <div class="modal-footer">
+        <a class="button button--secondary" asp-action="Details" asp-route-id="@Model.Id" data-bs-dismiss="modal">Cancel</a>
+        <button type="submit" class="button button--danger">Delete aircraft</button>
+    </div>
+</form>

@@ -1,0 +1,66 @@
+@model AircraftListViewModel
+@{
+    var chart = FleetStatusChartViewModel.From(Model.Statistics, Model.Filter.Status);
+    var size = FleetStatusChartViewModel.Number(FleetStatusChartViewModel.Size);
+    var center = FleetStatusChartViewModel.Number(FleetStatusChartViewModel.Center);
+    var radius = FleetStatusChartViewModel.Number(FleetStatusChartViewModel.Radius);
+    var thickness = FleetStatusChartViewModel.Number(FleetStatusChartViewModel.Thickness);
+}
+
+<section class="chart-card" aria-labelledby="fleet-status-chart-title">
+    <div class="chart-card__heading">
+        <h2 id="fleet-status-chart-title">Fleet status</h2>
+        <p>Share of aircraft by status</p>
+    </div>
+
+    <div class="donut-chart">
+        <svg class="donut @(chart.SelectedStatus is null ? null : "donut--has-selection")"
+             viewBox="0 0 @size @size" role="img"
+             aria-labelledby="fleet-status-chart-title fleet-status-chart-summary">
+            <desc id="fleet-status-chart-summary">
+                @(chart.Total == 0 ? "No aircraft yet." : string.Join(", ", chart.Segments.Select(s => $"{s.Label} {s.Count} ({s.Percent})")))
+            </desc>
+            <circle class="donut__track" cx="@center" cy="@center" r="@radius" stroke-width="@thickness" />
+            <g transform="rotate(-90 @center @center)">
+                @foreach (var segment in chart.Segments.Where(s => s.Count > 0))
+                {
+                    var isSelected = chart.SelectedStatus == segment.Status;
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(status: segment.Status, keepStatus: false)"
+                       class="donut__segment @segment.ColorClass @(isSelected ? "is-selected" : null)"
+                       aria-label="@segment.Label: @segment.Count aircraft, @segment.Percent. Show @segment.Label.ToLowerInvariant() aircraft."
+                       data-chart-tooltip data-tooltip-value="@segment.Count aircraft · @segment.Percent" data-tooltip-label="@segment.Label">
+                        <circle cx="@center" cy="@center" r="@radius" stroke-width="@thickness"
+                                stroke-dasharray="@segment.DashArray" stroke-dashoffset="@segment.DashOffset" />
+                    </a>
+                }
+            </g>
+            <text class="donut__total" x="@center" y="@center" aria-hidden="true">@chart.Total</text>
+            <text class="donut__caption" x="@center" y="@FleetStatusChartViewModel.Number(FleetStatusChartViewModel.Center + 20)" aria-hidden="true">aircraft</text>
+        </svg>
+
+        @* The legend doubles as the chart's table view: every value is readable without hovering. *@
+        <table class="chart-legend">
+            <caption class="visually-hidden">Aircraft by status</caption>
+            <thead class="visually-hidden">
+                <tr><th scope="col">Status</th><th scope="col">Aircraft</th><th scope="col">Share</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var segment in chart.Segments)
+                {
+                    <tr class="@(chart.SelectedStatus == segment.Status ? "is-selected" : null)">
+                        <th scope="row">
+                            <span class="chart-legend__swatch @segment.ColorClass" aria-hidden="true"></span>
+                            @segment.Label
+                        </th>
+                        <td>@segment.Count</td>
+                        <td>@segment.Percent</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="chart-tooltip" role="tooltip" hidden>
+        <strong class="chart-tooltip__value"></strong>
+        <span class="chart-tooltip__label"></span>
+    </div>
+</section>

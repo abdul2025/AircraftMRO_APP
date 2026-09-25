@@ -1,0 +1,122 @@
+@model AircraftListViewModel
+@{
+    ViewData["Title"] = "Aircraft";
+    var results = Model.Page;
+    var filter = Model.Filter;
+}
+
+<section aria-labelledby="aircraft-title">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Fleet records</p>
+            <h1 id="aircraft-title">Aircraft</h1>
+        </div>
+        <a class="button button--primary" asp-action="Create" data-modal>Add aircraft</a>
+    </div>
+
+    <partial name="_StatusMessages" />
+    <div class="fleet-overview">
+        <partial name="_FleetStatistics" model="Model" />
+        <partial name="_FleetStatusChart" model="Model" />
+    </div>
+
+    <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter aircraft">
+        <div class="filter-bar__field filter-bar__field--search">
+            <label for="aircraft-search">Search</label>
+            <input id="aircraft-search" type="search" name="search" value="@filter.Search"
+                   maxlength="@AircraftMRO.Application.Features.Aircraft.DTOs.AircraftListFilter.MaxSearchLength"
+                   placeholder="Registration, manufacturer, model, or serial" autocomplete="off" />
+        </div>
+        <div class="filter-bar__field">
+            <label for="aircraft-status">Status</label>
+            <select id="aircraft-status" name="status" data-auto-submit>
+                <option value="">All statuses</option>
+                @foreach (var option in AircraftStatusLabels.Options())
+                {
+                    <option value="@option.Value" selected="@(filter.Status?.ToString() == option.Value)">@option.Text</option>
+                }
+            </select>
+        </div>
+        <div class="filter-bar__actions">
+            <button type="submit" class="button button--primary">Apply</button>
+            @if (!filter.IsEmpty)
+            {
+                <a class="button button--secondary" asp-action="Index">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (!filter.IsEmpty)
+    {
+        <p class="filter-summary" role="status">
+            Showing @results.TotalCount of @Model.Statistics.TotalCount aircraft
+        </p>
+    }
+
+    @if (Model.Statistics.TotalCount == 0)
+    {
+        <p class="empty-state">No aircraft have been added yet.</p>
+    }
+    else if (results.TotalCount == 0)
+    {
+        <p class="empty-state">No aircraft match these filters. <a asp-action="Index">Clear filters</a></p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Registration</th>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">Model</th>
+                        <th scope="col" class="numeric">Year</th>
+                        <th scope="col" class="numeric">Flight hours</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var aircraft in results.Items)
+                    {
+                        <tr>
+                            <th scope="row"><a asp-action="Details" asp-route-id="@aircraft.Id">@aircraft.RegistrationNumber</a></th>
+                            <td>@aircraft.Manufacturer</td>
+                            <td>@aircraft.Model</td>
+                            <td class="numeric">@aircraft.YearOfManufacture</td>
+                            <td class="numeric">@aircraft.TotalFlightHours.ToString("N1")</td>
+                            <td><partial name="_StatusBadge" model="aircraft.Status" /></td>
+                            <td class="actions-cell">
+                                <partial name="_ActionIcons" model="new AircraftActionsViewModel(aircraft.Id, aircraft.RegistrationNumber)" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (results.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Aircraft pages">
+                @if (results.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page - 1)">Previous</a>
+                }
+                <span>Page @results.Page of @results.TotalPages (@results.TotalCount aircraft)</span>
+                @if (results.HasNextPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page + 1)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>
+
+@section Scripts {
+    <script src="~/js/chart-tooltip.js" asp-append-version="true"></script>
+    <script>
+        // Apply the status filter as soon as it changes; the Apply button covers no-JS use.
+        document.querySelectorAll("[data-auto-submit]").forEach((control) =>
+            control.addEventListener("change", () => control.form.requestSubmit()));
+    </script>
+}

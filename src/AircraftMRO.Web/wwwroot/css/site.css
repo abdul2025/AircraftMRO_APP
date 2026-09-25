@@ -701,3 +701,681 @@ html[data-theme="dark"] .theme-icon--moon {
     transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
   }
 }
+
+/* Fleet records (Aircraft feature) */
+.button--secondary {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.button--danger {
+  color: var(--color-text-inverse);
+  background: var(--color-danger);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+
+.notice:empty,
+.notice.validation-summary-valid {
+  display: none;
+}
+
+.notice ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.notice--success {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.notice--danger {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.status-badge--success {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.status-badge--warning {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.status-badge--danger {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.table-card {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.data-table thead th {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.data-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.data-table .numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.data-table td.actions-cell {
+  padding-block: 0.4rem;
+}
+
+.card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.audit-panel {
+  margin-top: 1.75rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.record-id {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+}
+
+.icon-button svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-button:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.icon-button--danger:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.icon-button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding-top: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.form-card {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.form-card h1 {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.form-field select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  background: var(--color-page);
+}
+
+.field-error {
+  color: var(--color-danger);
+  font-size: 0.8rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem 1.25rem;
+  margin: 0;
+}
+
+.detail-list dt {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.detail-list dd {
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+}
+
+.detail-list--muted dd {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.subheading {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1rem;
+}
+
+.lead-text {
+  color: var(--color-text-secondary);
+}
+
+/* Modal forms (create/edit/delete). The same partials render inside .form-card--page without JavaScript. */
+.app-modal .modal-content {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.app-modal .modal-header,
+.app-modal .modal-footer,
+.form-card--page .modal-header,
+.form-card--page .modal-footer {
+  border-color: var(--color-border-light);
+}
+
+.app-modal .modal-header,
+.form-card--page .modal-header {
+  align-items: flex-start;
+}
+
+.app-modal .modal-title,
+.form-card--page .modal-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+}
+
+.app-modal .modal-footer,
+.form-card--page .modal-footer {
+  gap: 0.75rem;
+}
+
+.app-modal .modal-footer .button,
+.form-card--page .modal-footer .button {
+  margin: 0;
+}
+
+.form-card--page {
+  padding: 0;
+}
+
+.form-card--page .modal-header,
+.form-card--page .modal-body,
+.form-card--page .modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.form-card--page .modal-header {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.form-card--page .modal-body {
+  display: block;
+}
+
+.form-card--page .modal-footer {
+  justify-content: flex-end;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.form-card--page .btn-close {
+  display: none;
+}
+
+html[data-theme="dark"] .app-modal .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.button[disabled] {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+.form-field .input-validation-error {
+  border-color: var(--color-danger);
+}
+
+.form-field .input-validation-error:focus {
+  box-shadow: 0 0 0 3px var(--color-danger-bg);
+}
+
+/* Topbar clock */
+.topbar-clock {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.topbar-clock__time {
+  color: var(--color-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.topbar-clock__utc {
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fleet summary (stat tiles) */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+}
+
+a.stat-tile:hover {
+  border-color: var(--color-border);
+  background: var(--color-surface-hover);
+}
+
+a.stat-tile:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.stat-tile.is-selected {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary), var(--shadow-card);
+}
+
+.stat-tile__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.stat-tile__value {
+  font-size: 1.6rem;
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.status-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-neutral);
+}
+
+.status-dot--success { background: var(--color-success); }
+.status-dot--warning { background: var(--color-warning); }
+.status-dot--danger { background: var(--color-danger); }
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.filter-bar__field {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 11rem;
+}
+
+.filter-bar__field--search {
+  flex: 1 1 18rem;
+}
+
+.filter-bar__field label {
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.filter-bar input,
+.filter-bar select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  background: var(--color-page);
+}
+
+.filter-bar__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-bar__actions .button {
+  margin: 0;
+  min-height: 2.5rem;
+}
+
+.filter-summary {
+  margin: 0 0 0.75rem;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 767.98px) {
+  .topbar-clock__date,
+  .system-status {
+    display: none;
+  }
+}
+
+/* Fleet overview: stat tiles beside the status doughnut on wide screens */
+.fleet-overview {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.fleet-overview .stat-row {
+  margin-bottom: 0;
+  align-content: start;
+}
+
+@media (min-width: 1200px) {
+  .fleet-overview {
+    grid-template-columns: minmax(0, 1fr) minmax(24rem, 28rem);
+  }
+
+  .fleet-overview .stat-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Status chart colors: validated for all-pairs CVD separation (ΔE 8.2) in both themes.
+   On the dark surface they sit below 3:1, so the legend table always shows the values. */
+:root {
+  --chart-status-active: #0e7a3a;
+  --chart-status-maintenance: #d97706;
+  --chart-status-grounded: #e11d48;
+  --chart-status-retired: #8a8f98;
+}
+
+.chart-status--active { --chart-color: var(--chart-status-active); }
+.chart-status--maintenance { --chart-color: var(--chart-status-maintenance); }
+.chart-status--grounded { --chart-color: var(--chart-status-grounded); }
+.chart-status--retired { --chart-color: var(--chart-status-retired); }
+
+.chart-card {
+  position: relative;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.chart-card__heading h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.chart-card__heading p {
+  margin: 0.15rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.donut-chart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.donut {
+  width: 8.25rem;
+  height: 8.25rem;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.donut__track {
+  fill: none;
+  stroke: var(--color-border-light);
+}
+
+.donut__segment circle {
+  fill: none;
+  stroke: var(--chart-color);
+  transition: opacity 120ms ease, stroke-width 120ms ease;
+}
+
+.donut__segment:hover circle,
+.donut__segment:focus-visible circle {
+  stroke-width: 26px;
+}
+
+.donut:hover .donut__segment:not(:hover) circle,
+.donut--has-selection .donut__segment:not(.is-selected) circle {
+  opacity: 0.4;
+}
+
+.donut__segment:focus-visible {
+  outline: none;
+}
+
+.donut__segment:focus-visible circle {
+  filter: drop-shadow(0 0 2px var(--color-focus));
+}
+
+.donut__total {
+  fill: var(--color-text);
+  font-size: 1.9rem;
+  font-weight: 650;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.donut__caption {
+  fill: var(--color-text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.chart-legend {
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.chart-legend th,
+.chart-legend td {
+  padding: 0.3rem 0.4rem;
+}
+
+.chart-legend th {
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.chart-legend td {
+  color: var(--color-text-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-legend td:nth-child(2) {
+  color: var(--color-text);
+  font-weight: 650;
+}
+
+.chart-legend tr.is-selected th {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.chart-legend__swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.4rem;
+  border-radius: 2px;
+  vertical-align: -0.05em;
+  background: var(--chart-color);
+}
+
+.chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.chart-tooltip[hidden] {
+  display: none;
+}
+
+.chart-tooltip__value {
+  font-size: 0.9rem;
+}
+
+.chart-tooltip__label {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .donut__segment circle {
+    transition: none;
+  }
+}

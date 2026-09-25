@@ -19,7 +19,7 @@ Apply the schema from the repository root before starting the Web host:
 ```bash
 ConnectionStrings__AircraftMRO='<connection-string>' dotnet ef database update \
   --project src/AircraftMRO.Infrastructure/AircraftMRO.Infrastructure.csproj \
-  --startup-project src/AircraftMRO.Infrastructure/AircraftMRO.Infrastructure.csproj
+  --startup-project src/AircraftMRO.Web/AircraftMRO.Web.csproj
 ```
 
 Then run either host with the same connection-string configuration:
@@ -32,3 +32,10 @@ dotnet run --project src/AircraftMRO.Api/AircraftMRO.Api.csproj
 When the application also runs in a container, replace `localhost` with the SQL Server
 container or service name on their shared container network. The password supplied in
 the connection string must match the container's `MSSQL_SA_PASSWORD`; do not commit it.
+
+## API reference
+
+In Development the API host serves an interactive [Scalar](https://scalar.com) reference at
+`/scalar` (for example `http://localhost:5146/scalar`) and the OpenAPI document at
+`/openapi/v1.json`. Neither is mapped in other environments. Updates and deletes need the
+aircraft's current `ETag` in an `If-Match` header; the reference documents this on each operation.

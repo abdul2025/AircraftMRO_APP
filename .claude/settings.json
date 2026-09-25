@@ -1,0 +1,8 @@
+{
+  "theme": "dark",
+  "agentPushNotifEnabled": true,
+  "permissions": {
+    "blockReadsOutsideWorkingDirectories": true,
+    "additionalDirectories": ["/private/tmp/claude-501"]
+  }
+}
