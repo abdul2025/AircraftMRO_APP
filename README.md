@@ -39,3 +39,13 @@ In Development the API host serves an interactive [Scalar](https://scalar.com) r
 `/scalar` (for example `http://localhost:5146/scalar`) and the OpenAPI document at
 `/openapi/v1.json`. Neither is mapped in other environments. Updates and deletes need the
 aircraft's current `ETag` in an `If-Match` header; the reference documents this on each operation.
+
+## Real-time notifications
+
+Every create, update, and delete of an auditable entity is recorded in the `Notifications`
+table in the same transaction as the change, from either host. The Web host polls that table
+and pushes new rows to browsers over SignalR (`/hubs/notifications`), so changes made through
+the API appear live too, typically within a second. Settings live in the `Notifications`
+configuration section: `PollInterval` (default `00:00:01`), `BatchSize` (100), and
+`ReplayWindow` (`00:00:10`). History is at `/Notifications`. The SignalR browser client is
+vendored under `wwwroot/lib/microsoft-signalr` and recorded in `libman.json`.

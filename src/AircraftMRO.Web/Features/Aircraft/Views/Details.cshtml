@@ -3,7 +3,9 @@
     ViewData["Title"] = Model.RegistrationNumber;
 }
 
-<section class="form-card" aria-labelledby="details-title">
+@* live-refresh.js re-renders this page when this aircraft changes, and returns to the list if it is deleted. *@
+<section class="form-card" aria-labelledby="details-title"
+         data-live-refresh="Aircraft" data-live-refresh-id="@Model.Id" data-live-refresh-gone="@Url.Action("Index")">
     <div class="card-heading">
         <div>
             <p class="eyebrow">Aircraft</p>

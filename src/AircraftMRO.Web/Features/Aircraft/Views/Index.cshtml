@@ -5,7 +5,8 @@
     var filter = Model.Filter;
 }
 
-<section aria-labelledby="aircraft-title">
+@* live-refresh.js re-renders this page in place when an aircraft changes. *@
+<section aria-labelledby="aircraft-title" data-live-refresh="Aircraft">
     <div class="section-heading">
         <div>
             <p class="eyebrow">Fleet records</p>
@@ -116,7 +117,11 @@
     <script src="~/js/chart-tooltip.js" asp-append-version="true"></script>
     <script>
         // Apply the status filter as soon as it changes; the Apply button covers no-JS use.
-        document.querySelectorAll("[data-auto-submit]").forEach((control) =>
-            control.addEventListener("change", () => control.form.requestSubmit()));
+        // Delegated, so it keeps working after live-refresh.js swaps the page content.
+        document.addEventListener("change", (event) => {
+            if (event.target.matches("[data-auto-submit]")) {
+                event.target.form.requestSubmit();
+            }
+        });
     </script>
 }

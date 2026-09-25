@@ -1,9 +1,10 @@
 // Hover/focus tooltip for chart marks marked [data-chart-tooltip].
 // Tooltips only enhance: every value is also in the chart's legend table.
+// Re-binds after live-refresh.js swaps the page content ("app:content-replaced").
 (() => {
   "use strict";
 
-  document.querySelectorAll(".chart-card").forEach((card) => {
+  const bind = (root) => root.querySelectorAll(".chart-card").forEach((card) => {
     const tooltip = card.querySelector(".chart-tooltip");
     if (!tooltip) {
       return;
@@ -46,4 +47,7 @@
       }
     });
   });
+
+  bind(document);
+  document.addEventListener("app:content-replaced", (event) => bind(event.detail.root));
 })();

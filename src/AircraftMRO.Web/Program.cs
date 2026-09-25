@@ -2,6 +2,7 @@ using System.Globalization;
 using AircraftMRO.Application;
 using AircraftMRO.Infrastructure;
 using AircraftMRO.Web.Configuration;
+using AircraftMRO.Web.Features.Notifications;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -15,6 +16,14 @@ builder.Services.Configure<RazorViewEngineOptions>(options =>
     options.ViewLocationExpanders.Add(new FeatureViewLocationExpander()));
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Real-time notifications: rows recorded by the audit interceptor are pushed over SignalR.
+builder.Services.AddSignalR();
+builder.Services.AddOptions<NotificationOptions>()
+    .Bind(builder.Configuration.GetSection(NotificationOptions.SectionName))
+    .Validate(NotificationOptions.IsValid, "Notifications settings are out of range.")
+    .ValidateOnStart();
+builder.Services.AddHostedService<NotificationDispatcher>();
 
 var app = builder.Build();
 
@@ -48,6 +57,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapHub<NotificationsHub>(NotificationsHub.Path);
 
 app.Run();
 

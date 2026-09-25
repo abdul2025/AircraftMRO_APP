@@ -230,14 +230,17 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
         Assert.Matches(@"Grounded\s*</span>\s*<span class=""stat-tile__value"">1<", all);
         Assert.Contains("href=\"/Aircraft?status=Grounded\"", all);
 
+        // Match table rows only: the notification bell on every page also mentions these registrations.
+        static string Row(string registration) => $">{registration}</a></th>";
+
         var grounded = await _client.GetStringAsync("/Aircraft?status=Grounded");
-        Assert.Contains("WF-G1", grounded);
-        Assert.DoesNotContain("WF-A1", grounded);
+        Assert.Contains(Row("WF-G1"), grounded);
+        Assert.DoesNotContain(Row("WF-A1"), grounded);
         Assert.Contains("Showing 1 of 3 aircraft", grounded);
 
         var searched = await _client.GetStringAsync("/Aircraft?search=wf-a2");
-        Assert.Contains("WF-A2", searched);
-        Assert.DoesNotContain("WF-A1", searched);
+        Assert.Contains(Row("WF-A2"), searched);
+        Assert.DoesNotContain(Row("WF-A1"), searched);
 
         var none = await _client.GetStringAsync("/Aircraft?search=no-such-aircraft");
         Assert.Contains("No aircraft match these filters.", none);
@@ -260,6 +263,26 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
         Assert.Contains("data-clock", html);
         Assert.Matches(@"data-clock-utc datetime=""\d{4}-\d{2}-\d{2}T\d{2}:\d{2}Z"">\d{2}:\d{2} UTC<", html);
         Assert.Contains("js/clock.js", html);
+    }
+
+    [Fact]
+    public async Task Pages_opt_in_to_live_refresh_instead_of_showing_a_banner()
+    {
+        var created = await PostFormAsync("/Aircraft/Create", "/Aircraft/Create", ValidForm(AircraftTestData.UniqueRegistration()));
+        var detailsUrl = created.Headers.Location!.OriginalString;
+        var id = detailsUrl.Split('/').Last();
+
+        var list = await _client.GetStringAsync("/Aircraft");
+        Assert.Contains("data-live-refresh=\"Aircraft\"", list);
+        Assert.DoesNotContain("live-banner", list);
+        Assert.Contains("js/live-refresh.js", list);
+
+        var details = await _client.GetStringAsync(detailsUrl);
+        Assert.Contains($"data-live-refresh-id=\"{id}\"", details);
+        Assert.Contains("data-live-refresh-gone=\"/Aircraft\"", details);
+
+        Assert.Contains("data-live-refresh=\"*\"", await _client.GetStringAsync("/Notifications"));
+        Assert.DoesNotContain("data-live-refresh", await _client.GetStringAsync("/Notifications?page=2"));
     }
 
     [Fact]

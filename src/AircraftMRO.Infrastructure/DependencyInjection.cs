@@ -1,8 +1,10 @@
 using AircraftMRO.Application.Common.Interfaces;
 using AircraftMRO.Application.Features.Aircraft.Ports;
+using AircraftMRO.Application.Features.Notifications.Ports;
 using AircraftMRO.Infrastructure.Auditing;
 using AircraftMRO.Infrastructure.Persistence;
 using AircraftMRO.Infrastructure.Persistence.Features.Aircraft;
+using AircraftMRO.Infrastructure.Persistence.Features.Notifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +39,7 @@ public static class DependencyInjection
                 .AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>()));
 
         services.AddScoped<IAircraftRepository, AircraftRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         return services;
     }

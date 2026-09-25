@@ -11,6 +11,7 @@ public sealed class AircraftMroDbContext(DbContextOptions<AircraftMroDbContext> 
     public const int UserIdMaxLength = 450;
 
     public DbSet<Aircraft> Aircraft => Set<Aircraft>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

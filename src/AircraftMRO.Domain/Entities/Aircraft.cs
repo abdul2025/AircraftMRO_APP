@@ -5,7 +5,7 @@ using AircraftMRO.Domain.Enums.Aircraft;
 
 namespace AircraftMRO.Domain.Entities;
 
-public sealed partial class Aircraft : AuditableEntity
+public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
 {
     public const string ValidationErrorCode = "Aircraft.Validation";
     public const int RegistrationNumberMinLength = 2;
@@ -27,6 +27,8 @@ public sealed partial class Aircraft : AuditableEntity
     public int YearOfManufacture { get; private set; }
     public decimal TotalFlightHours { get; private set; }
     public AircraftStatus Status { get; private set; }
+
+    public string DisplayName => RegistrationNumber;
 
     public static Result<Aircraft> Create(
         string registrationNumber,

@@ -1,0 +1,72 @@
+@model PagedResponse<NotificationDto>
+@{
+    ViewData["Title"] = "Notifications";
+    // The first page refreshes live on any change; older pages would shift under the reader, so they stay put.
+    // Razor always renders data-* attributes (even null ones), so the attribute is emitted only on page 1.
+    var liveRefreshAttribute = Model.Page == 1 ? Html.Raw("data-live-refresh=\"*\"") : Microsoft.AspNetCore.Html.HtmlString.Empty;
+}
+
+<section aria-labelledby="notifications-title" @liveRefreshAttribute>
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Activity</p>
+            <h1 id="notifications-title">Notifications</h1>
+        </div>
+        <p>Every create, update, and delete, newest first.</p>
+    </div>
+
+
+    @if (Model.TotalCount == 0)
+    {
+        <p class="empty-state">No notifications yet.</p>
+    }
+    else
+    {
+        <ol class="activity-list">
+            @foreach (var notification in Model.Items)
+            {
+                <li class="activity-item">
+                    <span class="activity-item__action activity-item__action--@notification.Action.ToString().ToLowerInvariant()">@notification.Action</span>
+                    <div class="activity-item__body">
+                        <p class="activity-item__message">@notification.Message</p>
+                        @if (notification.Changes.Count > 0)
+                        {
+                            <dl class="activity-changes">
+                                @foreach (var change in notification.Changes)
+                                {
+                                    <div>
+                                        <dt>@change.Property</dt>
+                                        <dd><span class="activity-changes__old">@(change.OldValue ?? "none")</span> → @(change.NewValue ?? "none")</dd>
+                                    </div>
+                                }
+                            </dl>
+                        }
+                        <p class="activity-item__meta">
+                            <time datetime="@AuditDisplay.MachineTimestamp(notification.OccurredAtUtc)">@AuditDisplay.Timestamp(notification.OccurredAtUtc)</time>
+                            · @AuditDisplay.User(notification.ActorUserId)
+                            @if (notification.Action != NotificationAction.Deleted && notification.EntityType == "Aircraft")
+                            {
+                                <text>· <a asp-controller="Aircraft" asp-action="Details" asp-route-id="@notification.EntityId">View @notification.EntityDisplayName</a></text>
+                            }
+                        </p>
+                    </div>
+                </li>
+            }
+        </ol>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Notification pages">
+                @if (Model.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-route-page="@(Model.Page - 1)">Newer</a>
+                }
+                <span>Page @Model.Page of @Model.TotalPages</span>
+                @if (Model.HasNextPage)
+                {
+                    <a asp-action="Index" asp-route-page="@(Model.Page + 1)">Older</a>
+                }
+            </nav>
+        }
+    }
+</section>

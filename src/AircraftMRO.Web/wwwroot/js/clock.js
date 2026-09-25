@@ -11,7 +11,10 @@
   const localElement = clock.querySelector("[data-clock-local]");
   const utcElement = clock.querySelector("[data-clock-utc]");
 
-  const dateFormat = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  // Built by hand to match the server's "Fri, 25 Sep 2026" exactly; locale data varies ("Sep" vs "Sept").
+  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const formatDate = (date) => `${weekdays[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   const localFormat = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZoneName: "short" });
   const utcFormat = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" });
   const pad = (value) => String(value).padStart(2, "0");
@@ -20,7 +23,7 @@
     const now = new Date();
     const localDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 
-    dateElement.textContent = dateFormat.format(now);
+    dateElement.textContent = formatDate(now);
     dateElement.dateTime = localDate;
     localElement.textContent = localFormat.format(now);
     localElement.dateTime = `${localDate}T${pad(now.getHours())}:${pad(now.getMinutes())}`;

@@ -1379,3 +1379,220 @@ a.stat-tile:focus-visible {
     transition: none;
   }
 }
+
+/* Notifications: topbar bell, panel, toasts, live banners, history page */
+.notification-bell__button {
+  position: relative;
+}
+
+.notification-bell__button svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notification-bell__badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.3rem;
+  border: 2px solid var(--color-surface);
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--color-danger);
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 0.85rem;
+  text-align: center;
+}
+
+.notification-bell__badge[hidden] {
+  display: none;
+}
+
+.notification-panel {
+  width: min(24rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.notification-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.notification-panel__status {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+.notification-list {
+  max-height: 22rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.notification-item {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.notification-item__message {
+  color: var(--color-text);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+a.notification-item__message:hover {
+  text-decoration: underline;
+}
+
+.notification-item__time {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+.notification-panel__empty {
+  margin: 0;
+  padding: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.notification-panel__footer {
+  display: block;
+  padding: 0.65rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.notification-toast {
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.notification-toast .toast-body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.notification-toast a {
+  color: var(--color-text);
+}
+
+html[data-theme="dark"] .notification-toast .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.activity-item {
+  display: flex;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.activity-item:last-child {
+  border-bottom: 0;
+}
+
+.activity-item__action {
+  flex: 0 0 5.5rem;
+  align-self: flex-start;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  color: var(--color-neutral);
+  background: var(--color-neutral-bg);
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-align: center;
+}
+
+.activity-item__action--created {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.activity-item__action--updated {
+  color: var(--color-info);
+  background: var(--color-info-bg);
+}
+
+.activity-item__action--deleted {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.activity-item__body {
+  min-width: 0;
+}
+
+.activity-item__message {
+  margin: 0;
+  font-weight: 600;
+}
+
+.activity-item__meta {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.activity-changes {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+}
+
+.activity-changes div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.activity-changes dt {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.activity-changes dd {
+  margin: 0;
+}
+
+.activity-changes__old {
+  color: var(--color-text-secondary);
+  text-decoration: line-through;
+}

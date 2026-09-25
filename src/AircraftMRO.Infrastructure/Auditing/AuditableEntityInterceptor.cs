@@ -1,5 +1,6 @@
 using AircraftMRO.Application.Common.Interfaces;
 using AircraftMRO.Domain.Common.Entities;
+using AircraftMRO.Domain.Entities;
 using AircraftMRO.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -8,7 +9,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace AircraftMRO.Infrastructure.Auditing;
 
 /// <summary>
-/// Stamps audit values on every <see cref="AuditableEntity"/> and turns deletes into soft deletes.
+/// Stamps audit values on every <see cref="AuditableEntity"/>, turns deletes into soft deletes,
+/// and records a <see cref="Notification"/> for each create, update, and delete.
 /// </summary>
 internal sealed class AuditableEntityInterceptor(ICurrentUser currentUser, TimeProvider timeProvider)
     : SaveChangesInterceptor
@@ -40,6 +42,12 @@ internal sealed class AuditableEntityInterceptor(ICurrentUser currentUser, TimeP
         var now = timeProvider.GetUtcNow();
         var userId = currentUser.UserId;
 
+        // Capture notifications first: a delete must be seen before it becomes a soft-delete update.
+        var notifications = context.ChangeTracker.Entries<AuditableEntity>()
+            .Select(entry => ChangeNotificationBuilder.Build(entry, userId, now))
+            .OfType<Notification>()
+            .ToList();
+
         foreach (var entry in context.ChangeTracker.Entries<AuditableEntity>())
         {
             switch (entry.State)
@@ -65,6 +73,9 @@ internal sealed class AuditableEntityInterceptor(ICurrentUser currentUser, TimeP
                     break;
             }
         }
+
+        // Saved in the same transaction as the changes, so a failed save records nothing.
+        context.AddRange(notifications);
     }
 
     private static void SoftDelete(EntityEntry<AuditableEntity> entry, DateTimeOffset now, string? userId)
