@@ -28,6 +28,41 @@ public sealed record WorkOrderListViewModel(
         && Filter.OpenOnly == openOnly && Filter.OverdueOnly == overdueOnly;
 
     /// <summary>
+    /// The current facets in words for the summary footer ("In progress", "Open critical",
+    /// "On hold · High priority"), or null when none is set. Overdue already implies open.
+    /// </summary>
+    public string? FacetLabel
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (Filter.Status is { } status)
+            {
+                parts.Add(WorkOrderLabels.ToLabel(status));
+            }
+
+            if (Filter.Priority is { } priority)
+            {
+                var label = WorkOrderLabels.ToLabel(priority);
+                parts.Add(Filter.OpenOnly && !Filter.OverdueOnly
+                    ? $"Open {label.ToLowerInvariant()}"
+                    : $"{label} priority");
+            }
+
+            if (Filter.OverdueOnly)
+            {
+                parts.Add("Overdue");
+            }
+            else if (Filter.OpenOnly && Filter.Priority is null)
+            {
+                parts.Add("Open only");
+            }
+
+            return parts.Count == 0 ? null : string.Join(" · ", parts);
+        }
+    }
+
+    /// <summary>
     /// Route values for list links. With <paramref name="keepFacets"/> the current facets are kept
     /// (pager links); without it only the facets given here apply (tiles and chart segments).
     /// </summary>

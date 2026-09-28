@@ -12,8 +12,12 @@ public sealed record DonutChartText(
     string UnitSingular,
     string UnitPlural);
 
-/// <summary>One slice as a feature defines it: its label, count, color, and the list URL it filters to.</summary>
-public sealed record DonutSlice(string Label, int Count, string ColorClass, string Url, bool IsSelected = false);
+/// <summary>
+/// One slice as a feature defines it: its label, count, status role, and the list URL it filters to.
+/// <paramref name="Role"/> is the same modifier the feature gives its status badge
+/// (success, warning, danger, info, active, neutral), so a slice always matches its badge color.
+/// </summary>
+public sealed record DonutSlice(string Label, int Count, string Role, string Url, bool IsSelected = false);
 
 /// <summary>
 /// Doughnut geometry shared by the list-page charts. Segments are circles drawn with
@@ -65,7 +69,10 @@ public sealed record DonutSegment(DonutSlice Slice, double Share, double Length,
 
     public int Count => Slice.Count;
 
-    public string ColorClass => Slice.ColorClass;
+    public string Role => Slice.Role;
+
+    /// <summary>Shared role class; site.css maps each role to its semantic chart fill.</summary>
+    public string ColorClass => $"chart-role--{Slice.Role}";
 
     public string Url => Slice.Url;
 

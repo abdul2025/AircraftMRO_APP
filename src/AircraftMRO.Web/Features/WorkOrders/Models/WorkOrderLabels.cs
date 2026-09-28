@@ -33,7 +33,8 @@ public static class WorkOrderLabels
     public static string ToCssModifier(WorkOrderStatus status) => status switch
     {
         WorkOrderStatus.Open => "info",
-        WorkOrderStatus.InProgress => "warning",
+        WorkOrderStatus.InProgress => "active",
+        WorkOrderStatus.OnHold => "warning",
         WorkOrderStatus.Completed => "success",
         _ => "neutral"
     };
@@ -44,14 +45,6 @@ public static class WorkOrderLabels
         WorkOrderPriority.High => "warning",
         WorkOrderPriority.Medium => "info",
         _ => "neutral"
-    };
-
-    public static string ToChartColorClass(WorkOrderPriority priority) => priority switch
-    {
-        WorkOrderPriority.Critical => "chart-priority--critical",
-        WorkOrderPriority.High => "chart-priority--high",
-        WorkOrderPriority.Medium => "chart-priority--medium",
-        _ => "chart-priority--low"
     };
 
     public static IEnumerable<SelectListItem> StatusOptions() =>

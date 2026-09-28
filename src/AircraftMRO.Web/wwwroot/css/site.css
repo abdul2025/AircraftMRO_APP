@@ -1,83 +1,119 @@
 :root {
-  /* Brand and navigation */
-  --color-navy-900: #04090e;
-  --color-navy-800: #12344d;
+  /* Base palette */
+  --palette-black: #0d0d0d;
+  --palette-grey: #b6b6b6;
+  --palette-grey-dark: #767676;
+  --palette-white: #ffffff;
+  --palette-live: #9eeb21;
 
-  --color-primary: #153387;
-  --color-primary-hover: #1e40af;
-  --color-primary-light: #dbeafe;
+  /* Brand and navigation (sidebar stays on the dark base in both themes) */
+  --color-navy-900: var(--palette-black);
+  --color-navy-800: #1a1a1a;
+
+  --color-primary: var(--palette-black);
+  --color-primary-hover: #2b2b2b;
+  --color-primary-light: #ececec;
+  --color-on-primary: var(--palette-white);
 
   /* Surfaces */
-  --color-page: #f4f7fa;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f8fafc;
-  --color-selected: #dbeafe;
+  --color-page: #f2f2f2;
+  --color-surface: var(--palette-white);
+  --color-surface-hover: #f4f4f4;
+  --color-selected: #e6e6e6;
 
   /* Typography */
-  --color-text: #172033;
-  --color-text-secondary: #64748b;
-  --color-text-inverse: #ffffff;
+  --color-text: var(--palette-black);
+  --color-text-secondary: var(--palette-grey-dark);
+  --color-text-inverse: var(--palette-white);
 
   /* Structure */
-  --color-border: #cbd5e1;
-  --color-border-light: #e2e8f0;
-  --color-focus: #0891b2;
+  --color-border: var(--palette-grey);
+  --color-border-light: #e0e0e0;
+  --color-focus: var(--palette-black);
 
-  /* Semantic states */
-  --color-success: #166534;
-  --color-success-bg: #dcfce7;
+  /* System and live-notification status */
+  --color-live: var(--palette-live);
+  --color-live-glow: rgb(158 235 33 / 35%);
+  --color-live-text: #3f6b00;
 
-  --color-warning: #92400e;
-  --color-warning-bg: #fef3c7;
+  /* Semantic states follow cockpit alerting colours: red warning, amber caution,
+     green normal, cyan advisory, magenta active work, grey inactive.
+     Text/bg pairs meet 4.5:1; -fill values (dots, charts, tile edges) meet 3:1 on surfaces. */
+  --color-success: #3f6b00;
+  --color-success-bg: #eef9dc;
+  --color-success-fill: #5e9a0c;
 
-  --color-danger: #b91c1c;
-  --color-danger-bg: #fee2e2;
+  --color-warning: #8a5300;
+  --color-warning-bg: #fff1d6;
+  --color-warning-fill: #c27c00;
 
-  --color-info: #1d4ed8;
-  --color-info-bg: #dbeafe;
+  --color-danger: #b42318;
+  --color-danger-bg: #fde8e6;
+  --color-danger-fill: #d92d20;
+  --color-on-danger: var(--palette-white);
 
-  --color-neutral: #475569;
-  --color-neutral-bg: #f1f5f9;
+  --color-info: #0b6e80;
+  --color-info-bg: #dff5f9;
+  --color-info-fill: #1491a8;
+
+  --color-active: #9c1fa8;
+  --color-active-bg: #f8e6fa;
+  --color-active-fill: #b43fc4;
+
+  --color-neutral: #5c5c5c;
+  --color-neutral-bg: #ebebeb;
+  --color-neutral-fill: #8a8a8a;
 
   --sidebar-width: 17rem;
   --topbar-height: 4.25rem;
   --radius-sm: 0.5rem;
   --radius-md: 0.875rem;
   --radius-lg: 1.25rem;
-  --shadow-card: 0 0.75rem 2rem rgb(11 31 51 / 8%);
+  --shadow-card: 0 0.75rem 2rem rgb(13 13 13 / 10%);
 
   /* Fleet overview panel and its hover overlay */
-  --fleet-overview-bg: #e8eef5;
-  --fleet-overview-hover: rgb(21 51 135 / 6%);
+  --fleet-overview-bg: #e6e6e6;
+  --fleet-overview-hover: rgb(13 13 13 / 6%);
 }
 
 html[data-theme="dark"] {
   color-scheme: dark;
-  --color-page: #071421;
-  --color-surface: #354f67;
-  --color-surface-hover: #12344d;
-  --color-selected: #173e62;
-  --color-text: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-border: #475569;
-  --color-border-light: #29465f;
-  --color-primary: #60a5fa;
-  --color-primary-hover: #93c5fd;
-  --color-primary-light: #27394a;
-  --color-focus: #22d3ee;
-  --color-success: #86efac;
-  --color-success-bg: #14532d;
-  --color-warning: #fcd34d;
-  --color-warning-bg: #713f12;
-  --color-danger: #fca5a5;
-  --color-danger-bg: #7f1d1d;
-  --color-info: #93c5fd;
-  --color-info-bg: #1e3a8a;
-  --color-neutral: #cbd5e1;
-  --color-neutral-bg: #1e293b;
-  --shadow-card: 0 0.75rem 2rem rgb(0 0 0 / 24%);
-  --fleet-overview-bg: #0d2236;
-  --fleet-overview-hover: rgb(255 255 255 / 8%);
+  --color-page: var(--palette-black);
+  --color-surface: #1a1a1a;
+  --color-surface-hover: #242424;
+  --color-selected: #2e2e2e;
+  --color-text: var(--palette-white);
+  --color-text-secondary: var(--palette-grey);
+  --color-border: #3a3a3a;
+  --color-border-light: #262626;
+  --color-primary: var(--palette-white);
+  --color-primary-hover: var(--palette-grey);
+  --color-primary-light: #2e2e2e;
+  --color-on-primary: var(--palette-black);
+  --color-focus: var(--palette-live);
+  --color-live-text: var(--palette-live);
+  --color-success: var(--palette-live);
+  --color-success-bg: #1c2a09;
+  --color-success-fill: var(--palette-live);
+  --color-warning: #ffb547;
+  --color-warning-bg: #2e2008;
+  --color-warning-fill: #ffb547;
+  --color-danger: #ff6b6b;
+  --color-danger-bg: #331314;
+  --color-danger-fill: #ff6b6b;
+  --color-on-danger: var(--palette-black);
+  --color-info: #4dd4ea;
+  --color-info-bg: #0b272c;
+  --color-info-fill: #4dd4ea;
+  --color-active: #e27bff;
+  --color-active-bg: #2b1531;
+  --color-active-fill: #e27bff;
+  --color-neutral: var(--palette-grey);
+  --color-neutral-bg: #262626;
+  --color-neutral-fill: var(--palette-grey-dark);
+  --shadow-card: 0 0.75rem 2rem rgb(0 0 0 / 45%);
+  --fleet-overview-bg: #141414;
+  --fleet-overview-hover: rgb(255 255 255 / 6%);
 }
 
 *,
@@ -125,13 +161,13 @@ input {
   z-index: 1100;
   padding: 0.65rem 1rem;
   border-radius: var(--radius-sm);
-  color: var(--color-text-inverse);
+  color: var(--color-on-primary);
   background: var(--color-primary);
   transform: translateY(-160%);
 }
 
 .skip-link:focus {
-  color: var(--color-text-inverse);
+  color: var(--color-on-primary);
   transform: translateY(0);
 }
 
@@ -201,7 +237,7 @@ input {
 
 .brand small {
   margin-top: 0.1rem;
-  color: #cbd5e1;
+  color: var(--palette-grey);
   font-size: 0.75rem;
 }
 
@@ -213,7 +249,7 @@ input {
 .sidebar-nav__label {
   margin: 0 0 0.4rem;
   padding-inline: 0.75rem;
-  color: #94a3b8;
+  color: var(--palette-grey-dark);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -222,12 +258,13 @@ input {
 
 .sidebar-nav__link {
   display: flex;
+  position: relative;
   align-items: center;
   gap: 0.8rem;
   min-height: 2.75rem;
   padding: 0.65rem 0.8rem;
   border-radius: var(--radius-sm);
-  color: #dbe7f3;
+  color: #e6e6e6;
   text-decoration: none;
 }
 
@@ -242,8 +279,20 @@ a.sidebar-nav__link:hover,
   background: rgb(255 255 255 / 12%);
 }
 
+/* Lime marker on the current page, the same signal as the live status dot. */
+.sidebar-nav__link.is-active::before {
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-live);
+  content: "";
+}
+
 .sidebar-nav__link.is-disabled {
-  color: #a9bacb;
+  color: var(--palette-grey-dark);
   cursor: not-allowed;
 }
 
@@ -257,7 +306,7 @@ a.sidebar-nav__link:hover,
 
 .sidebar__footer a,
 .sidebar__footer small {
-  color: #cbd5e1;
+  color: var(--palette-grey);
 }
 
 .page-column {
@@ -297,7 +346,8 @@ a.sidebar-nav__link:hover,
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: var(--color-success);
+  background: var(--color-live);
+  box-shadow: 0 0 0 0.2rem var(--color-live-glow);
 }
 
 .menu-button,
@@ -531,7 +581,7 @@ html[data-theme="dark"] .theme-icon--moon {
 }
 
 .button--primary {
-  color: var(--color-text-inverse);
+  color: var(--color-on-primary);
   background: var(--color-primary);
 }
 
@@ -716,8 +766,8 @@ html[data-theme="dark"] .theme-icon--moon {
 }
 
 .button--danger {
-  color: var(--color-text-inverse);
-  background: var(--color-danger);
+  color: var(--color-on-danger);
+  background: var(--color-danger-fill);
 }
 
 .button:focus-visible {
@@ -770,6 +820,11 @@ html[data-theme="dark"] .theme-icon--moon {
 .status-badge--info {
   color: var(--color-info);
   background: var(--color-info-bg);
+}
+
+.status-badge--active {
+  color: var(--color-active);
+  background: var(--color-active-bg);
 }
 
 .table-card {
@@ -1106,70 +1161,270 @@ html[data-theme="dark"] .app-modal .btn-close {
   font-variant-numeric: tabular-nums;
 }
 
-/* Fleet summary (stat tiles) */
-.stat-row {
+/* List summary panel (_StatPanel): total, share-filled status rows, highlights, live footer.
+   Rows and highlights take their color from the shared chart-role--* classes. */
+.stat-panel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.stat-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 1.35rem;
-  padding: 0.9rem 1rem;
+  gap: 1.1rem;
+  align-content: start;
+  padding: 1.25rem 1.25rem 0;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
-  color: var(--color-text);
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+}
+
+.stat-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stat-panel__total {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.stat-panel__total-label {
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.stat-panel__total-value {
+  font-size: 2.75rem;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-panel__highlights {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.stat-highlight {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 9rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-border-light);
+  border-left: 3px solid var(--chart-color, var(--color-neutral-fill));
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
   text-decoration: none;
 }
 
-a.stat-tile:hover {
-  border-color: var(--color-border);
+a.stat-highlight:hover {
+  color: var(--color-text);
   background: var(--color-surface-hover);
 }
 
-a.stat-tile:focus-visible {
+.stat-highlight.is-selected {
+  background: var(--color-surface-hover);
+  box-shadow: inset 0 0 0 1px var(--chart-color, var(--color-primary));
+}
+
+.stat-highlight__label {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 550;
+}
+
+.stat-highlight__value {
+  font-size: 1.2rem;
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-shares {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 0.4rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The tinted fill behind each row is its share of the total, so the list reads as a bar chart. */
+.stat-share {
+  --role: var(--chart-color, var(--color-neutral-fill));
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto 1fr auto 3rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+
+.stat-share::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: -1;
+  width: var(--share, 0%);
+  background: color-mix(in srgb, var(--role) 12%, transparent);
+  content: "";
+}
+
+.stat-share:hover {
+  color: var(--color-text);
+}
+
+.stat-share:hover::before {
+  background: color-mix(in srgb, var(--role) 20%, transparent);
+}
+
+.stat-share.is-selected {
+  box-shadow: inset 0 0 0 1.5px var(--role);
+}
+
+.stat-share--all.is-selected {
+  box-shadow: inset 0 0 0 1.5px var(--color-primary);
+}
+
+.stat-share__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--role);
+}
+
+.stat-share--all .stat-share__dot {
+  background: var(--color-primary);
+}
+
+.stat-share__value {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-share__percent {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-share:focus-visible,
+.stat-highlight:focus-visible,
+.filter-pill__clear:focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
-.stat-tile.is-selected {
-  border-color: var(--color-primary);
-  box-shadow: inset 0 0 0 1px var(--color-primary), var(--shadow-card);
+.stat-panel__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  min-height: 2.9rem;
+  margin: 0 -1.25rem;
+  padding: 0.6rem 1.25rem;
+  border-top: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
 }
 
-.stat-tile__label {
+.stat-panel__status,
+.stat-panel__filter {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
-  font-weight: 650;
+  gap: 0.45rem;
 }
 
-.stat-tile__value {
-  font-size: 1.6rem;
-  font-weight: 650;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+.stat-panel__filter strong {
+  color: var(--color-text);
+  font-weight: 600;
 }
 
-.status-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  flex: 0 0 auto;
+.live-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+}
+
+.live-status::before {
+  width: 0.45rem;
+  height: 0.45rem;
   border-radius: 50%;
-  background: var(--color-neutral);
+  background: var(--color-border);
+  content: "";
 }
 
-.status-dot--success { background: var(--color-success); }
-.status-dot--warning { background: var(--color-warning); }
-.status-dot--danger { background: var(--color-danger); }
-.status-dot--info { background: var(--color-info); }
+.live-status[data-state="live"] {
+  color: var(--color-live-text);
+}
+
+.live-status[data-state="live"]::before {
+  background: var(--color-live);
+  box-shadow: 0 0 0 0.18rem var(--color-live-glow);
+}
+
+.live-status[data-state="offline"]::before {
+  background: var(--color-danger);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .live-status[data-state="live"]::before {
+    animation: live-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes live-pulse {
+  50% { box-shadow: 0 0 0 0.3rem transparent; }
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.2rem 0.15rem 0.6rem;
+  border-radius: 999px;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  font-weight: 600;
+}
+
+.filter-pill__clear {
+  display: inline-grid;
+  width: 1.15rem;
+  height: 1.15rem;
+  place-items: center;
+  border-radius: 50%;
+  color: inherit;
+  background: color-mix(in srgb, var(--color-on-primary) 20%, transparent);
+}
+
+.filter-pill__clear:hover {
+  color: inherit;
+  background: color-mix(in srgb, var(--color-on-primary) 35%, transparent);
+}
+
+.filter-pill__clear svg {
+  width: 0.7rem;
+  height: 0.7rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
 
 /* Filter bar */
 .filter-bar {
@@ -1233,7 +1488,7 @@ a.stat-tile:focus-visible {
   }
 }
 
-/* Fleet overview: stat tiles beside the status doughnut on wide screens */
+/* Fleet overview: the summary panel beside the status doughnut on wide screens */
 .fleet-overview {
   display: grid;
   gap: 0.75rem;
@@ -1244,19 +1499,13 @@ a.stat-tile:focus-visible {
   background: var(--fleet-overview-bg);
 }
 
-.fleet-overview .stat-row {
-  margin-bottom: 0;
-  align-content: start;
-}
-
-/* Each tile and the chart card get a translucent overlay on hover so the
-   pointer's target stands out against the panel background. */
-.fleet-overview .stat-tile,
+.fleet-overview .stat-share::before,
+.fleet-overview .stat-highlight,
 .fleet-overview .chart-card {
   transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.fleet-overview .stat-tile:hover,
+/* The chart card gets a translucent overlay on hover so it stands out against the panel background. */
 .fleet-overview .chart-card:hover {
   border-color: var(--color-border);
   background-color: var(--color-surface);
@@ -1264,13 +1513,9 @@ a.stat-tile:focus-visible {
   box-shadow: 0 0 0 1px var(--color-border), var(--shadow-card);
 }
 
-.fleet-overview .stat-tile.is-selected:hover {
-  border-color: var(--color-primary);
-  box-shadow: inset 0 0 0 1px var(--color-primary), var(--shadow-card);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .fleet-overview .stat-tile,
+  .fleet-overview .stat-share::before,
+  .fleet-overview .stat-highlight,
   .fleet-overview .chart-card {
     transition: none;
   }
@@ -1280,39 +1525,17 @@ a.stat-tile:focus-visible {
   .fleet-overview {
     grid-template-columns: minmax(0, 1fr) minmax(24rem, 28rem);
   }
-
-  .fleet-overview .stat-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
-/* Status chart colors: validated for all-pairs CVD separation (ΔE 8.2) in both themes.
-   On the dark surface they sit below 3:1, so the legend table always shows the values. */
-:root {
-  --chart-status-active: #0e7a3a;
-  --chart-status-maintenance: #d97706;
-  --chart-status-grounded: #e11d48;
-  --chart-status-retired: #8a8f98;
-}
-
-.chart-status--active { --chart-color: var(--chart-status-active); }
-.chart-status--maintenance { --chart-color: var(--chart-status-maintenance); }
-.chart-status--grounded { --chart-color: var(--chart-status-grounded); }
-.chart-status--retired { --chart-color: var(--chart-status-retired); }
-
-/* Work order priority chart: rose, amber, blue, and grey stay apart under common color-vision
-   deficiencies; the legend table carries every value, so color is never the only cue. */
-:root {
-  --chart-priority-critical: #e11d48;
-  --chart-priority-high: #d97706;
-  --chart-priority-medium: #2563eb;
-  --chart-priority-low: #8a8f98;
-}
-
-.chart-priority--critical { --chart-color: var(--chart-priority-critical); }
-.chart-priority--high { --chart-color: var(--chart-priority-high); }
-.chart-priority--medium { --chart-color: var(--chart-priority-medium); }
-.chart-priority--low { --chart-color: var(--chart-priority-low); }
+/* Chart slices use the same role as their status badge (DonutSlice.Role), so every entity's
+   chart matches its badges with no per-entity CSS. Fills are at least 3:1 on their surface,
+   and the legend table shows every value, so color is never the only cue. */
+.chart-role--success { --chart-color: var(--color-success-fill); }
+.chart-role--warning { --chart-color: var(--color-warning-fill); }
+.chart-role--danger { --chart-color: var(--color-danger-fill); }
+.chart-role--info { --chart-color: var(--color-info-fill); }
+.chart-role--active { --chart-color: var(--color-active-fill); }
+.chart-role--neutral { --chart-color: var(--color-neutral-fill); }
 
 .chart-card {
   position: relative;
@@ -1367,9 +1590,17 @@ a.stat-tile:focus-visible {
   stroke-width: 26px;
 }
 
-.donut:hover .donut__segment:not(:hover) circle,
-.donut--has-selection .donut__segment:not(.is-selected) circle {
+.donut:hover .donut__segment:not(:hover) circle {
   opacity: 0.4;
+}
+
+/* The selected slice grows and the rest recede; the bright fills stay vivid at 40%, so fade further. */
+.donut--has-selection .donut__segment:not(.is-selected):not(:hover) circle {
+  opacity: 0.18;
+}
+
+.donut__segment.is-selected circle {
+  stroke-width: 28px;
 }
 
 .donut__segment:focus-visible {
@@ -1424,6 +1655,7 @@ a.stat-tile:focus-visible {
 }
 
 .chart-legend tr.is-selected th {
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
@@ -1496,8 +1728,8 @@ a.stat-tile:focus-visible {
   padding: 0 0.3rem;
   border: 2px solid var(--color-surface);
   border-radius: 999px;
-  color: #ffffff;
-  background: var(--color-danger);
+  color: var(--color-on-danger);
+  background: var(--color-danger-fill);
   font-size: 0.65rem;
   font-weight: 750;
   line-height: 0.85rem;
@@ -1527,8 +1759,33 @@ a.stat-tile:focus-visible {
 }
 
 .notification-panel__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: var(--color-text-secondary);
   font-size: 0.75rem;
+}
+
+.notification-panel__status::before {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-border);
+  content: "";
+}
+
+.notification-panel__status[data-state="live"] {
+  color: var(--color-live-text);
+  font-weight: 650;
+}
+
+.notification-panel__status[data-state="live"]::before {
+  background: var(--color-live);
+  box-shadow: 0 0 0 0.18rem var(--color-live-glow);
+}
+
+.notification-panel__status[data-state="offline"]::before {
+  background: var(--color-danger);
 }
 
 .notification-list {
@@ -1578,6 +1835,7 @@ a.notification-item__message:hover {
 
 .notification-toast {
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-live);
   color: var(--color-text);
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
