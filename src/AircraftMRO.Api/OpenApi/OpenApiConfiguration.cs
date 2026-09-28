@@ -24,7 +24,7 @@ public static class OpenApiConfiguration
                     Title = DocumentTitle,
                     Version = "v1",
                     Description =
-                        "Fleet records for the Aircraft MRO platform. Reads return an `ETag` header; " +
+                        "Fleet records and work orders for the Aircraft MRO platform. Reads return an `ETag` header; " +
                         "send it back in `If-Match` to update or delete, so concurrent edits are rejected " +
                         "with 412 instead of being overwritten. Errors use RFC 9457 problem details with a `code` extension."
                 };
@@ -56,7 +56,7 @@ public static class OpenApiConfiguration
                         concrete.Headers ??= new Dictionary<string, IOpenApiHeader>();
                         concrete.Headers["ETag"] = new OpenApiHeader
                         {
-                            Description = "Current version of the aircraft; send it in If-Match to update or delete.",
+                            Description = "Current version of the record; send it in If-Match to update or delete.",
                             Schema = new OpenApiSchema { Type = JsonSchemaType.String }
                         };
                     }

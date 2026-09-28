@@ -89,6 +89,40 @@ public sealed class AircraftTests
         Assert.Equal(AircraftStatus.Active, aircraft.Status);
     }
 
+    [Theory]
+    [InlineData(AircraftStatus.Active, 1, true, AircraftStatus.Grounded)]
+    [InlineData(AircraftStatus.InMaintenance, 2, true, AircraftStatus.Grounded)]
+    [InlineData(AircraftStatus.Active, 1, false, AircraftStatus.InMaintenance)]
+    [InlineData(AircraftStatus.Grounded, 1, false, AircraftStatus.InMaintenance)]   // critical lowered to high
+    [InlineData(AircraftStatus.Grounded, 0, false, AircraftStatus.Active)]          // last one closed
+    [InlineData(AircraftStatus.InMaintenance, 0, false, AircraftStatus.Active)]
+    [InlineData(AircraftStatus.Active, 0, false, AircraftStatus.Active)]
+    [InlineData(AircraftStatus.Retired, 0, false, AircraftStatus.Retired)]
+    public void Open_work_orders_decide_the_status(
+        AircraftStatus before,
+        int openCount,
+        bool anyCritical,
+        AircraftStatus after)
+    {
+        var aircraft = Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", 2012, 0, before, CurrentYear).Value!;
+
+        var result = aircraft.ApplyOpenWorkOrders(openCount, anyCritical);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(after, aircraft.Status);
+    }
+
+    [Fact]
+    public void Open_work_orders_are_rejected_for_a_retired_aircraft()
+    {
+        var aircraft = Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", 2012, 0, AircraftStatus.Retired, CurrentYear).Value!;
+
+        var result = aircraft.ApplyOpenWorkOrders(1, anyCritical: true);
+
+        Assert.Equal(Aircraft.RetiredErrorCode, result.ErrorCode);
+        Assert.Equal(AircraftStatus.Retired, aircraft.Status);
+    }
+
     private static void AssertInvalid(string? errorCode) =>
         Assert.Equal(Aircraft.ValidationErrorCode, errorCode);
 }

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using AircraftMRO.Domain.Common.Entities;
 using AircraftMRO.Domain.Entities;
+using AircraftMRO.Infrastructure.Persistence.Features.WorkOrders;
 using Microsoft.EntityFrameworkCore;
 
 namespace AircraftMRO.Infrastructure.Persistence;
@@ -12,10 +13,12 @@ public sealed class AircraftMroDbContext(DbContextOptions<AircraftMroDbContext> 
 
     public DbSet<Aircraft> Aircraft => Set<Aircraft>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.HasSequence<long>(WorkOrderConfiguration.NumberSequenceName);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AircraftMroDbContext).Assembly);
         ConfigureAuditableEntities(modelBuilder);
     }

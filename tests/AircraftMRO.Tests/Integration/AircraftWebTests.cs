@@ -211,7 +211,8 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
         var detailsUrl = await ReadRedirectUrlAsync(await ModalPostAsync("/Aircraft/Create", html, ValidForm(AircraftTestData.UniqueRegistration()), returnUrl: null));
 
         Assert.Equal(3, Regex.Matches(await _client.GetStringAsync("/Aircraft"), "data-modal[ >]").Count);
-        Assert.Equal(2, Regex.Matches(await _client.GetStringAsync(detailsUrl), "data-modal[ >]").Count);
+        // Edit, delete, and new work order.
+        Assert.Equal(3, Regex.Matches(await _client.GetStringAsync(detailsUrl), "data-modal[ >]").Count);
         Assert.Contains("id=\"app-modal\"", await _client.GetStringAsync("/Aircraft"));
     }
 

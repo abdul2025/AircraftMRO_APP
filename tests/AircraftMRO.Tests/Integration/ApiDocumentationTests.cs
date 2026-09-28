@@ -45,6 +45,17 @@ public sealed class ApiDocumentationTests
             .GetProperty("responses").GetProperty("201").GetProperty("headers").TryGetProperty("ETag", out _));
     }
 
+    [Fact]
+    public async Task Unknown_work_order_time_zone_fails_at_startup()
+    {
+        await using var factory = new ApiHostFactory(UnusedConnectionString, "Production")
+            .WithWebHostBuilder(builder => builder.UseSetting("WorkOrders:TimeZone", "Not/AZone"));
+
+        var exception = Assert.Throws<InvalidOperationException>(() => factory.CreateClient());
+
+        Assert.Contains("WorkOrders:TimeZone", exception.Message);
+    }
+
     [Theory]
     [InlineData("/scalar/v1")]
     [InlineData("/openapi/v1.json")]

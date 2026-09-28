@@ -20,6 +20,7 @@ public sealed class AircraftServiceTests
         _repository.Setup(r => r.AddAsync(It.IsAny<Aircraft>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
         _repository.Setup(r => r.UpdateAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
         _repository.Setup(r => r.DeleteAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
+        _repository.Setup(r => r.GetOpenWorkOrderCountsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(OpenWorkOrderCounts.None);
         _service = new AircraftService(_repository.Object, new FakeTimeProvider());
     }
 
@@ -119,6 +120,59 @@ public sealed class AircraftServiceTests
         Assert.Equal(AircraftErrors.ConcurrencyConflict, result.ErrorCode);
     }
 
+    [Theory]
+    [InlineData(AircraftStatus.Active)]
+    [InlineData(AircraftStatus.InMaintenance)]
+    [InlineData(AircraftStatus.Retired)]
+    public async Task Update_keeps_aircraft_grounded_while_a_critical_work_order_is_open(AircraftStatus newStatus)
+    {
+        var aircraft = TrackedAircraft(openWorkOrders: new OpenWorkOrderCounts(Total: 2, Critical: 1));
+
+        var result = await _service.UpdateAsync(aircraft.Id, UpdateDto() with { Status = newStatus }, CancellationToken.None);
+
+        Assert.Equal(AircraftErrors.OpenCriticalWorkOrders, result.ErrorCode);
+        _repository.Verify(r => r.UpdateAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(AircraftStatus.Active)]
+    [InlineData(AircraftStatus.Grounded)]
+    [InlineData(AircraftStatus.Retired)]
+    public async Task Update_keeps_aircraft_in_maintenance_while_other_work_orders_are_open(AircraftStatus newStatus)
+    {
+        var aircraft = TrackedAircraft(openWorkOrders: new OpenWorkOrderCounts(Total: 1, Critical: 0));
+
+        var result = await _service.UpdateAsync(aircraft.Id, UpdateDto() with { Status = newStatus }, CancellationToken.None);
+
+        Assert.Equal(AircraftErrors.OpenWorkOrders, result.ErrorCode);
+    }
+
+    [Theory]
+    [InlineData(AircraftStatus.InMaintenance, 1, 0)]
+    [InlineData(AircraftStatus.Grounded, 3, 2)]
+    [InlineData(AircraftStatus.Active, 0, 0)]
+    [InlineData(AircraftStatus.Grounded, 0, 0)]
+    [InlineData(AircraftStatus.Retired, 0, 0)]
+    public async Task Update_allows_only_the_status_open_work_orders_require(AircraftStatus newStatus, int open, int critical)
+    {
+        var aircraft = TrackedAircraft(openWorkOrders: new OpenWorkOrderCounts(open, critical));
+
+        var result = await _service.UpdateAsync(aircraft.Id, UpdateDto() with { Status = newStatus }, CancellationToken.None);
+
+        Assert.True(result.IsSuccess, result.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task Delete_is_blocked_while_any_work_order_is_open()
+    {
+        var aircraft = TrackedAircraft(openWorkOrders: new OpenWorkOrderCounts(Total: 1, Critical: 0));
+
+        var result = await _service.DeleteAsync(aircraft.Id, [1], CancellationToken.None);
+
+        Assert.Equal(AircraftErrors.HasOpenWorkOrders, result.ErrorCode);
+        _repository.Verify(r => r.DeleteAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     [Fact]
     public async Task List_passes_request_and_cancellation_token_to_repository()
     {
@@ -167,6 +221,14 @@ public sealed class AircraftServiceTests
         Assert.Equal(expectedPage, request.Page);
         Assert.Equal(expectedPageSize, request.PageSize);
         Assert.True(request.Skip >= 0);
+    }
+
+    private Aircraft TrackedAircraft(OpenWorkOrderCounts openWorkOrders)
+    {
+        var aircraft = AircraftTestData.NewAircraft();
+        _repository.Setup(r => r.GetForUpdateAsync(aircraft.Id, It.IsAny<CancellationToken>())).ReturnsAsync(aircraft);
+        _repository.Setup(r => r.GetOpenWorkOrderCountsAsync(aircraft.Id, It.IsAny<CancellationToken>())).ReturnsAsync(openWorkOrders);
+        return aircraft;
     }
 
     private static UpdateAircraftDto UpdateDto(byte[]? rowVersion = null) =>

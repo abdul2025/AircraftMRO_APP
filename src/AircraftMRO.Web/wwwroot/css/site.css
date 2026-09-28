@@ -45,6 +45,10 @@
   --radius-md: 0.875rem;
   --radius-lg: 1.25rem;
   --shadow-card: 0 0.75rem 2rem rgb(11 31 51 / 8%);
+
+  /* Fleet overview panel and its hover overlay */
+  --fleet-overview-bg: #e8eef5;
+  --fleet-overview-hover: rgb(21 51 135 / 6%);
 }
 
 html[data-theme="dark"] {
@@ -72,6 +76,8 @@ html[data-theme="dark"] {
   --color-neutral: #cbd5e1;
   --color-neutral-bg: #1e293b;
   --shadow-card: 0 0.75rem 2rem rgb(0 0 0 / 24%);
+  --fleet-overview-bg: #0d2236;
+  --fleet-overview-hover: rgb(255 255 255 / 8%);
 }
 
 *,
@@ -761,6 +767,11 @@ html[data-theme="dark"] .theme-icon--moon {
   background: var(--color-danger-bg);
 }
 
+.status-badge--info {
+  color: var(--color-info);
+  background: var(--color-info-bg);
+}
+
 .table-card {
   overflow-x: auto;
   border: 1px solid var(--color-border-light);
@@ -909,6 +920,41 @@ html[data-theme="dark"] .theme-icon--moon {
 .field-error {
   color: var(--color-danger);
   font-size: 0.8rem;
+}
+
+.form-field textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  background: var(--color-page);
+  resize: vertical;
+}
+
+.form-field--full,
+.detail-list__wide {
+  grid-column: 1 / -1;
+}
+
+.form-field__label {
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.form-field__value {
+  min-height: 2.75rem;
+  padding-block: 0.65rem;
+  font-weight: 600;
+}
+
+.field-hint {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.preserve-lines {
+  white-space: pre-line;
 }
 
 .form-actions {
@@ -1123,6 +1169,7 @@ a.stat-tile:focus-visible {
 .status-dot--success { background: var(--color-success); }
 .status-dot--warning { background: var(--color-warning); }
 .status-dot--danger { background: var(--color-danger); }
+.status-dot--info { background: var(--color-info); }
 
 /* Filter bar */
 .filter-bar {
@@ -1191,11 +1238,42 @@ a.stat-tile:focus-visible {
   display: grid;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background: var(--fleet-overview-bg);
 }
 
 .fleet-overview .stat-row {
   margin-bottom: 0;
   align-content: start;
+}
+
+/* Each tile and the chart card get a translucent overlay on hover so the
+   pointer's target stands out against the panel background. */
+.fleet-overview .stat-tile,
+.fleet-overview .chart-card {
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.fleet-overview .stat-tile:hover,
+.fleet-overview .chart-card:hover {
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
+  background-image: linear-gradient(var(--fleet-overview-hover), var(--fleet-overview-hover));
+  box-shadow: 0 0 0 1px var(--color-border), var(--shadow-card);
+}
+
+.fleet-overview .stat-tile.is-selected:hover {
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary), var(--shadow-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fleet-overview .stat-tile,
+  .fleet-overview .chart-card {
+    transition: none;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -1221,6 +1299,20 @@ a.stat-tile:focus-visible {
 .chart-status--maintenance { --chart-color: var(--chart-status-maintenance); }
 .chart-status--grounded { --chart-color: var(--chart-status-grounded); }
 .chart-status--retired { --chart-color: var(--chart-status-retired); }
+
+/* Work order priority chart: rose, amber, blue, and grey stay apart under common color-vision
+   deficiencies; the legend table carries every value, so color is never the only cue. */
+:root {
+  --chart-priority-critical: #e11d48;
+  --chart-priority-high: #d97706;
+  --chart-priority-medium: #2563eb;
+  --chart-priority-low: #8a8f98;
+}
+
+.chart-priority--critical { --chart-color: var(--chart-priority-critical); }
+.chart-priority--high { --chart-color: var(--chart-priority-high); }
+.chart-priority--medium { --chart-color: var(--chart-priority-medium); }
+.chart-priority--low { --chart-color: var(--chart-priority-low); }
 
 .chart-card {
   position: relative;

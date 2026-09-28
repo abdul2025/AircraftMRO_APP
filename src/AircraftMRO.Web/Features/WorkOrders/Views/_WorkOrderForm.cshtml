@@ -1,0 +1,58 @@
+@model WorkOrderFormViewModel
+@{
+    var isEdit = Model.Number is not null;
+}
+
+<div asp-validation-summary="ModelOnly" class="notice notice--danger" role="alert"></div>
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="form-grid">
+    @if (isEdit)
+    {
+        <div class="form-field">
+            <span class="form-field__label">Aircraft</span>
+            <span class="form-field__value">@Model.AircraftRegistration</span>
+            <span asp-validation-for="AircraftId" class="field-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Status"></label>
+            <select asp-for="Status" asp-items="WorkOrderLabels.StatusOptions()"></select>
+            <span asp-validation-for="Status" class="field-error"></span>
+        </div>
+    }
+    else
+    {
+        <div class="form-field">
+            <label asp-for="AircraftId"></label>
+            <select asp-for="AircraftId">
+                <option value="">Select an aircraft</option>
+                @foreach (var aircraft in Model.AircraftOptions.Where(a => a.CanRaiseWorkOrders))
+                {
+                    <option value="@aircraft.Id" selected="@(Model.AircraftId == aircraft.Id)">@aircraft.RegistrationNumber</option>
+                }
+            </select>
+            <span asp-validation-for="AircraftId" class="field-error"></span>
+        </div>
+    }
+    <div class="form-field">
+        <label asp-for="Priority"></label>
+        <select asp-for="Priority" asp-items="WorkOrderLabels.PriorityOptions()" aria-describedby="priority-hint"></select>
+        <span id="priority-hint" class="field-hint">Any open critical work order grounds the aircraft; other open work puts it in maintenance. It returns to Active when none are open.</span>
+        <span asp-validation-for="Priority" class="field-error"></span>
+    </div>
+    <div class="form-field form-field--full">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" autocomplete="off" placeholder="Replace left main landing gear actuator" />
+        <span asp-validation-for="Title" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="DueDate"></label>
+        <input asp-for="DueDate" />
+        <span asp-validation-for="DueDate" class="field-error"></span>
+    </div>
+    <div class="form-field form-field--full">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" rows="4"></textarea>
+        <span asp-validation-for="Description" class="field-error"></span>
+    </div>
+</div>

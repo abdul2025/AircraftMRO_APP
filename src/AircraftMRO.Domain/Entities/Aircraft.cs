@@ -8,6 +8,7 @@ namespace AircraftMRO.Domain.Entities;
 public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
 {
     public const string ValidationErrorCode = "Aircraft.Validation";
+    public const string RetiredErrorCode = "Aircraft.Retired";
     public const int RegistrationNumberMinLength = 2;
     public const int RegistrationNumberMaxLength = 10;
     public const int ManufacturerMaxLength = 100;
@@ -62,6 +63,38 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
         Apply(
             registrationNumber, manufacturer, model, serialNumber,
             yearOfManufacture, totalFlightHours, status, currentYear);
+
+    public bool IsRetired => Status == AircraftStatus.Retired;
+
+    /// <summary>The status open work orders require: grounded when any is critical, in maintenance otherwise.</summary>
+    public static AircraftStatus StatusForOpenWorkOrders(bool anyCritical) =>
+        anyCritical ? AircraftStatus.Grounded : AircraftStatus.InMaintenance;
+
+    /// <summary>
+    /// Sets the status from the aircraft's open work orders after a work order changed: grounded
+    /// while any is critical, in maintenance while any other is open, and back to active once the
+    /// last one is completed or cancelled. A retired aircraft cannot have open work orders.
+    /// </summary>
+    public Result ApplyOpenWorkOrders(int openCount, bool anyCritical)
+    {
+        if (openCount == 0)
+        {
+            if (Status is AircraftStatus.InMaintenance or AircraftStatus.Grounded)
+            {
+                Status = AircraftStatus.Active;
+            }
+
+            return Result.Success();
+        }
+
+        if (IsRetired)
+        {
+            return Result.Failure(RetiredErrorCode, "Work orders cannot be raised or changed for a retired aircraft.");
+        }
+
+        Status = StatusForOpenWorkOrders(anyCritical);
+        return Result.Success();
+    }
 
     public static string NormalizeRegistrationNumber(string? registrationNumber) =>
         (registrationNumber ?? string.Empty).Trim().ToUpperInvariant();

@@ -1,0 +1,65 @@
+@model DonutChartViewModel
+@{
+    var text = Model.Text;
+    var size = DonutChartViewModel.Number(DonutChartViewModel.Size);
+    var center = DonutChartViewModel.Number(DonutChartViewModel.Center);
+    var radius = DonutChartViewModel.Number(DonutChartViewModel.Radius);
+    var thickness = DonutChartViewModel.Number(DonutChartViewModel.Thickness);
+}
+
+<section class="chart-card" aria-labelledby="@text.Id-title">
+    <div class="chart-card__heading">
+        <h2 id="@text.Id-title">@text.Title</h2>
+        <p>@text.Subtitle</p>
+    </div>
+
+    <div class="donut-chart">
+        <svg class="donut @(Model.HasSelection ? "donut--has-selection" : null)"
+             viewBox="0 0 @size @size" role="img"
+             aria-labelledby="@text.Id-title @text.Id-summary">
+            <desc id="@text.Id-summary">
+                @(Model.Total == 0 ? $"No {text.UnitPlural} yet." : string.Join(", ", Model.Segments.Select(s => $"{s.Label} {s.Count} ({s.Percent})")))
+            </desc>
+            <circle class="donut__track" cx="@center" cy="@center" r="@radius" stroke-width="@thickness" />
+            <g transform="rotate(-90 @center @center)">
+                @foreach (var segment in Model.Segments.Where(s => s.Count > 0))
+                {
+                    <a href="@segment.Url"
+                       class="donut__segment @segment.ColorClass @(segment.IsSelected ? "is-selected" : null)"
+                       aria-label="@segment.Label: @Model.CountText(segment.Count), @segment.Percent. Show @segment.Label.ToLowerInvariant() @text.UnitPlural."
+                       data-chart-tooltip data-tooltip-value="@Model.CountText(segment.Count) · @segment.Percent" data-tooltip-label="@segment.Label">
+                        <circle cx="@center" cy="@center" r="@radius" stroke-width="@thickness"
+                                stroke-dasharray="@segment.DashArray" stroke-dashoffset="@segment.DashOffset" />
+                    </a>
+                }
+            </g>
+            <text class="donut__total" x="@center" y="@center" aria-hidden="true">@Model.Total</text>
+            <text class="donut__caption" x="@center" y="@DonutChartViewModel.Number(DonutChartViewModel.Center + 20)" aria-hidden="true">@text.Caption</text>
+        </svg>
+
+        @* The legend doubles as the chart's table view: every value is readable without hovering. *@
+        <table class="chart-legend">
+            <caption class="visually-hidden">@text.Subtitle</caption>
+            <thead class="visually-hidden">
+                <tr><th scope="col">@text.Category</th><th scope="col">Count</th><th scope="col">Share</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var segment in Model.Segments)
+                {
+                    <tr class="@(segment.IsSelected ? "is-selected" : null)">
+                        <th scope="row">
+                            <span class="chart-legend__swatch @segment.ColorClass" aria-hidden="true"></span>
+                            @segment.Label
+                        </th>
+                        <td>@segment.Count</td>
+                        <td>@segment.Percent</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="chart-tooltip" role="tooltip" hidden>
+        <strong class="chart-tooltip__value"></strong>
+        <span class="chart-tooltip__label"></span>
+    </div>
+</section>

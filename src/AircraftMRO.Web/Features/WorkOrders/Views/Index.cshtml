@@ -1,0 +1,161 @@
+@model WorkOrderListViewModel
+@{
+    ViewData["Title"] = "Work orders";
+    var results = Model.Page;
+    var filter = Model.Filter;
+    var aircraftRegistration = Model.SelectedAircraftRegistration;
+}
+
+@* live-refresh.js re-renders this page in place when a work order changes. *@
+<section aria-labelledby="work-orders-title" data-live-refresh="WorkOrder">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Maintenance</p>
+            <h1 id="work-orders-title">
+                Work orders@(aircraftRegistration is null ? null : $" for {aircraftRegistration}")
+            </h1>
+        </div>
+        <a class="button button--primary" asp-action="Create" asp-route-aircraftId="@filter.AircraftId" data-modal>New work order</a>
+    </div>
+
+    <partial name="_StatusMessages" />
+    <div class="fleet-overview">
+        <partial name="_WorkOrderStatistics" model="Model" />
+        <partial name="_WorkOrderPriorityChart" model="Model" />
+    </div>
+
+    <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter work orders">
+        <div class="filter-bar__field filter-bar__field--search">
+            <label for="work-order-search">Search</label>
+            <input id="work-order-search" type="search" name="search" value="@filter.Search"
+                   maxlength="@WorkOrderListFilter.MaxSearchLength"
+                   placeholder="Number, title, or registration" autocomplete="off" />
+        </div>
+        <div class="filter-bar__field">
+            <label for="work-order-aircraft">Aircraft</label>
+            <select id="work-order-aircraft" name="aircraftId" data-auto-submit>
+                <option value="">All aircraft</option>
+                @foreach (var aircraft in Model.Aircraft)
+                {
+                    <option value="@aircraft.Id" selected="@(filter.AircraftId == aircraft.Id)">@aircraft.RegistrationNumber</option>
+                }
+            </select>
+        </div>
+        <div class="filter-bar__field">
+            <label for="work-order-status">Status</label>
+            <select id="work-order-status" name="status" data-auto-submit>
+                <option value="">All statuses</option>
+                @foreach (var option in WorkOrderLabels.StatusOptions())
+                {
+                    <option value="@option.Value" selected="@(filter.Status?.ToString() == option.Value)">@option.Text</option>
+                }
+            </select>
+        </div>
+        <div class="filter-bar__field">
+            <label for="work-order-priority">Priority</label>
+            <select id="work-order-priority" name="priority" data-auto-submit>
+                <option value="">All priorities</option>
+                @foreach (var option in WorkOrderLabels.PriorityOptions())
+                {
+                    <option value="@option.Value" selected="@(filter.Priority?.ToString() == option.Value)">@option.Text</option>
+                }
+            </select>
+        </div>
+        @* Tile-only facets survive a filter change until cleared. *@
+        @if (filter.OpenOnly)
+        {
+            <input type="hidden" name="open" value="true" />
+        }
+        @if (filter.OverdueOnly)
+        {
+            <input type="hidden" name="overdue" value="true" />
+        }
+        <div class="filter-bar__actions">
+            <button type="submit" class="button button--primary">Apply</button>
+            @if (!filter.IsEmpty)
+            {
+                <a class="button button--secondary" asp-action="Index">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (!filter.IsEmpty)
+    {
+        <p class="filter-summary" role="status">
+            Showing @results.TotalCount of @Model.Statistics.TotalCount work orders@(filter.OverdueOnly ? " · overdue only" : filter.OpenOnly ? " · open only" : null)
+        </p>
+    }
+
+    @if (Model.Statistics.TotalCount == 0)
+    {
+        <p class="empty-state">
+            @(aircraftRegistration is null ? "No work orders have been raised yet." : $"No work orders have been raised for {aircraftRegistration} yet.")
+        </p>
+    }
+    else if (results.TotalCount == 0)
+    {
+        <p class="empty-state">No work orders match these filters. <a asp-action="Index">Clear filters</a></p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Number</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Aircraft</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Due</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var workOrder in results.Items)
+                    {
+                        <tr>
+                            <th scope="row"><a asp-action="Details" asp-route-id="@workOrder.Id">@workOrder.Number</a></th>
+                            <td>@workOrder.Title</td>
+                            <td><a asp-controller="Aircraft" asp-action="Details" asp-route-id="@workOrder.AircraftId">@workOrder.AircraftRegistration</a></td>
+                            <td><partial name="_PriorityBadge" model="workOrder.Priority" /></td>
+                            <td><partial name="_WorkOrderStatusBadge" model="workOrder.Status" /></td>
+                            <td><partial name="_DueDate" model="(workOrder.DueDate, workOrder.IsOverdue)" /></td>
+                            <td class="actions-cell">
+                                <partial name="_WorkOrderActions" model="new WorkOrderActionsViewModel(workOrder.Id, workOrder.Number, AircraftMRO.Domain.Entities.WorkOrder.IsOpenStatus(workOrder.Status))" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (results.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Work order pages">
+                @if (results.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page - 1)">Previous</a>
+                }
+                <span>Page @results.Page of @results.TotalPages (@results.TotalCount work orders)</span>
+                @if (results.HasNextPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page + 1)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>
+
+@section Scripts {
+    <script src="~/js/chart-tooltip.js" asp-append-version="true"></script>
+    <script>
+        // Apply a select filter as soon as it changes; the Apply button covers no-JS use.
+        // Delegated, so it keeps working after live-refresh.js swaps the page content.
+        document.addEventListener("change", (event) => {
+            if (event.target.matches("[data-auto-submit]")) {
+                event.target.form.requestSubmit();
+            }
+        });
+    </script>
+}

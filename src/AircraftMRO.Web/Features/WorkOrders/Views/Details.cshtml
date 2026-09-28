@@ -1,0 +1,59 @@
+@model WorkOrderDetailsViewModel
+@{
+    ViewData["Title"] = Model.Number;
+}
+
+@* live-refresh.js re-renders this page when this work order changes, and returns to the list if it is deleted. *@
+<section class="form-card" aria-labelledby="details-title"
+         data-live-refresh="WorkOrder" data-live-refresh-id="@Model.Id" data-live-refresh-gone="@Url.Action("Index")">
+    <div class="card-heading">
+        <div>
+            <p class="eyebrow">Work order</p>
+            <h1 id="details-title">@Model.Number</h1>
+        </div>
+        <partial name="_WorkOrderActions" model="Model.Actions" />
+    </div>
+
+    <partial name="_StatusMessages" />
+    <partial name="_WorkOrderSummary" model="Model" />
+
+    <section class="audit-panel" aria-labelledby="audit-title">
+        <h2 id="audit-title" class="subheading">Audit trail</h2>
+        <dl class="detail-list detail-list--muted">
+            <div>
+                <dt>Created</dt>
+                <dd><time datetime="@AuditDisplay.MachineTimestamp(Model.CreatedAtUtc)">@AuditDisplay.Timestamp(Model.CreatedAtUtc)</time></dd>
+            </div>
+            <div>
+                <dt>Created by</dt>
+                <dd>@AuditDisplay.User(Model.CreatedBy)</dd>
+            </div>
+            <div>
+                <dt>Last updated</dt>
+                <dd>
+                    @if (Model.UpdatedAtUtc is { } updatedAt)
+                    {
+                        <time datetime="@AuditDisplay.MachineTimestamp(updatedAt)">@AuditDisplay.Timestamp(updatedAt)</time>
+                    }
+                    else
+                    {
+                        <span>Never updated</span>
+                    }
+                </dd>
+            </div>
+            <div>
+                <dt>Last updated by</dt>
+                <dd>@(Model.UpdatedAtUtc is null ? "—" : AuditDisplay.User(Model.UpdatedBy))</dd>
+            </div>
+            <div>
+                <dt>Record ID</dt>
+                <dd><code class="record-id">@Model.Id</code></dd>
+            </div>
+        </dl>
+    </section>
+
+    <div class="form-actions">
+        <a class="button button--secondary" asp-action="Index">Back to work orders</a>
+        <a class="button button--secondary" asp-action="Index" asp-route-aircraftId="@Model.AircraftId">All work for @Model.AircraftRegistration</a>
+    </div>
+</section>

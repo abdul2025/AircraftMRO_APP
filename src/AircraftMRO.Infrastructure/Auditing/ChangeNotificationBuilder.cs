@@ -144,6 +144,7 @@ internal static class ChangeNotificationBuilder
             Enum e => e.ToString(),
             DateTimeOffset d => d.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture),
             DateTime d => d.ToString("O", CultureInfo.InvariantCulture),
+            DateOnly d => d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             IFormattable f => f.ToString(null, CultureInfo.InvariantCulture),
             _ => value.ToString()
         };

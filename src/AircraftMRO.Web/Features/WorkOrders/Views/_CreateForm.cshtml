@@ -1,0 +1,18 @@
+@model WorkOrderFormViewModel
+
+<form asp-action="Create" method="post" novalidate data-modal-form>
+    <div class="modal-header">
+        <div>
+            <p class="eyebrow">Maintenance</p>
+            <h2 class="modal-title" id="work-order-form-title">New work order</h2>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        <partial name="_WorkOrderForm" model="Model" />
+    </div>
+    <div class="modal-footer">
+        <a class="button button--secondary" asp-action="Index" data-bs-dismiss="modal">Cancel</a>
+        <button type="submit" class="button button--primary">Save work order</button>
+    </div>
+</form>

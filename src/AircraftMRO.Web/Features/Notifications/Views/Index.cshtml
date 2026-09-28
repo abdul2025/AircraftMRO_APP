@@ -1,4 +1,5 @@
 @model PagedResponse<NotificationDto>
+@inject Microsoft.AspNetCore.Routing.LinkGenerator Links
 @{
     ViewData["Title"] = "Notifications";
     // The first page refreshes live on any change; older pages would shift under the reader, so they stay put.
@@ -44,9 +45,10 @@
                         <p class="activity-item__meta">
                             <time datetime="@AuditDisplay.MachineTimestamp(notification.OccurredAtUtc)">@AuditDisplay.Timestamp(notification.OccurredAtUtc)</time>
                             · @AuditDisplay.User(notification.ActorUserId)
-                            @if (notification.Action != NotificationAction.Deleted && notification.EntityType == "Aircraft")
+                            @if (NotificationLinks.DetailsPath(Links, notification.EntityType, notification.EntityId,
+                                     notification.Action == NotificationAction.Deleted) is { } detailsPath)
                             {
-                                <text>· <a asp-controller="Aircraft" asp-action="Details" asp-route-id="@notification.EntityId">View @notification.EntityDisplayName</a></text>
+                                <text>· <a href="@detailsPath">View @notification.EntityDisplayName</a></text>
                             }
                         </p>
                     </div>

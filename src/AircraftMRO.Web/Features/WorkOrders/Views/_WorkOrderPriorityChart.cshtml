@@ -1,0 +1,8 @@
+@model WorkOrderListViewModel
+@{
+    var chart = WorkOrderPriorityChart.From(
+        Model,
+        priority => Url.Action("Index", (object)Model.RouteValues(priority: priority, openOnly: true, keepFacets: false))!);
+}
+
+<partial name="_DonutChart" model="chart" />

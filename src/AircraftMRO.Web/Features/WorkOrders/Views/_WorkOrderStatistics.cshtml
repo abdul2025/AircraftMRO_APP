@@ -1,0 +1,53 @@
+@model WorkOrderListViewModel
+@{
+    var statistics = Model.Statistics;
+}
+
+<section class="stat-row" aria-label="Work order summary">
+    @{ var allSelected = Model.IsFacet(); }
+    <a class="stat-tile @(allSelected ? "is-selected" : null)"
+       asp-action="Index" asp-all-route-data="Model.RouteValues(keepFacets: false)"
+       aria-current="@(allSelected ? "true" : null)">
+        <span class="stat-tile__label">Total work orders</span>
+        <span class="stat-tile__value">@NumberDisplay.Compact(statistics.TotalCount)</span>
+    </a>
+
+    @foreach (var status in Enum.GetValues<WorkOrderStatus>())
+    {
+        var isSelected = Model.IsFacet(status: status);
+        <a class="stat-tile @(isSelected ? "is-selected" : null)"
+           asp-action="Index" asp-all-route-data="Model.RouteValues(status: status, keepFacets: false)"
+           aria-current="@(isSelected ? "true" : null)"
+           title="Show @WorkOrderLabels.ToLabel(status).ToLowerInvariant() work orders">
+            <span class="stat-tile__label">
+                <span class="status-dot status-dot--@WorkOrderLabels.ToCssModifier(status)" aria-hidden="true"></span>
+                @WorkOrderLabels.ToLabel(status)
+            </span>
+            <span class="stat-tile__value">@NumberDisplay.Compact(statistics.CountFor(status))</span>
+        </a>
+    }
+
+    @{ var criticalSelected = Model.IsFacet(priority: WorkOrderPriority.Critical, openOnly: true); }
+    <a class="stat-tile @(criticalSelected ? "is-selected" : null)"
+       asp-action="Index" asp-all-route-data="Model.RouteValues(priority: WorkOrderPriority.Critical, openOnly: true, keepFacets: false)"
+       aria-current="@(criticalSelected ? "true" : null)"
+       title="Show open critical work orders">
+        <span class="stat-tile__label">
+            <span class="status-dot status-dot--danger" aria-hidden="true"></span>
+            Open critical
+        </span>
+        <span class="stat-tile__value">@NumberDisplay.Compact(statistics.OpenCountFor(WorkOrderPriority.Critical))</span>
+    </a>
+
+    @{ var overdueSelected = Model.IsFacet(overdueOnly: true); }
+    <a class="stat-tile @(overdueSelected ? "is-selected" : null)"
+       asp-action="Index" asp-all-route-data="Model.RouteValues(overdueOnly: true, keepFacets: false)"
+       aria-current="@(overdueSelected ? "true" : null)"
+       title="Show open work orders past their due date">
+        <span class="stat-tile__label">
+            <span class="status-dot status-dot--warning" aria-hidden="true"></span>
+            Overdue
+        </span>
+        <span class="stat-tile__value">@NumberDisplay.Compact(statistics.OverdueCount)</span>
+    </a>
+</section>

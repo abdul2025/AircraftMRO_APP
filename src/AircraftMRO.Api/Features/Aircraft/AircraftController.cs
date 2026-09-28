@@ -7,7 +7,6 @@ using AircraftMRO.Application.Features.Aircraft.Interfaces;
 using AircraftMRO.Domain.Common.Results;
 using AircraftMRO.Domain.Enums.Aircraft;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 
 namespace AircraftMRO.Api.Features.Aircraft;
 
@@ -122,6 +121,7 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
     [RequiresIfMatch]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status412PreconditionFailed)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status428PreconditionRequired)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
@@ -141,7 +141,9 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
         {
             AircraftErrors.NotFound => StatusCodes.Status404NotFound,
             AircraftErrors.Validation => StatusCodes.Status400BadRequest,
-            AircraftErrors.DuplicateRegistration or AircraftErrors.DuplicateSerialNumber => StatusCodes.Status409Conflict,
+            AircraftErrors.DuplicateRegistration or AircraftErrors.DuplicateSerialNumber
+                or AircraftErrors.OpenCriticalWorkOrders or AircraftErrors.OpenWorkOrders
+                or AircraftErrors.HasOpenWorkOrders => StatusCodes.Status409Conflict,
             AircraftErrors.ConcurrencyConflict => StatusCodes.Status412PreconditionFailed,
             _ => StatusCodes.Status400BadRequest
         };
@@ -160,26 +162,7 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
         return problem;
     }
 
-    private void SetETag(byte[] rowVersion) =>
-        Response.Headers.ETag = new EntityTagHeaderValue($"\"{Convert.ToBase64String(rowVersion)}\"").ToString();
+    private void SetETag(byte[] rowVersion) => ConcurrencyHeaders.SetETag(Response, rowVersion);
 
-    private bool TryReadIfMatch(out byte[] rowVersion)
-    {
-        rowVersion = [];
-        var header = Request.GetTypedHeaders().IfMatch;
-        if (header is not [{ IsWeak: false } tag] || tag.Tag.Length < 3)
-        {
-            return false;
-        }
-
-        var value = tag.Tag.Value![1..^1];
-        var buffer = new byte[value.Length];
-        if (!Convert.TryFromBase64String(value, buffer, out var written) || written == 0)
-        {
-            return false;
-        }
-
-        rowVersion = buffer[..written];
-        return true;
-    }
+    private bool TryReadIfMatch(out byte[] rowVersion) => ConcurrencyHeaders.TryReadIfMatch(Request, out rowVersion);
 }

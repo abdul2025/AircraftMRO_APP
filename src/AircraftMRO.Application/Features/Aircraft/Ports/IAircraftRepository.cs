@@ -23,6 +23,8 @@ public interface IAircraftRepository
 
     Task<bool> SerialNumberExistsAsync(string manufacturer, string serialNumber, Guid? excludeId, CancellationToken cancellationToken);
 
+    Task<OpenWorkOrderCounts> GetOpenWorkOrderCountsAsync(Guid aircraftId, CancellationToken cancellationToken);
+
     /// <summary>Fails with a duplicate error when a unique constraint rejects the insert.</summary>
     Task<Result> AddAsync(AircraftEntity aircraft, CancellationToken cancellationToken);
 

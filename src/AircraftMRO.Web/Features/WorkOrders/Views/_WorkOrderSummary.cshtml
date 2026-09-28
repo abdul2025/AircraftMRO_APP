@@ -1,0 +1,24 @@
+@model WorkOrderDetailsViewModel
+
+<dl class="detail-list">
+    <div><dt>Number</dt><dd>@Model.Number</dd></div>
+    <div>
+        <dt>Aircraft</dt>
+        <dd><a asp-controller="Aircraft" asp-action="Details" asp-route-id="@Model.AircraftId">@Model.AircraftRegistration</a></dd>
+    </div>
+    <div><dt>Status</dt><dd><partial name="_WorkOrderStatusBadge" model="Model.Status" /></dd></div>
+    <div><dt>Priority</dt><dd><partial name="_PriorityBadge" model="Model.Priority" /></dd></div>
+    <div><dt>Due date</dt><dd><partial name="_DueDate" model="(Model.DueDate, Model.IsOverdue)" /></dd></div>
+    @if (Model.CompletedAtUtc is { } completedAt)
+    {
+        <div>
+            <dt>Completed</dt>
+            <dd><time datetime="@AuditDisplay.MachineTimestamp(completedAt)">@AuditDisplay.Timestamp(completedAt)</time></dd>
+        </div>
+    }
+    <div class="detail-list__wide"><dt>Title</dt><dd>@Model.Title</dd></div>
+    <div class="detail-list__wide">
+        <dt>Description</dt>
+        <dd class="preserve-lines">@(Model.Description ?? "No description")</dd>
+    </div>
+</dl>

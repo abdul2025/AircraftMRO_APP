@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace AircraftMRO.Web.Features.Aircraft.Models;
+namespace AircraftMRO.Web.Models;
 
 public static class AuditDisplay
 {

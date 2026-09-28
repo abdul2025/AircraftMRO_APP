@@ -1,0 +1,36 @@
+@model WorkOrderDetailsViewModel
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post" data-modal-form>
+    <input type="hidden" name="rowVersion" value="@Model.RowVersion" />
+    <div class="modal-header">
+        <div>
+            <p class="eyebrow">Work order</p>
+            <h2 class="modal-title" id="work-order-form-title">Delete @Model.Number?</h2>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        @if (Model.IsOpen)
+        {
+            <p class="notice notice--danger" role="alert">
+                Open work orders can't be deleted. Complete or cancel it first so the aircraft's status change is recorded.
+            </p>
+        }
+        else
+        {
+            <p class="lead-text">
+                The work order will be removed from the list. Its record is kept for audit.
+                The aircraft's status does not change.
+            </p>
+        }
+        <partial name="_StatusMessages" />
+        <partial name="_WorkOrderSummary" model="Model" />
+    </div>
+    <div class="modal-footer">
+        <a class="button button--secondary" asp-action="Details" asp-route-id="@Model.Id" data-bs-dismiss="modal">Cancel</a>
+        @if (!Model.IsOpen)
+        {
+            <button type="submit" class="button button--danger">Delete work order</button>
+        }
+    </div>
+</form>

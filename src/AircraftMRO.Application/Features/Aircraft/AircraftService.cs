@@ -3,6 +3,7 @@ using AircraftMRO.Application.Features.Aircraft.DTOs;
 using AircraftMRO.Application.Features.Aircraft.Interfaces;
 using AircraftMRO.Application.Features.Aircraft.Ports;
 using AircraftMRO.Domain.Common.Results;
+using AircraftMRO.Domain.Enums.Aircraft;
 using AircraftEntity = AircraftMRO.Domain.Entities.Aircraft;
 
 namespace AircraftMRO.Application.Features.Aircraft;
@@ -74,6 +75,12 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
             return uniqueness;
         }
 
+        var status = await CheckStatusAgainstOpenWorkOrdersAsync(id, aircraft.Status, cancellationToken);
+        if (status.IsFailure)
+        {
+            return status;
+        }
+
         return await repository.UpdateAsync(aircraft, dto.RowVersion, cancellationToken);
     }
 
@@ -85,7 +92,40 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
             return Result.Failure(AircraftErrors.NotFound, AircraftErrors.NotFoundMessage);
         }
 
+        var openWorkOrders = await repository.GetOpenWorkOrderCountsAsync(id, cancellationToken);
+        if (openWorkOrders.Total > 0)
+        {
+            return Result.Failure(AircraftErrors.HasOpenWorkOrders, AircraftErrors.HasOpenWorkOrdersMessage);
+        }
+
         return await repository.DeleteAsync(aircraft, rowVersion, cancellationToken);
+    }
+
+    /// <summary>
+    /// While work orders are open they decide the status: grounded if any is critical, in
+    /// maintenance otherwise, and nothing else can be set by hand. A work order saved at the same
+    /// moment is caught by the row version, because saving a work order always writes its aircraft.
+    /// </summary>
+    private async Task<Result> CheckStatusAgainstOpenWorkOrdersAsync(
+        Guid aircraftId,
+        AircraftStatus newStatus,
+        CancellationToken cancellationToken)
+    {
+        var openWorkOrders = await repository.GetOpenWorkOrderCountsAsync(aircraftId, cancellationToken);
+        if (openWorkOrders.Total == 0)
+        {
+            return Result.Success();
+        }
+
+        var anyCritical = openWorkOrders.Critical > 0;
+        if (newStatus == AircraftEntity.StatusForOpenWorkOrders(anyCritical))
+        {
+            return Result.Success();
+        }
+
+        return anyCritical
+            ? Result.Failure(AircraftErrors.OpenCriticalWorkOrders, AircraftErrors.OpenCriticalWorkOrdersMessage)
+            : Result.Failure(AircraftErrors.OpenWorkOrders, AircraftErrors.OpenWorkOrdersMessage);
     }
 
     private int CurrentYear => timeProvider.GetUtcNow().Year;

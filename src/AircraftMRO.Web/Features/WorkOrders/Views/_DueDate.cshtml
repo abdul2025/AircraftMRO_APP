@@ -1,0 +1,13 @@
+@model (DateOnly? DueDate, bool IsOverdue)
+@if (Model.DueDate is { } dueDate)
+{
+    <time datetime="@WorkOrderLabels.MachineDate(dueDate)">@WorkOrderLabels.Date(dueDate)</time>
+    @if (Model.IsOverdue)
+    {
+        <span class="status-badge status-badge--danger">Overdue</span>
+    }
+}
+else
+{
+    <span class="lead-text">No due date</span>
+}

@@ -1,0 +1,9 @@
+@model WorkOrderDetailsViewModel
+@{
+    ViewData["Title"] = $"Delete {Model.Number}";
+}
+
+@* Full-page fallback when JavaScript is unavailable; the same form opens in a modal otherwise. *@
+<section class="form-card form-card--page" aria-labelledby="work-order-form-title">
+    <partial name="_DeleteForm" model="Model" />
+</section>

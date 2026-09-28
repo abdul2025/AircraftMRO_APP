@@ -40,6 +40,35 @@ In Development the API host serves an interactive [Scalar](https://scalar.com) r
 `/openapi/v1.json`. Neither is mapped in other environments. Updates and deletes need the
 aircraft's current `ETag` in an `If-Match` header; the reference documents this on each operation.
 
+## Work orders
+
+Each aircraft can have many work orders (`/WorkOrders` in the Web host, `/api/work-orders` in the
+API). A new work order is always `Open` and gets the next number from the `WorkOrderNumbers`
+database sequence (`WO-000001`, …). Completed and cancelled work orders are final.
+
+An aircraft's open work orders decide its status. Every create, priority change, completion, or
+cancellation recalculates it in the same transaction:
+
+| Open work orders on the aircraft | Aircraft status |
+| --- | --- |
+| At least one Critical | Grounded |
+| Some, none Critical | In maintenance |
+| None (the last one was completed or cancelled) | Active |
+
+So lowering a work order from Critical to High moves the aircraft from Grounded to In maintenance
+(unless another critical one is open), and raising it back grounds it again. While work orders are
+open, the aircraft's status cannot be changed by hand (409). Open work orders cannot be deleted;
+complete or cancel them first, so every status change has a recorded reason. Aircraft with open
+work orders cannot be deleted, and retired aircraft cannot get new work orders. Every work order
+save also writes its aircraft row, so a concurrent change to the aircraft or to another of its work
+orders is caught by the row version instead of leaving the status out of step. That case returns
+409 with code `WorkOrder.AircraftChanged`: the caller's work order version is still valid, so the
+save can simply be retried. A stale work order version still returns 412 `WorkOrder.ConcurrencyConflict`.
+
+A work order is overdue once its due date has passed in the business time zone, set with
+`WorkOrders:TimeZone` (an IANA id such as `Asia/Riyadh`; default `UTC`) in both hosts. An unknown
+id stops the host at startup.
+
 ## Real-time notifications
 
 Every create, update, and delete of an auditable entity is recorded in the `Notifications`

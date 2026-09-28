@@ -17,6 +17,21 @@
     <partial name="_StatusMessages" />
     <partial name="_AircraftSummary" model="Model" />
 
+    <section class="audit-panel" aria-labelledby="work-orders-title">
+        <h2 id="work-orders-title" class="subheading">Work orders</h2>
+        <p class="lead-text">
+            Open work orders set this aircraft's status: grounded while any is critical, in maintenance otherwise,
+            and back to Active when the last one is completed or cancelled.
+        </p>
+        <div class="form-actions">
+            <a class="button button--secondary" asp-controller="WorkOrders" asp-action="Index" asp-route-aircraftId="@Model.Id">View work orders</a>
+            @if (Model.Status != AircraftStatus.Retired)
+            {
+                <a class="button button--primary" asp-controller="WorkOrders" asp-action="Create" asp-route-aircraftId="@Model.Id" data-modal>New work order</a>
+            }
+        </div>
+    </section>
+
     <section class="audit-panel" aria-labelledby="audit-title">
         <h2 id="audit-title" class="subheading">Audit trail</h2>
         <dl class="detail-list detail-list--muted">

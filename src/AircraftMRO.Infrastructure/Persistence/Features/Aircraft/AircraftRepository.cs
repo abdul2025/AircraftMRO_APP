@@ -3,6 +3,7 @@ using AircraftMRO.Application.Features.Aircraft;
 using AircraftMRO.Application.Features.Aircraft.DTOs;
 using AircraftMRO.Application.Features.Aircraft.Ports;
 using AircraftMRO.Domain.Common.Results;
+using AircraftMRO.Infrastructure.Persistence.Features.WorkOrders;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using AircraftEntity = AircraftMRO.Domain.Entities.Aircraft;
@@ -120,6 +121,12 @@ internal sealed class AircraftRepository(AircraftMroDbContext dbContext) : IAirc
                     && aircraft.SerialNumber == serialNumber
                     && (excludeId == null || aircraft.Id != excludeId),
                 cancellationToken);
+
+    public Task<OpenWorkOrderCounts> GetOpenWorkOrderCountsAsync(Guid aircraftId, CancellationToken cancellationToken) =>
+        dbContext.WorkOrders
+            .AsNoTracking()
+            .Where(workOrder => workOrder.AircraftId == aircraftId)
+            .CountOpenAsync(cancellationToken);
 
     public Task<Result> AddAsync(AircraftEntity aircraft, CancellationToken cancellationToken)
     {

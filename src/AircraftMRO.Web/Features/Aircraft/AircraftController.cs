@@ -4,24 +4,14 @@ using AircraftMRO.Application.Features.Aircraft.DTOs;
 using AircraftMRO.Application.Features.Aircraft.Interfaces;
 using AircraftMRO.Domain.Common.Results;
 using AircraftMRO.Domain.Enums.Aircraft;
+using AircraftMRO.Web.Controllers;
 using AircraftMRO.Web.Features.Aircraft.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AircraftMRO.Web.Features.Aircraft;
 
-/// <summary>
-/// Create, edit, and delete render as modal content when requested with the modal header
-/// (see <c>wwwroot/js/modal-forms.js</c>) and as full pages otherwise.
-/// </summary>
-public sealed class AircraftController(IAircraftService aircraftService) : Controller
+public sealed class AircraftController(IAircraftService aircraftService) : ModalFormController
 {
-    public const string ModalRequestHeader = "X-Modal-Request";
-    public const string ModalReturnUrlHeader = "X-Modal-Return-Url";
-    private const string StatusMessageKey = "StatusMessage";
-    private const string ErrorMessageKey = "ErrorMessage";
-
-    private bool IsModalRequest => Request.Headers[ModalRequestHeader] == "true";
-
     [HttpGet]
     public async Task<IActionResult> Index(
         string? search = null,
@@ -176,39 +166,11 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
         return Saved("Aircraft deleted.", Url.Action(nameof(Index))!);
     }
 
-    /// <summary>Renders the form as modal content (partial) or as a full page.</summary>
-    private IActionResult FormView(string action, object model, int statusCode = StatusCodes.Status200OK)
-    {
-        Response.StatusCode = statusCode;
-        return IsModalRequest ? PartialView($"_{action}Form", model) : View(action, model);
-    }
-
-    /// <summary>After a successful save: a redirect for full pages, or its URL as JSON for the modal script.</summary>
-    private IActionResult Saved(string message, string redirectUrl)
-    {
-        TempData[StatusMessageKey] = message;
-        return IsModalRequest ? Json(new { redirectUrl }) : Redirect(redirectUrl);
-    }
-
-    /// <summary>The page the modal was opened from, accepted only when it is local to this site.</summary>
-    private string? ModalReturnUrl
-    {
-        get
-        {
-            if (!IsModalRequest)
-            {
-                return null;
-            }
-
-            var returnUrl = Request.Headers[ModalReturnUrlHeader].ToString();
-            return Url.IsLocalUrl(returnUrl) ? returnUrl : null;
-        }
-    }
-
     private static int StatusFor(string errorCode) => errorCode switch
     {
         AircraftErrors.DuplicateRegistration or AircraftErrors.DuplicateSerialNumber
-            or AircraftErrors.ConcurrencyConflict => StatusCodes.Status409Conflict,
+            or AircraftErrors.ConcurrencyConflict or AircraftErrors.OpenCriticalWorkOrders
+            or AircraftErrors.OpenWorkOrders => StatusCodes.Status409Conflict,
         _ => StatusCodes.Status422UnprocessableEntity
     };
 
@@ -218,27 +180,10 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
         {
             AircraftErrors.DuplicateRegistration => nameof(AircraftFormViewModel.RegistrationNumber),
             AircraftErrors.DuplicateSerialNumber => nameof(AircraftFormViewModel.SerialNumber),
+            AircraftErrors.OpenCriticalWorkOrders or AircraftErrors.OpenWorkOrders => nameof(AircraftFormViewModel.Status),
             _ => string.Empty
         };
 
         ModelState.AddModelError(key, errorMessage);
-    }
-
-    private static bool TryDecodeRowVersion(string? value, out byte[] rowVersion)
-    {
-        rowVersion = [];
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        var buffer = new byte[value.Length];
-        if (!Convert.TryFromBase64String(value, buffer, out var written) || written == 0)
-        {
-            return false;
-        }
-
-        rowVersion = buffer[..written];
-        return true;
     }
 }
