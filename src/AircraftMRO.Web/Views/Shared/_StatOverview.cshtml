@@ -1,0 +1,11 @@
+@model StatPanelViewModel
+@*
+    The list-page overview: the summary panel beside its status doughnut. Both are drawn from the
+    same StatPanelViewModel (the doughnut is Model.Breakdown), so the panel rows and the chart
+    slices always show the same counts, colors, and links. A feature only builds the panel model.
+*@
+
+<div class="stat-overview">
+    <partial name="_StatPanel" model="Model" />
+    <partial name="_DonutChart" model="Model.Breakdown" />
+</div>

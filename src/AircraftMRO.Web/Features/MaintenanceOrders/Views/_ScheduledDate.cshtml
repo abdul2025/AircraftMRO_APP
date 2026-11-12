@@ -1,0 +1,6 @@
+@model (DateOnly ScheduledDate, bool IsOverdue)
+<time datetime="@MaintenanceOrderLabels.MachineDate(Model.ScheduledDate)">@MaintenanceOrderLabels.Date(Model.ScheduledDate)</time>
+@if (Model.IsOverdue)
+{
+    <span class="status-badge status-badge--danger">Overdue</span>
+}

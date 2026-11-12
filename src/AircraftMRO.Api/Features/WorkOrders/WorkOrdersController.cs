@@ -11,7 +11,8 @@ namespace AircraftMRO.Api.Features.WorkOrders;
 
 /// <summary>
 /// Work order CRUD. Every save also sets the aircraft's status from its open work orders:
-/// grounded if any is critical, in maintenance otherwise, active once none are open. Only closed
+/// grounded if any is critical, in maintenance otherwise, active once none are open. A work order
+/// cannot be completed or cancelled while it has scheduled or in-progress maintenance. Only closed
 /// work orders can be deleted. Reads return an <c>ETag</c>; updates and deletes require it in <c>If-Match</c>.
 /// </summary>
 [ApiController]
@@ -153,7 +154,7 @@ public sealed class WorkOrdersController(IWorkOrderService workOrderService) : C
             WorkOrderErrors.Validation => StatusCodes.Status400BadRequest,
             WorkOrderErrors.AircraftNotFound => StatusCodes.Status422UnprocessableEntity,
             WorkOrderErrors.AircraftRetired or WorkOrderErrors.Closed or WorkOrderErrors.OpenCannotBeDeleted
-                or WorkOrderErrors.AircraftChanged => StatusCodes.Status409Conflict,
+                or WorkOrderErrors.AircraftChanged or WorkOrderErrors.OpenMaintenance => StatusCodes.Status409Conflict,
             WorkOrderErrors.ConcurrencyConflict => StatusCodes.Status412PreconditionFailed,
             _ => StatusCodes.Status400BadRequest
         };

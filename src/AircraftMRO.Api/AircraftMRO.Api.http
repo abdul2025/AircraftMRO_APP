@@ -43,4 +43,33 @@ If-Match: "{{etag}}"
 DELETE {{AircraftMRO.Api_HostAddress}}/api/aircraft/{{id}}
 If-Match: "{{etag}}"
 
+### List maintenance orders (filters: workOrderId, status, type, open, overdue)
+GET {{AircraftMRO.Api_HostAddress}}/api/maintenance-orders?open=true
+
+### Schedule maintenance under an open work order
+POST {{AircraftMRO.Api_HostAddress}}/api/maintenance-orders
+Content-Type: application/json
+
+{
+  "workOrderId": "{{workOrderId}}",
+  "type": "CCheck",
+  "scheduledDate": "2026-12-01",
+  "notes": "Hangar 2"
+}
+
+### Update maintenance (completing it is final)
+PUT {{AircraftMRO.Api_HostAddress}}/api/maintenance-orders/{{maintenanceOrderId}}
+Content-Type: application/json
+If-Match: "{{etag}}"
+
+{
+  "type": "CCheck",
+  "scheduledDate": "2026-12-01",
+  "status": "Completed"
+}
+
+### Delete maintenance (only while Scheduled; soft delete)
+DELETE {{AircraftMRO.Api_HostAddress}}/api/maintenance-orders/{{maintenanceOrderId}}
+If-Match: "{{etag}}"
+
 ###

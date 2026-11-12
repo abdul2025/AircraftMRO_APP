@@ -168,7 +168,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
         await using var slow = NewContext();
         var repository = new WorkOrderRepository(slow);
         var workOrder = (await repository.GetForUpdateAsync(first, CancellationToken.None))!;
-        workOrder.Update(workOrder.Title, null, WorkOrderPriority.Low, WorkOrderStatus.Completed, null, _clock.Now);
+        workOrder.Update(workOrder.Title, null, WorkOrderPriority.Low, WorkOrderStatus.Completed, null, 0, _clock.Now);
         var tracked = (await repository.GetAircraftForUpdateAsync(aircraft.Id, CancellationToken.None))!;
         var others = await repository.GetOpenWorkOrderCountsAsync(aircraft.Id, first, CancellationToken.None);
         Assert.Equal(1, others.Total);

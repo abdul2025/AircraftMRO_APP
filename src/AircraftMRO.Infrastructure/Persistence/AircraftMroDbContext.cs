@@ -14,6 +14,7 @@ public sealed class AircraftMroDbContext(DbContextOptions<AircraftMroDbContext> 
     public DbSet<Aircraft> Aircraft => Set<Aircraft>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+    public DbSet<MaintenanceOrder> MaintenanceOrders => Set<MaintenanceOrder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

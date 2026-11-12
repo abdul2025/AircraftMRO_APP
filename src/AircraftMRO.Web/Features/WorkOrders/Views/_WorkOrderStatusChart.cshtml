@@ -1,8 +1,0 @@
-@model WorkOrderListViewModel
-@{
-    var chart = WorkOrderStatusChart.From(
-        Model,
-        status => Url.Action("Index", (object)Model.RouteValues(status: status, keepFacets: false))!);
-}
-
-<partial name="_DonutChart" model="chart" />

@@ -72,8 +72,8 @@
   --shadow-card: 0 0.75rem 2rem rgb(13 13 13 / 10%);
 
   /* Fleet overview panel and its hover overlay */
-  --fleet-overview-bg: #e6e6e6;
-  --fleet-overview-hover: rgb(13 13 13 / 6%);
+  --stat-overview-bg: #e6e6e6;
+  --stat-overview-hover: rgb(13 13 13 / 6%);
 }
 
 html[data-theme="dark"] {
@@ -112,8 +112,8 @@ html[data-theme="dark"] {
   --color-neutral-bg: #262626;
   --color-neutral-fill: var(--palette-grey-dark);
   --shadow-card: 0 0.75rem 2rem rgb(0 0 0 / 45%);
-  --fleet-overview-bg: #141414;
-  --fleet-overview-hover: rgb(255 255 255 / 6%);
+  --stat-overview-bg: #141414;
+  --stat-overview-hover: rgb(255 255 255 / 6%);
 }
 
 *,
@@ -1488,41 +1488,41 @@ a.stat-highlight:hover {
   }
 }
 
-/* Fleet overview: the summary panel beside the status doughnut on wide screens */
-.fleet-overview {
+/* List overview (_StatOverview): the summary panel beside the status doughnut on wide screens */
+.stat-overview {
   display: grid;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
   padding: 0.75rem;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
-  background: var(--fleet-overview-bg);
+  background: var(--stat-overview-bg);
 }
 
-.fleet-overview .stat-share::before,
-.fleet-overview .stat-highlight,
-.fleet-overview .chart-card {
+.stat-overview .stat-share::before,
+.stat-overview .stat-highlight,
+.stat-overview .chart-card {
   transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 /* The chart card gets a translucent overlay on hover so it stands out against the panel background. */
-.fleet-overview .chart-card:hover {
+.stat-overview .chart-card:hover {
   border-color: var(--color-border);
   background-color: var(--color-surface);
-  background-image: linear-gradient(var(--fleet-overview-hover), var(--fleet-overview-hover));
+  background-image: linear-gradient(var(--stat-overview-hover), var(--stat-overview-hover));
   box-shadow: 0 0 0 1px var(--color-border), var(--shadow-card);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fleet-overview .stat-share::before,
-  .fleet-overview .stat-highlight,
-  .fleet-overview .chart-card {
+  .stat-overview .stat-share::before,
+  .stat-overview .stat-highlight,
+  .stat-overview .chart-card {
     transition: none;
   }
 }
 
 @media (min-width: 1200px) {
-  .fleet-overview {
+  .stat-overview {
     grid-template-columns: minmax(0, 1fr) minmax(24rem, 28rem);
   }
 }

@@ -1,9 +1,0 @@
-@model AircraftListViewModel
-@{
-    var chart = FleetStatusChart.From(
-        Model.Statistics,
-        Model.Filter.Status,
-        status => Url.Action("Index", (object)Model.RouteValues(status: status, keepStatus: false))!);
-}
-
-<partial name="_DonutChart" model="chart" />

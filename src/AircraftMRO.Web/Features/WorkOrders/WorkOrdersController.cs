@@ -195,7 +195,7 @@ public sealed class WorkOrdersController(IWorkOrderService workOrderService) : M
     {
         WorkOrderErrors.ConcurrencyConflict or WorkOrderErrors.Closed
             or WorkOrderErrors.AircraftRetired or WorkOrderErrors.OpenCannotBeDeleted
-            or WorkOrderErrors.AircraftChanged => StatusCodes.Status409Conflict,
+            or WorkOrderErrors.AircraftChanged or WorkOrderErrors.OpenMaintenance => StatusCodes.Status409Conflict,
         _ => StatusCodes.Status422UnprocessableEntity
     };
 
@@ -204,6 +204,7 @@ public sealed class WorkOrdersController(IWorkOrderService workOrderService) : M
         var key = errorCode switch
         {
             WorkOrderErrors.AircraftNotFound or WorkOrderErrors.AircraftRetired => nameof(WorkOrderFormViewModel.AircraftId),
+            WorkOrderErrors.OpenMaintenance => nameof(WorkOrderFormViewModel.Status),
             _ => string.Empty
         };
 

@@ -6,6 +6,7 @@
         && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Index", StringComparison.OrdinalIgnoreCase);
     var isAircraft = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Aircraft", StringComparison.OrdinalIgnoreCase);
     var isWorkOrders = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "WorkOrders", StringComparison.OrdinalIgnoreCase);
+    var isMaintenance = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "MaintenanceOrders", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -56,6 +57,9 @@
                     </a>
                     <a class="sidebar-nav__link @(isWorkOrders ? "is-active" : null)" asp-controller="WorkOrders" asp-action="Index" aria-current="@(isWorkOrders ? "page" : null)">
                         <span aria-hidden="true">⚒</span><span>Work orders</span>
+                    </a>
+                    <a class="sidebar-nav__link @(isMaintenance ? "is-active" : null)" asp-controller="MaintenanceOrders" asp-action="Index" aria-current="@(isMaintenance ? "page" : null)">
+                        <span aria-hidden="true">⚙</span><span>Maintenance</span>
                     </a>
                 </nav>
 

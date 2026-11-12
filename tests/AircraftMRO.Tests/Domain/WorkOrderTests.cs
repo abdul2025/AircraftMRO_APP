@@ -36,12 +36,59 @@ public sealed class WorkOrderTests
         AssertInvalid(WorkOrder.Create(AircraftId, "WO-1", "Title", null, (WorkOrderPriority)99, null).ErrorCode);
     }
 
+    [Theory]
+    [InlineData(WorkOrderStatus.Open)]
+    [InlineData(WorkOrderStatus.OnHold)]
+    public void Maintenance_in_progress_puts_the_work_order_in_progress(WorkOrderStatus status)
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+        workOrder.Update(workOrder.Title, null, workOrder.Priority, status, null, 0, Now);
+
+        Assert.True(workOrder.FollowMaintenance(maintenanceCount: 3, inProgressCount: 1, completedCount: 1, Now));
+        Assert.Equal(WorkOrderStatus.InProgress, workOrder.Status);
+        Assert.Null(workOrder.CompletedAtUtc);
+
+        // Already in progress: nothing changes.
+        Assert.False(workOrder.FollowMaintenance(3, 1, 1, Now));
+    }
+
+    [Fact]
+    public void All_maintenance_completed_completes_the_work_order()
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+
+        Assert.True(workOrder.FollowMaintenance(maintenanceCount: 2, inProgressCount: 0, completedCount: 2, Now));
+        Assert.Equal(WorkOrderStatus.Completed, workOrder.Status);
+        Assert.Equal(Now, workOrder.CompletedAtUtc);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 0)]   // no maintenance at all
+    [InlineData(2, 0, 1)]   // one completed, one still scheduled
+    public void Work_order_stays_as_it_is_while_maintenance_is_only_scheduled_or_partly_done(int total, int inProgress, int completed)
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+
+        Assert.False(workOrder.FollowMaintenance(total, inProgress, completed, Now));
+        Assert.Equal(WorkOrderStatus.Open, workOrder.Status);
+    }
+
+    [Fact]
+    public void Closed_work_order_does_not_follow_maintenance()
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+        workOrder.Update(workOrder.Title, null, workOrder.Priority, WorkOrderStatus.Cancelled, null, 0, Now);
+
+        Assert.False(workOrder.FollowMaintenance(1, 0, 1, Now));
+        Assert.Equal(WorkOrderStatus.Cancelled, workOrder.Status);
+    }
+
     [Fact]
     public void Completing_stamps_completion_time_and_closes_the_work_order()
     {
         var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
 
-        var result = workOrder.Update("Replace brake assembly", null, WorkOrderPriority.Medium, WorkOrderStatus.Completed, null, Now);
+        var result = workOrder.Update("Replace brake assembly", null, WorkOrderPriority.Medium, WorkOrderStatus.Completed, null, 0, Now);
 
         Assert.True(result.IsSuccess);
         Assert.False(workOrder.IsOpen);
@@ -54,13 +101,52 @@ public sealed class WorkOrderTests
     public void Closed_work_orders_can_no_longer_change(WorkOrderStatus closedStatus)
     {
         var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
-        workOrder.Update("Replace brake assembly", null, WorkOrderPriority.Medium, closedStatus, null, Now);
+        workOrder.Update("Replace brake assembly", null, WorkOrderPriority.Medium, closedStatus, null, 0, Now);
 
-        var result = workOrder.Update("Reopened", null, WorkOrderPriority.Critical, WorkOrderStatus.Open, null, Now);
+        var result = workOrder.Update("Reopened", null, WorkOrderPriority.Critical, WorkOrderStatus.Open, null, 0, Now);
 
         Assert.Equal(WorkOrder.ClosedErrorCode, result.ErrorCode);
         Assert.Equal(closedStatus, workOrder.Status);
         Assert.Equal("Replace brake assembly", workOrder.Title);
+    }
+
+    [Theory]
+    [InlineData(WorkOrderStatus.Completed)]
+    [InlineData(WorkOrderStatus.Cancelled)]
+    public void Open_maintenance_blocks_closing_the_work_order(WorkOrderStatus closedStatus)
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+
+        var result = workOrder.Update("Replace brake assembly", null, WorkOrderPriority.Medium, closedStatus, null, 1, Now);
+
+        Assert.Equal(WorkOrder.OpenMaintenanceErrorCode, result.ErrorCode);
+        Assert.True(workOrder.IsOpen);
+        Assert.Null(workOrder.CompletedAtUtc);
+    }
+
+    [Fact]
+    public void Undefined_status_is_a_validation_error_even_with_open_maintenance()
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+
+        var result = workOrder.Update("Replace brake assembly", null, WorkOrderPriority.Medium, (WorkOrderStatus)99, null, 1, Now);
+
+        Assert.Equal(WorkOrder.ValidationErrorCode, result.ErrorCode);
+        Assert.Equal(WorkOrderStatus.Open, workOrder.Status);
+    }
+
+    [Theory]
+    [InlineData(WorkOrderStatus.Open)]
+    [InlineData(WorkOrderStatus.InProgress)]
+    [InlineData(WorkOrderStatus.OnHold)]
+    public void Open_maintenance_does_not_block_other_changes(WorkOrderStatus openStatus)
+    {
+        var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId);
+
+        var result = workOrder.Update("Renamed", null, WorkOrderPriority.High, openStatus, null, 3, Now);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Renamed", workOrder.Title);
     }
 
     [Fact]
@@ -68,7 +154,7 @@ public sealed class WorkOrderTests
     {
         var workOrder = WorkOrderTestData.NewWorkOrder(AircraftId, WorkOrderPriority.Low);
 
-        var result = workOrder.Update(" ", null, WorkOrderPriority.Critical, WorkOrderStatus.InProgress, null, Now);
+        var result = workOrder.Update(" ", null, WorkOrderPriority.Critical, WorkOrderStatus.InProgress, null, 0, Now);
 
         Assert.True(result.IsFailure);
         Assert.Equal(WorkOrderPriority.Low, workOrder.Priority);

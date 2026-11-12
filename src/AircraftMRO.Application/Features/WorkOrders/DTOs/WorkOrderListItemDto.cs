@@ -11,4 +11,5 @@ public sealed record WorkOrderListItemDto(
     WorkOrderPriority Priority,
     WorkOrderStatus Status,
     DateOnly? DueDate,
-    bool IsOverdue);
+    bool IsOverdue,
+    int MaintenanceCount);

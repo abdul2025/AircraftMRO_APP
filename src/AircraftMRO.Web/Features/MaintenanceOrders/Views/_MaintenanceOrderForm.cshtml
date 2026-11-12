@@ -1,0 +1,55 @@
+@model MaintenanceOrderFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="notice notice--danger" role="alert"></div>
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="form-grid">
+    @if (Model.IsEdit)
+    {
+        <div class="form-field">
+            <span class="form-field__label">Work order</span>
+            <span class="form-field__value">@Model.WorkOrderNumber</span>
+            <span asp-validation-for="WorkOrderId" class="field-error"></span>
+        </div>
+        <div class="form-field">
+            <label asp-for="Status"></label>
+            <select asp-for="Status" asp-items="MaintenanceOrderLabels.StatusOptions()" aria-describedby="status-hint"></select>
+            <span id="status-hint" class="field-hint">Completed maintenance is final. Its work order can only be closed once all of its maintenance is completed.</span>
+            <span asp-validation-for="Status" class="field-error"></span>
+        </div>
+    }
+    else
+    {
+        <div class="form-field">
+            <label asp-for="WorkOrderId"></label>
+            <select asp-for="WorkOrderId">
+                <option value="">Select a work order</option>
+                @foreach (var workOrder in Model.WorkOrderOptions.Where(w => w.CanScheduleMaintenance))
+                {
+                    <option value="@workOrder.Id" selected="@(Model.WorkOrderId == workOrder.Id)">@workOrder.Number · @workOrder.AircraftRegistration</option>
+                }
+            </select>
+            <span asp-validation-for="WorkOrderId" class="field-error"></span>
+        </div>
+    }
+    <div class="form-field">
+        <label asp-for="Type"></label>
+        <select asp-for="Type" asp-items="MaintenanceOrderLabels.TypeOptions()">
+            <option value="">Select a type</option>
+        </select>
+        <span asp-validation-for="Type" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="ScheduledDate"></label>
+        @* The tag helper renders DateOnly as a text box, so the date picker is asked for explicitly.
+           Browsers with a picker show their own mask and ignore the placeholder; the hint states the format. *@
+        <input asp-for="ScheduledDate" type="date" placeholder="YYYY-MM-DD" aria-describedby="scheduled-date-hint" />
+        <span id="scheduled-date-hint" class="field-hint">Date format: YYYY-MM-DD, e.g. 2026-11-25</span>
+        <span asp-validation-for="ScheduledDate" class="field-error"></span>
+    </div>
+    <div class="form-field form-field--full">
+        <label asp-for="Notes"></label>
+        <textarea asp-for="Notes" rows="4"></textarea>
+        <span asp-validation-for="Notes" class="field-error"></span>
+    </div>
+</div>
