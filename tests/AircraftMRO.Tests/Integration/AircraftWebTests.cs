@@ -248,7 +248,7 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
         Assert.Contains("No aircraft match these filters.", none);
 
         Assert.Contains("id=\"fleet-status-chart-title\"", all);
-        Assert.Contains("Active 2 (67%), In maintenance 0 (0%), Grounded 1 (33%), Retired 0 (0%)", all);
+        Assert.Contains("Active 2 (67%), Required maintenance 0 (0%), Grounded 1 (33%), Retired 0 (0%)", all);
         Assert.Equal(2, Regex.Matches(all, "class=\"donut__segment ").Count);
         Assert.Contains("data-tooltip-value=\"2 aircraft · 67%\"", WebUtility.HtmlDecode(all));
         Assert.Contains("donut--has-selection", grounded);

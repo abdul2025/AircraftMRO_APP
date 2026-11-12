@@ -28,7 +28,7 @@ public sealed class ApiDocumentationTests
 
         var statusValues = root.GetProperty("components").GetProperty("schemas").GetProperty("AircraftStatus")
             .GetProperty("enum").EnumerateArray().Select(value => value.GetString());
-        Assert.Equal(["Active", "InMaintenance", "Grounded", "Retired"], statusValues);
+        Assert.Equal(["Active", "RequiredMaintenance", "Grounded", "Retired"], statusValues);
 
         var itemPath = root.GetProperty("paths").GetProperty("/api/aircraft/{id}");
         foreach (var method in new[] { "put", "delete" })

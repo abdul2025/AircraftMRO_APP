@@ -10,7 +10,7 @@ namespace AircraftMRO.Application.Features.WorkOrders;
 
 /// <summary>
 /// Every work order save also sets its aircraft's status from all of that aircraft's open work
-/// orders (grounded, in maintenance, or back to active) in the same save, so the two never disagree.
+/// orders (grounded, required maintenance, or back to active) in the same save, so the two never disagree.
 /// </summary>
 public sealed class WorkOrderService(
     IWorkOrderRepository repository,

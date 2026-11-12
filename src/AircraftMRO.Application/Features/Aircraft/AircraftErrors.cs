@@ -17,7 +17,7 @@ public static class AircraftErrors
     public const string OpenCriticalWorkOrdersMessage =
         "This aircraft has an open critical work order, so it must stay grounded. Complete or cancel that work order first.";
     public const string OpenWorkOrdersMessage =
-        "This aircraft has open work orders, so it must stay in maintenance. Complete or cancel them first.";
+        "This aircraft has open work orders, so it must stay in required maintenance. Complete or cancel them first.";
     public const string HasOpenWorkOrdersMessage =
         "This aircraft has open work orders. Complete or cancel them before deleting it.";
     public const string DuplicateRegistrationMessage = "An aircraft with this registration number already exists.";

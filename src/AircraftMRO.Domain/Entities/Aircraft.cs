@@ -66,20 +66,20 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
 
     public bool IsRetired => Status == AircraftStatus.Retired;
 
-    /// <summary>The status open work orders require: grounded when any is critical, in maintenance otherwise.</summary>
+    /// <summary>The status open work orders require: grounded when any is critical, required maintenance otherwise.</summary>
     public static AircraftStatus StatusForOpenWorkOrders(bool anyCritical) =>
-        anyCritical ? AircraftStatus.Grounded : AircraftStatus.InMaintenance;
+        anyCritical ? AircraftStatus.Grounded : AircraftStatus.RequiredMaintenance;
 
     /// <summary>
     /// Sets the status from the aircraft's open work orders after a work order changed: grounded
-    /// while any is critical, in maintenance while any other is open, and back to active once the
+    /// while any is critical, required maintenance while any other is open, and back to active once the
     /// last one is completed or cancelled. A retired aircraft cannot have open work orders.
     /// </summary>
     public Result ApplyOpenWorkOrders(int openCount, bool anyCritical)
     {
         if (openCount == 0)
         {
-            if (Status is AircraftStatus.InMaintenance or AircraftStatus.Grounded)
+            if (Status is AircraftStatus.RequiredMaintenance or AircraftStatus.Grounded)
             {
                 Status = AircraftStatus.Active;
             }

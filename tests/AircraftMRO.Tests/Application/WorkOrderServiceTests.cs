@@ -53,8 +53,8 @@ public sealed class WorkOrderServiceTests
     }
 
     [Theory]
-    [InlineData(AircraftStatus.Active, 0, 0, AircraftStatus.InMaintenance)]
-    [InlineData(AircraftStatus.Grounded, 0, 0, AircraftStatus.InMaintenance)]   // manual grounding: work orders decide
+    [InlineData(AircraftStatus.Active, 0, 0, AircraftStatus.RequiredMaintenance)]
+    [InlineData(AircraftStatus.Grounded, 0, 0, AircraftStatus.RequiredMaintenance)]   // manual grounding: work orders decide
     [InlineData(AircraftStatus.Grounded, 1, 1, AircraftStatus.Grounded)]        // another critical is still open
     public async Task Create_non_critical_work_order_sets_status_from_all_open_work(
         AircraftStatus before,
@@ -98,9 +98,9 @@ public sealed class WorkOrderServiceTests
     }
 
     [Theory]
-    [InlineData(WorkOrderPriority.Medium, WorkOrderPriority.Critical, AircraftStatus.InMaintenance, AircraftStatus.Grounded)]
-    [InlineData(WorkOrderPriority.Critical, WorkOrderPriority.High, AircraftStatus.Grounded, AircraftStatus.InMaintenance)]
-    [InlineData(WorkOrderPriority.Critical, WorkOrderPriority.Low, AircraftStatus.Grounded, AircraftStatus.InMaintenance)]
+    [InlineData(WorkOrderPriority.Medium, WorkOrderPriority.Critical, AircraftStatus.RequiredMaintenance, AircraftStatus.Grounded)]
+    [InlineData(WorkOrderPriority.Critical, WorkOrderPriority.High, AircraftStatus.Grounded, AircraftStatus.RequiredMaintenance)]
+    [InlineData(WorkOrderPriority.Critical, WorkOrderPriority.Low, AircraftStatus.Grounded, AircraftStatus.RequiredMaintenance)]
     public async Task Changing_priority_moves_the_aircraft_both_ways(
         WorkOrderPriority from,
         WorkOrderPriority to,
@@ -135,7 +135,7 @@ public sealed class WorkOrderServiceTests
     [Theory]
     [InlineData(WorkOrderStatus.Completed, 0, 0, AircraftStatus.Active)]
     [InlineData(WorkOrderStatus.Cancelled, 0, 0, AircraftStatus.Active)]
-    [InlineData(WorkOrderStatus.Completed, 2, 0, AircraftStatus.InMaintenance)]
+    [InlineData(WorkOrderStatus.Completed, 2, 0, AircraftStatus.RequiredMaintenance)]
     [InlineData(WorkOrderStatus.Cancelled, 1, 1, AircraftStatus.Grounded)]
     public async Task Closing_a_work_order_sets_status_from_the_work_still_open(
         WorkOrderStatus closedStatus,
@@ -159,7 +159,7 @@ public sealed class WorkOrderServiceTests
     [Fact]
     public async Task Update_passes_through_closed_and_concurrency_failures()
     {
-        AircraftWithStatus(AircraftStatus.InMaintenance);
+        AircraftWithStatus(AircraftStatus.RequiredMaintenance);
         var workOrder = TrackedWorkOrder(WorkOrderPriority.Low);
         _repository.Setup(r => r.UpdateAsync(workOrder, It.IsAny<byte[]>(), It.IsAny<Aircraft>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Failure(WorkOrderErrors.ConcurrencyConflict, WorkOrderErrors.ConcurrencyConflictMessage));
@@ -175,7 +175,7 @@ public sealed class WorkOrderServiceTests
     [Fact]
     public async Task Closing_is_rejected_while_maintenance_is_open_and_nothing_is_saved()
     {
-        var aircraft = AircraftWithStatus(AircraftStatus.InMaintenance);
+        var aircraft = AircraftWithStatus(AircraftStatus.RequiredMaintenance);
         var workOrder = TrackedWorkOrder(WorkOrderPriority.Low);
         _repository.Setup(r => r.CountOpenMaintenanceOrdersAsync(workOrder.Id, It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
@@ -184,7 +184,7 @@ public sealed class WorkOrderServiceTests
 
         Assert.Equal(WorkOrderErrors.OpenMaintenance, result.ErrorCode);
         Assert.True(workOrder.IsOpen);
-        Assert.Equal(AircraftStatus.InMaintenance, aircraft.Status);
+        Assert.Equal(AircraftStatus.RequiredMaintenance, aircraft.Status);
         _repository.Verify(r => r.UpdateAsync(It.IsAny<WorkOrder>(), It.IsAny<byte[]>(), It.IsAny<Aircraft>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 

@@ -8,7 +8,7 @@ public static class AircraftStatusLabels
     public static string ToLabel(AircraftStatus status) => status switch
     {
         AircraftStatus.Active => "Active",
-        AircraftStatus.InMaintenance => "In maintenance",
+        AircraftStatus.RequiredMaintenance => "Required maintenance",
         AircraftStatus.Grounded => "Grounded",
         AircraftStatus.Retired => "Retired",
         _ => status.ToString()
@@ -17,7 +17,7 @@ public static class AircraftStatusLabels
     public static string ToCssModifier(AircraftStatus status) => status switch
     {
         AircraftStatus.Active => "success",
-        AircraftStatus.InMaintenance => "warning",
+        AircraftStatus.RequiredMaintenance => "warning",
         AircraftStatus.Grounded => "danger",
         _ => "neutral"
     };

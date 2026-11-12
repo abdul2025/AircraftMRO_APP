@@ -75,7 +75,7 @@ public sealed class MaintenanceOrderPersistenceIntegrationTests(SqlServerFixture
     {
         var workOrderId = await CreateWorkOrderAsync("MN-006");
         var aircraftId = (await GetWorkOrderAsync(workOrderId)).AircraftId;
-        Assert.Equal(AircraftStatus.InMaintenance, await AircraftStatusAsync(aircraftId));
+        Assert.Equal(AircraftStatus.RequiredMaintenance, await AircraftStatusAsync(aircraftId));
         var first = await CreateAsync(workOrderId, MaintenanceType.ACheck, Today);
         var second = await CreateAsync(workOrderId, MaintenanceType.BCheck, Today);
 

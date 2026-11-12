@@ -73,7 +73,7 @@ public sealed class WorkOrderWebTests(SqlServerFixture fixture) : IAsyncLifetime
 
         // Lowering the priority moves the aircraft to maintenance; completing the last one returns it to Active.
         Assert.Equal(HttpStatusCode.Redirect, (await EditWorkOrderAsync(id, aircraftId, "High", "InProgress")).StatusCode);
-        Assert.Contains(">In maintenance<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
+        Assert.Contains(">Required maintenance<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
         Assert.Equal(HttpStatusCode.Redirect, (await EditWorkOrderAsync(id, aircraftId, "High", "Completed")).StatusCode);
         Assert.Contains(">Active<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
         Assert.Contains($"/WorkOrders/Delete/{id}", await _client.GetStringAsync(detailsUrl));
@@ -152,7 +152,7 @@ public sealed class WorkOrderWebTests(SqlServerFixture fixture) : IAsyncLifetime
 
         var created = await ModalPostAsync("/WorkOrders/Create", html, WorkOrderForm(aircraftId, "Low"), returnUrl: $"/Aircraft/Details/{aircraftId}");
         Assert.Equal($"/Aircraft/Details/{aircraftId}", await ReadRedirectUrlAsync(created));
-        Assert.Contains(">In maintenance<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
+        Assert.Contains(">Required maintenance<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public sealed class WorkOrderWebTests(SqlServerFixture fixture) : IAsyncLifetime
         Assert.Contains("This work order was changed by someone else", conflictHtml);
         Assert.Contains($"Edit {number}", conflictHtml);
         // The stale save changed nothing: the aircraft reflects the first save (High), not Critical.
-        Assert.Contains(">In maintenance<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
+        Assert.Contains(">Required maintenance<", await _client.GetStringAsync($"/Aircraft/Details/{aircraftId}"));
     }
 
     [Fact]

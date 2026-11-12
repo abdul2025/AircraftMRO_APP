@@ -91,11 +91,11 @@ public sealed class AircraftTests
 
     [Theory]
     [InlineData(AircraftStatus.Active, 1, true, AircraftStatus.Grounded)]
-    [InlineData(AircraftStatus.InMaintenance, 2, true, AircraftStatus.Grounded)]
-    [InlineData(AircraftStatus.Active, 1, false, AircraftStatus.InMaintenance)]
-    [InlineData(AircraftStatus.Grounded, 1, false, AircraftStatus.InMaintenance)]   // critical lowered to high
+    [InlineData(AircraftStatus.RequiredMaintenance, 2, true, AircraftStatus.Grounded)]
+    [InlineData(AircraftStatus.Active, 1, false, AircraftStatus.RequiredMaintenance)]
+    [InlineData(AircraftStatus.Grounded, 1, false, AircraftStatus.RequiredMaintenance)]   // critical lowered to high
     [InlineData(AircraftStatus.Grounded, 0, false, AircraftStatus.Active)]          // last one closed
-    [InlineData(AircraftStatus.InMaintenance, 0, false, AircraftStatus.Active)]
+    [InlineData(AircraftStatus.RequiredMaintenance, 0, false, AircraftStatus.Active)]
     [InlineData(AircraftStatus.Active, 0, false, AircraftStatus.Active)]
     [InlineData(AircraftStatus.Retired, 0, false, AircraftStatus.Retired)]
     public void Open_work_orders_decide_the_status(

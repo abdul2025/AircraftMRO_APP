@@ -114,7 +114,7 @@ public sealed class MaintenanceOrderServiceTests
     public async Task Completing_the_last_open_maintenance_completes_the_work_order_and_frees_the_aircraft()
     {
         var workOrder = TrackedWorkOrder();
-        var aircraft = TrackedAircraftInMaintenance();
+        var aircraft = TrackedAircraftRequiringMaintenance();
         var maintenanceOrder = TrackedMaintenanceOrder();
         _repository.Setup(r => r.GetMaintenanceProgressAsync(WorkOrderId, maintenanceOrder.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new MaintenanceProgressDto(Total: 2, InProgress: 0, Completed: 2));
@@ -152,7 +152,7 @@ public sealed class MaintenanceOrderServiceTests
     public async Task Deleting_the_last_open_maintenance_completes_the_work_order_when_the_rest_is_completed()
     {
         var workOrder = TrackedWorkOrder();
-        var aircraft = TrackedAircraftInMaintenance();
+        var aircraft = TrackedAircraftRequiringMaintenance();
         var maintenanceOrder = TrackedMaintenanceOrder();
         _repository.Setup(r => r.GetMaintenanceProgressAsync(WorkOrderId, maintenanceOrder.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new MaintenanceProgressDto(Total: 1, InProgress: 0, Completed: 1));
@@ -268,12 +268,12 @@ public sealed class MaintenanceOrderServiceTests
         return workOrder;
     }
 
-    /// <summary>An aircraft held in maintenance by the tracked work order, its only open one.</summary>
-    private Aircraft TrackedAircraftInMaintenance()
+    /// <summary>An aircraft held in required maintenance by the tracked work order, its only open one.</summary>
+    private Aircraft TrackedAircraftRequiringMaintenance()
     {
         var aircraft = AircraftTestData.NewAircraft();
         aircraft.ApplyOpenWorkOrders(1, anyCritical: false);
-        Assert.Equal(AircraftStatus.InMaintenance, aircraft.Status);
+        Assert.Equal(AircraftStatus.RequiredMaintenance, aircraft.Status);
         _repository.Setup(r => r.GetAircraftForUpdateAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(aircraft);
         return aircraft;
     }

@@ -122,7 +122,7 @@ public sealed class AircraftServiceTests
 
     [Theory]
     [InlineData(AircraftStatus.Active)]
-    [InlineData(AircraftStatus.InMaintenance)]
+    [InlineData(AircraftStatus.RequiredMaintenance)]
     [InlineData(AircraftStatus.Retired)]
     public async Task Update_keeps_aircraft_grounded_while_a_critical_work_order_is_open(AircraftStatus newStatus)
     {
@@ -148,7 +148,7 @@ public sealed class AircraftServiceTests
     }
 
     [Theory]
-    [InlineData(AircraftStatus.InMaintenance, 1, 0)]
+    [InlineData(AircraftStatus.RequiredMaintenance, 1, 0)]
     [InlineData(AircraftStatus.Grounded, 3, 2)]
     [InlineData(AircraftStatus.Active, 0, 0)]
     [InlineData(AircraftStatus.Grounded, 0, 0)]

@@ -11,7 +11,7 @@ namespace AircraftMRO.Api.Features.WorkOrders;
 
 /// <summary>
 /// Work order CRUD. Every save also sets the aircraft's status from its open work orders:
-/// grounded if any is critical, in maintenance otherwise, active once none are open. A work order
+/// grounded if any is critical, required maintenance otherwise, active once none are open. A work order
 /// cannot be completed or cancelled while it has scheduled or in-progress maintenance. Only closed
 /// work orders can be deleted. Reads return an <c>ETag</c>; updates and deletes require it in <c>If-Match</c>.
 /// </summary>

@@ -52,10 +52,10 @@ cancellation recalculates it in the same transaction:
 | Open work orders on the aircraft | Aircraft status |
 | --- | --- |
 | At least one Critical | Grounded |
-| Some, none Critical | In maintenance |
+| Some, none Critical | Required maintenance |
 | None (the last one was completed or cancelled) | Active |
 
-So lowering a work order from Critical to High moves the aircraft from Grounded to In maintenance
+So lowering a work order from Critical to High moves the aircraft from Grounded to Required maintenance
 (unless another critical one is open), and raising it back grounds it again. While work orders are
 open, the aircraft's status cannot be changed by hand (409). Open work orders cannot be deleted;
 complete or cancel them first, so every status change has a recorded reason. Aircraft with open

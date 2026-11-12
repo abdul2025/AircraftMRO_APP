@@ -83,7 +83,7 @@ public sealed class WorkOrderApiTests(SqlServerFixture fixture) : IAsyncLifetime
     {
         var (aircraftUri, aircraftId, registration) = await CreateAircraftAsync("Active");
         await _client.PostAsJsonAsync("/api/work-orders", new { aircraftId, title = "Cabin panel", priority = "Low" });
-        Assert.Equal("InMaintenance", await StatusOfAsync(aircraftUri));
+        Assert.Equal("RequiredMaintenance", await StatusOfAsync(aircraftUri));
 
         var aircraft = await _client.GetAsync(aircraftUri);
         var activate = await SendAsync(HttpMethod.Put, aircraftUri, aircraft.Headers.ETag!, AircraftBody(registration, "Active"));

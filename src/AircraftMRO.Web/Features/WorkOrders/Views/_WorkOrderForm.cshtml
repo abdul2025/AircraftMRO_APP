@@ -37,7 +37,7 @@
     <div class="form-field">
         <label asp-for="Priority"></label>
         <select asp-for="Priority" asp-items="WorkOrderLabels.PriorityOptions()" aria-describedby="priority-hint"></select>
-        <span id="priority-hint" class="field-hint">Any open critical work order grounds the aircraft; other open work puts it in maintenance. It returns to Active when none are open.</span>
+        <span id="priority-hint" class="field-hint">Any open critical work order grounds the aircraft; other open work marks it as required maintenance. It returns to Active when none are open.</span>
         <span asp-validation-for="Priority" class="field-error"></span>
     </div>
     <div class="form-field form-field--full">

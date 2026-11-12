@@ -47,7 +47,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
         await using (var context = NewContext())
         {
             var tracked = await context.Aircraft.SingleAsync(a => a.Id == aircraft.Id);
-            tracked.Update("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 31300m, AircraftStatus.InMaintenance, 2026);
+            tracked.Update("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 31300m, AircraftStatus.RequiredMaintenance, 2026);
             var entry = context.Entry(tracked);
             entry.Property(a => a.CreatedAtUtc).CurrentValue = DateTimeOffset.UnixEpoch;
             entry.Property(a => a.CreatedBy).CurrentValue = "attacker";
@@ -56,7 +56,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
 
         await using var verify = NewContext();
         var stored = await verify.Aircraft.AsNoTracking().SingleAsync(a => a.Id == aircraft.Id);
-        Assert.Equal(AircraftStatus.InMaintenance, stored.Status);
+        Assert.Equal(AircraftStatus.RequiredMaintenance, stored.Status);
         Assert.Equal(createdAt, stored.CreatedAtUtc);
         Assert.Equal("user-1", stored.CreatedBy);
         Assert.Equal(_clock.Now, stored.UpdatedAtUtc);
@@ -224,7 +224,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
     {
         await AddAsync(Aircraft.Create("ST-1", "Airbus", "A320", "ST-1", 2012, 100.5m, AircraftStatus.Active, 2026).Value!);
         await AddAsync(Aircraft.Create("ST-2", "Airbus", "A320", "ST-2", 2012, 200m, AircraftStatus.Active, 2026).Value!);
-        await AddAsync(Aircraft.Create("ST-3", "Airbus", "A320", "ST-3", 2012, 50m, AircraftStatus.InMaintenance, 2026).Value!);
+        await AddAsync(Aircraft.Create("ST-3", "Airbus", "A320", "ST-3", 2012, 50m, AircraftStatus.RequiredMaintenance, 2026).Value!);
         var deleted = await AddAsync(Aircraft.Create("ST-4", "Airbus", "A320", "ST-4", 2012, 999m, AircraftStatus.Grounded, 2026).Value!);
         await DeleteAsync(deleted.Id);
 
@@ -233,7 +233,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
 
         Assert.Equal(3, statistics.TotalCount);
         Assert.Equal(2, statistics.CountFor(AircraftStatus.Active));
-        Assert.Equal(1, statistics.CountFor(AircraftStatus.InMaintenance));
+        Assert.Equal(1, statistics.CountFor(AircraftStatus.RequiredMaintenance));
         Assert.Equal(0, statistics.CountFor(AircraftStatus.Grounded));
         Assert.Equal(0, statistics.CountFor(AircraftStatus.Retired));
         Assert.Equal(350.5m, statistics.TotalFlightHours);

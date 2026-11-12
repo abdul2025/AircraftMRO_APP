@@ -16,7 +16,7 @@ public sealed class DonutChartViewModelTests
             new Dictionary<AircraftStatus, int>
             {
                 [AircraftStatus.Active] = active,
-                [AircraftStatus.InMaintenance] = maintenance,
+                [AircraftStatus.RequiredMaintenance] = maintenance,
                 [AircraftStatus.Grounded] = grounded,
                 [AircraftStatus.Retired] = retired
             },
@@ -30,7 +30,7 @@ public sealed class DonutChartViewModelTests
     {
         var chart = Fleet(Stats(5, 3, 2, 0));
 
-        Assert.Equal(["Active", "In maintenance", "Grounded", "Retired"], chart.Segments.Select(s => s.Label));
+        Assert.Equal(["Active", "Required maintenance", "Grounded", "Retired"], chart.Segments.Select(s => s.Label));
         var drawn = chart.Segments.Where(s => s.Count > 0).ToList();
         Assert.Equal(3, drawn.Count);
         // Drawn arcs plus one surface gap per visible segment close the ring exactly.
@@ -45,7 +45,7 @@ public sealed class DonutChartViewModelTests
     [Fact]
     public void A_single_category_is_a_full_ring_without_a_gap()
     {
-        var chart = Fleet(Stats(0, 4, 0, 0), selected: AircraftStatus.InMaintenance);
+        var chart = Fleet(Stats(0, 4, 0, 0), selected: AircraftStatus.RequiredMaintenance);
 
         var segment = Assert.Single(chart.Segments, s => s.Count > 0);
         Assert.Equal(DonutChartViewModel.Circumference, segment.Length, precision: 6);

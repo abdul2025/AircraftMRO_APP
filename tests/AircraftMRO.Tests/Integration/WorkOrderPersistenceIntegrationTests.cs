@@ -61,7 +61,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
 
         await CreateAsync(aircraft.Id, WorkOrderPriority.Low);
 
-        Assert.Equal(AircraftStatus.InMaintenance, await AircraftStatusAsync(aircraft.Id));
+        Assert.Equal(AircraftStatus.RequiredMaintenance, await AircraftStatusAsync(aircraft.Id));
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
     [Fact]
     public async Task Saving_without_a_status_change_writes_the_aircraft_but_records_no_aircraft_notification()
     {
-        var aircraft = await AddAircraftAsync("NN-001", AircraftStatus.InMaintenance);
+        var aircraft = await AddAircraftAsync("NN-001", AircraftStatus.RequiredMaintenance);
         var rowVersionBefore = await AircraftRowVersionAsync(aircraft.Id);
 
         await CreateAsync(aircraft.Id, WorkOrderPriority.Medium);
@@ -106,7 +106,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
         var aircraftUpdates = await context.Notifications.AsNoTracking()
             .CountAsync(n => n.EntityId == aircraft.Id && n.Action == NotificationAction.Updated);
         Assert.Equal(0, aircraftUpdates);
-        Assert.Equal(AircraftStatus.InMaintenance, await AircraftStatusAsync(aircraft.Id));
+        Assert.Equal(AircraftStatus.RequiredMaintenance, await AircraftStatusAsync(aircraft.Id));
     }
 
     [Fact]
@@ -143,13 +143,13 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
         Assert.Equal(AircraftStatus.Grounded, await AircraftStatusAsync(aircraft.Id));
 
         await UpdateAsync(critical, WorkOrderStatus.InProgress, WorkOrderPriority.High);
-        Assert.Equal(AircraftStatus.InMaintenance, await AircraftStatusAsync(aircraft.Id));
+        Assert.Equal(AircraftStatus.RequiredMaintenance, await AircraftStatusAsync(aircraft.Id));
 
         await UpdateAsync(critical, WorkOrderStatus.InProgress, WorkOrderPriority.Critical);
         Assert.Equal(AircraftStatus.Grounded, await AircraftStatusAsync(aircraft.Id));
 
         await UpdateAsync(critical, WorkOrderStatus.Completed, WorkOrderPriority.Critical);
-        Assert.Equal(AircraftStatus.InMaintenance, await AircraftStatusAsync(aircraft.Id));   // the low one is still open
+        Assert.Equal(AircraftStatus.RequiredMaintenance, await AircraftStatusAsync(aircraft.Id));   // the low one is still open
 
         await UpdateAsync(low, WorkOrderStatus.Cancelled, WorkOrderPriority.Low);
         Assert.Equal(AircraftStatus.Active, await AircraftStatusAsync(aircraft.Id));
@@ -164,7 +164,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
         var firstRowVersion = await WorkOrderRowVersionAsync(first);
 
         // The first close is part-way through, as the service does it: aircraft loaded, then the
-        // other open work (the second one) counted, so it would set In maintenance.
+        // other open work (the second one) counted, so it would set Required maintenance.
         await using var slow = NewContext();
         var repository = new WorkOrderRepository(slow);
         var workOrder = (await repository.GetForUpdateAsync(first, CancellationToken.None))!;
