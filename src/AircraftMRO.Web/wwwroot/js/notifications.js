@@ -57,8 +57,11 @@
     bell.querySelector("button").setAttribute("aria-label", unread ? `Notifications, ${unread} unread` : "Notifications");
   };
 
-  const setStatus = (text) => {
+  const setStatus = (text, state) => {
     status.textContent = text;
+    status.dataset.state = state;
+    // Other live indicators (live-status.js) follow the same connection.
+    document.dispatchEvent(new CustomEvent("app:live-state", { detail: { text, state } }));
   };
 
   // Notification text is data: build DOM with textContent only.
@@ -152,26 +155,26 @@
     .build();
 
   connection.on("NotificationReceived", (notification) => add(notification, { toast: true }));
-  connection.onreconnecting(() => setStatus("Reconnecting…"));
+  connection.onreconnecting(() => setStatus("Reconnecting…", "pending"));
   connection.onreconnected(async () => {
-    setStatus("Live");
+    setStatus("Live", "live");
     await catchUp();
   });
 
   const start = async () => {
     try {
       await connection.start();
-      setStatus("Live");
+      setStatus("Live", "live");
       await catchUp();
     } catch {
-      setStatus("Offline, retrying…");
+      setStatus("Offline, retrying…", "offline");
       window.setTimeout(start, 5000);
     }
   };
 
   // Automatic reconnect gives up after a few attempts; keep trying on a slower cadence.
   connection.onclose(() => {
-    setStatus("Offline, retrying…");
+    setStatus("Offline, retrying…", "offline");
     window.setTimeout(start, 5000);
   });
 

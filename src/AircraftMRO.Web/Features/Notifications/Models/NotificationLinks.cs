@@ -13,7 +13,8 @@ public static class NotificationLinks
     private static readonly Dictionary<string, string> DetailsControllers = new(StringComparer.Ordinal)
     {
         [nameof(Aircraft)] = "Aircraft",
-        [nameof(WorkOrder)] = "WorkOrders"
+        [nameof(WorkOrder)] = "WorkOrders",
+        [nameof(MaintenanceOrder)] = "MaintenanceOrders"
     };
 
     /// <summary>The path to the entity's Details page, or null when it was deleted or has none.</summary>

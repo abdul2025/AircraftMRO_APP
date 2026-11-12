@@ -15,6 +15,8 @@ public sealed record WorkOrderResponse(
     DateOnly? DueDate,
     bool IsOverdue,
     DateTimeOffset? CompletedAtUtc,
+    int MaintenanceCount,
+    int CompletedMaintenanceCount,
     DateTimeOffset CreatedAtUtc,
     string? CreatedBy,
     DateTimeOffset? UpdatedAtUtc,
@@ -23,6 +25,7 @@ public sealed record WorkOrderResponse(
     public static WorkOrderResponse From(WorkOrderDto dto) => new(
         dto.Id, dto.AircraftId, dto.AircraftRegistration, dto.Number, dto.Title, dto.Description,
         dto.Priority, dto.Status, dto.DueDate, dto.IsOverdue, dto.CompletedAtUtc,
+        dto.MaintenanceCount, dto.CompletedMaintenanceCount,
         dto.CreatedAtUtc, dto.CreatedBy, dto.UpdatedAtUtc, dto.UpdatedBy);
 }
 
@@ -35,11 +38,12 @@ public sealed record WorkOrderSummaryResponse(
     WorkOrderPriority Priority,
     WorkOrderStatus Status,
     DateOnly? DueDate,
-    bool IsOverdue)
+    bool IsOverdue,
+    int MaintenanceCount)
 {
     public static WorkOrderSummaryResponse From(WorkOrderListItemDto dto) => new(
         dto.Id, dto.AircraftId, dto.AircraftRegistration, dto.Number, dto.Title,
-        dto.Priority, dto.Status, dto.DueDate, dto.IsOverdue);
+        dto.Priority, dto.Status, dto.DueDate, dto.IsOverdue, dto.MaintenanceCount);
 }
 
 public sealed record WorkOrderPageResponse(

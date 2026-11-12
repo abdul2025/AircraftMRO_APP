@@ -167,9 +167,25 @@ public sealed class WorkOrderServiceTests
         Assert.Equal(WorkOrderErrors.ConcurrencyConflict,
             (await _service.UpdateAsync(workOrder.Id, WorkOrderTestData.UpdateDto(), CancellationToken.None)).ErrorCode);
 
-        workOrder.Update("Done", null, WorkOrderPriority.Low, WorkOrderStatus.Cancelled, null, _clock.Now);
+        workOrder.Update("Done", null, WorkOrderPriority.Low, WorkOrderStatus.Cancelled, null, 0, _clock.Now);
         Assert.Equal(WorkOrderErrors.Closed,
             (await _service.UpdateAsync(workOrder.Id, WorkOrderTestData.UpdateDto(), CancellationToken.None)).ErrorCode);
+    }
+
+    [Fact]
+    public async Task Closing_is_rejected_while_maintenance_is_open_and_nothing_is_saved()
+    {
+        var aircraft = AircraftWithStatus(AircraftStatus.InMaintenance);
+        var workOrder = TrackedWorkOrder(WorkOrderPriority.Low);
+        _repository.Setup(r => r.CountOpenMaintenanceOrdersAsync(workOrder.Id, It.IsAny<CancellationToken>())).ReturnsAsync(2);
+
+        var result = await _service.UpdateAsync(
+            workOrder.Id, WorkOrderTestData.UpdateDto(WorkOrderStatus.Completed, WorkOrderPriority.Low), CancellationToken.None);
+
+        Assert.Equal(WorkOrderErrors.OpenMaintenance, result.ErrorCode);
+        Assert.True(workOrder.IsOpen);
+        Assert.Equal(AircraftStatus.InMaintenance, aircraft.Status);
+        _repository.Verify(r => r.UpdateAsync(It.IsAny<WorkOrder>(), It.IsAny<byte[]>(), It.IsAny<Aircraft>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -181,7 +197,7 @@ public sealed class WorkOrderServiceTests
         Assert.Equal(WorkOrderErrors.OpenCannotBeDeleted, open.ErrorCode);
         _repository.Verify(r => r.DeleteAsync(It.IsAny<WorkOrder>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()), Times.Never);
 
-        workOrder.Update("Done", null, WorkOrderPriority.Critical, WorkOrderStatus.Completed, null, _clock.Now);
+        workOrder.Update("Done", null, WorkOrderPriority.Critical, WorkOrderStatus.Completed, null, 0, _clock.Now);
         Assert.True((await _service.DeleteAsync(workOrder.Id, [1], CancellationToken.None)).IsSuccess);
     }
 

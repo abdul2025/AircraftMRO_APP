@@ -69,6 +69,43 @@ A work order is overdue once its due date has passed in the business time zone, 
 `WorkOrders:TimeZone` (an IANA id such as `Asia/Riyadh`; default `UTC`) in both hosts. An unknown
 id stops the host at startup.
 
+## Maintenance orders
+
+Each work order can have many maintenance orders (`/MaintenanceOrders` in the Web host,
+`/api/maintenance-orders` in the API). A maintenance order has a type (`ACheck`, `BCheck`,
+`CCheck`, `DCheck`, `Unscheduled`), a scheduled date, optional notes, and a status:
+
+| Status | Can edit | Can delete |
+| --- | --- | --- |
+| `Scheduled` (every new order starts here) | yes | yes |
+| `InProgress` | yes | no |
+| `Completed` (completion time is stamped) | no, final | no, kept as history |
+
+- Maintenance can only be scheduled or changed while its work order is open (409
+  `MaintenanceOrder.WorkOrderClosed`).
+- **A work order cannot be completed or cancelled while any of its maintenance is `Scheduled` or
+  `InProgress`** (409 `WorkOrder.OpenMaintenance`). Complete the maintenance, or delete it if it was
+  only scheduled, first.
+- **The work order follows its maintenance.** When any maintenance is started (`InProgress`), an
+  `Open` or `OnHold` work order moves to `InProgress`. When all of its maintenance is `Completed`
+  (by completing the last open one, or by deleting the last scheduled one), the work order is
+  `Completed` too, and its aircraft's status is recalculated from its remaining open work orders,
+  exactly as when a work order is closed by hand (for example back to `Active`). Editing only the
+  type, date, or notes does not touch the work order.
+- Scheduling new maintenance, changing a maintenance status, and deleting maintenance all write
+  the work order row, so concurrent changes are caught by its row version. A close that missed
+  newly scheduled maintenance gets 412 `WorkOrder.ConcurrencyConflict`; a maintenance change that
+  missed a work order change (including another maintenance change under the same work order)
+  gets 409 `MaintenanceOrder.WorkOrderChanged`. Reload and retry in either case.
+- **Known limitation:** changing several maintenance orders under the *same* work order in
+  parallel (for example a bulk API import) makes all but one of the simultaneous requests fail
+  with 409 `MaintenanceOrder.WorkOrderChanged`. Nothing is lost and the failed requests can be
+  retried as-is. Send them one at a time, or retry on that code.
+- Work order list and details show how many maintenance orders each work order has
+  (`maintenanceCount`, and `completedMaintenanceCount` on details, in the API).
+- Maintenance is overdue once its scheduled date has passed (same business time zone as work
+  orders) and it is not completed.
+
 ## Real-time notifications
 
 Every create, update, and delete of an auditable entity is recorded in the `Notifications`

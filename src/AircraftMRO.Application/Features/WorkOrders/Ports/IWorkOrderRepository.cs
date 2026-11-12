@@ -39,6 +39,9 @@ public interface IWorkOrderRepository
         Guid? excludeWorkOrderId,
         CancellationToken cancellationToken);
 
+    /// <summary>Scheduled and in-progress maintenance orders under the work order.</summary>
+    Task<int> CountOpenMaintenanceOrdersAsync(Guid workOrderId, CancellationToken cancellationToken);
+
     /// <summary>Reserves the next work order number, such as <c>WO-000042</c>.</summary>
     Task<string> NextNumberAsync(CancellationToken cancellationToken);
 

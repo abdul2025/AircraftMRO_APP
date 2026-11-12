@@ -1,0 +1,31 @@
+@model MaintenanceOrderListViewModel
+@{
+    var statistics = Model.Statistics;
+    string ListUrl(Dictionary<string, string> routeValues) => Url.Action("Index", (object)routeValues)!;
+
+    var panel = new StatPanelViewModel(
+        Label: "Maintenance summary",
+        TotalLabel: "Total maintenance orders",
+        AllUrl: ListUrl(Model.RouteValues(keepFacets: false)),
+        Breakdown: MaintenanceOrderStatusChart.From(Model, status => ListUrl(Model.RouteValues(status: status, keepFacets: false))),
+        Highlights:
+        [
+            new StatHighlight(
+                "Open",
+                NumberDisplay.Compact(statistics.OpenCount),
+                "info",
+                ListUrl(Model.RouteValues(openOnly: true, keepFacets: false)),
+                Model.IsFacet(openOnly: true),
+                "Show scheduled and in-progress maintenance"),
+            new StatHighlight(
+                "Overdue",
+                NumberDisplay.Compact(statistics.OverdueCount),
+                "warning",
+                ListUrl(Model.RouteValues(overdueOnly: true, keepFacets: false)),
+                Model.IsFacet(overdueOnly: true),
+                "Show open maintenance past its scheduled date")
+        ],
+        FacetLabel: Model.FacetLabel);
+}
+
+<partial name="_StatOverview" model="panel" />

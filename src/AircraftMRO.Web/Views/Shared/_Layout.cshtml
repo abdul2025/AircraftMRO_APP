@@ -6,6 +6,7 @@
         && string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Index", StringComparison.OrdinalIgnoreCase);
     var isAircraft = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Aircraft", StringComparison.OrdinalIgnoreCase);
     var isWorkOrders = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "WorkOrders", StringComparison.OrdinalIgnoreCase);
+    var isMaintenance = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "MaintenanceOrders", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -34,10 +35,10 @@
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="app-shell">
         <aside class="sidebar offcanvas-lg offcanvas-start" tabindex="-1" id="primary-navigation" aria-labelledby="navigation-title">
-            <div class="offcanvas-header sidebar__mobile-header">
+            @* <div class="offcanvas-header sidebar__mobile-header">
                 <h2 class="offcanvas-title" id="navigation-title">Navigation</h2>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#primary-navigation" aria-label="Close navigation"></button>
-            </div>
+            </div> *@
             <div class="offcanvas-body sidebar__body">
                 <a class="brand" asp-controller="Home" asp-action="Index" aria-label="Aircraft MRO home">
                     <span class="brand__mark" aria-hidden="true">
@@ -56,6 +57,9 @@
                     </a>
                     <a class="sidebar-nav__link @(isWorkOrders ? "is-active" : null)" asp-controller="WorkOrders" asp-action="Index" aria-current="@(isWorkOrders ? "page" : null)">
                         <span aria-hidden="true">⚒</span><span>Work orders</span>
+                    </a>
+                    <a class="sidebar-nav__link @(isMaintenance ? "is-active" : null)" asp-controller="MaintenanceOrders" asp-action="Index" aria-current="@(isMaintenance ? "page" : null)">
+                        <span aria-hidden="true">⚙</span><span>Maintenance</span>
                     </a>
                 </nav>
 
@@ -112,6 +116,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/modal-forms.js" asp-append-version="true"></script>
     <script src="~/js/clock.js" asp-append-version="true"></script>
+    <script src="~/js/live-status.js" asp-append-version="true"></script>
     <script src="~/js/notifications.js" asp-append-version="true"></script>
     <script src="~/js/live-refresh.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

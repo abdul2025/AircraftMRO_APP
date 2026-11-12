@@ -1,0 +1,153 @@
+@model MaintenanceOrderListViewModel
+@{
+    ViewData["Title"] = "Maintenance";
+    var results = Model.Page;
+    var filter = Model.Filter;
+    var selected = Model.SelectedWorkOrder;
+}
+
+@* live-refresh.js re-renders this page in place when a maintenance order changes. *@
+<section aria-labelledby="maintenance-title" data-live-refresh="MaintenanceOrder">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Maintenance</p>
+            <h1 id="maintenance-title">
+                Maintenance orders@(selected is null ? null : $" for {selected.Number}")
+            </h1>
+        </div>
+        @if (Model.CanSchedule)
+        {
+            <a class="button button--primary" asp-action="Create" asp-route-workOrderId="@filter.WorkOrderId" data-modal>Schedule maintenance</a>
+        }
+    </div>
+
+    <partial name="_StatusMessages" />
+    <partial name="_MaintenanceOrderStatistics" model="Model" />
+
+    <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter maintenance orders">
+        <div class="filter-bar__field">
+            <label for="maintenance-work-order">Work order</label>
+            <select id="maintenance-work-order" name="workOrderId" data-auto-submit>
+                <option value="">All work orders</option>
+                @foreach (var workOrder in Model.FilterOptions)
+                {
+                    <option value="@workOrder.Id" selected="@(filter.WorkOrderId == workOrder.Id)">@workOrder.Number · @workOrder.AircraftRegistration</option>
+                }
+            </select>
+        </div>
+        <div class="filter-bar__field">
+            <label for="maintenance-status">Status</label>
+            <select id="maintenance-status" name="status" data-auto-submit>
+                <option value="">All statuses</option>
+                @foreach (var option in MaintenanceOrderLabels.StatusOptions())
+                {
+                    <option value="@option.Value" selected="@(filter.Status?.ToString() == option.Value)">@option.Text</option>
+                }
+            </select>
+        </div>
+        <div class="filter-bar__field">
+            <label for="maintenance-type">Type</label>
+            <select id="maintenance-type" name="type" data-auto-submit>
+                <option value="">All types</option>
+                @foreach (var option in MaintenanceOrderLabels.TypeOptions())
+                {
+                    <option value="@option.Value" selected="@(filter.Type?.ToString() == option.Value)">@option.Text</option>
+                }
+            </select>
+        </div>
+        @if (filter.OpenOnly)
+        {
+            <input type="hidden" name="open" value="true" />
+        }
+        @if (filter.OverdueOnly)
+        {
+            <input type="hidden" name="overdue" value="true" />
+        }
+        <div class="filter-bar__actions">
+            <button type="submit" class="button button--primary">Apply</button>
+            @if (!filter.IsEmpty)
+            {
+                <a class="button button--secondary" asp-action="Index">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (!filter.IsEmpty)
+    {
+        <p class="filter-summary" role="status">
+            Showing @results.TotalCount of @Model.Statistics.TotalCount maintenance orders@(filter.OverdueOnly ? " · overdue only" : filter.OpenOnly ? " · open only" : null)
+        </p>
+    }
+
+    @if (Model.Statistics.TotalCount == 0)
+    {
+        <p class="empty-state">
+            @(selected is null ? "No maintenance has been scheduled yet." : $"No maintenance has been scheduled for {selected.Number} yet.")
+        </p>
+    }
+    else if (results.TotalCount == 0)
+    {
+        <p class="empty-state">No maintenance matches these filters. <a asp-action="Index">Clear filters</a></p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th scope="col">Work order</th>
+                        <th scope="col">Aircraft</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Scheduled</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in results.Items)
+                    {
+                        var label = $"{MaintenanceOrderLabels.ToLabel(item.Type)} · {MaintenanceOrderLabels.Date(item.ScheduledDate)}";
+                        <tr>
+                            <th scope="row"><a asp-action="Details" asp-route-id="@item.Id">@MaintenanceOrderLabels.ToLabel(item.Type)</a></th>
+                            <td><a asp-controller="WorkOrders" asp-action="Details" asp-route-id="@item.WorkOrderId">@item.WorkOrderNumber</a></td>
+                            <td>@item.AircraftRegistration</td>
+                            <td><partial name="_MaintenanceStatusBadge" model="item.Status" /></td>
+                            <td><partial name="_ScheduledDate" model="(item.ScheduledDate, item.IsOverdue)" /></td>
+                            <td class="actions-cell">
+                                <partial name="_MaintenanceOrderActions" model="MaintenanceOrderActionsViewModel.For(item.Id, label, item.Status)" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (results.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Maintenance pages">
+                @if (results.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page - 1)">Previous</a>
+                }
+                <span>Page @results.Page of @results.TotalPages (@results.TotalCount maintenance orders)</span>
+                @if (results.HasNextPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page + 1)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>
+
+@section Scripts {
+    <script src="~/js/chart-tooltip.js" asp-append-version="true"></script>
+    <script>
+        // Apply a select filter as soon as it changes; the Apply button covers no-JS use.
+        // Delegated, so it keeps working after live-refresh.js swaps the page content.
+        document.addEventListener("change", (event) => {
+            if (event.target.matches("[data-auto-submit]")) {
+                event.target.form.requestSubmit();
+            }
+        });
+    </script>
+}

@@ -34,8 +34,8 @@ public sealed class WorkOrderWebTests(SqlServerFixture fixture) : IAsyncLifetime
         Assert.Contains("href=\"/WorkOrders\"", html);
         Assert.Contains("aria-current=\"page\"", html);
         Assert.Contains("data-live-refresh=\"WorkOrder\"", html);
-        Assert.Contains("id=\"work-order-priority-chart-title\"", html);
-        Assert.Contains("No open work orders yet.", html);
+        Assert.Contains("id=\"work-order-status-chart-title\"", html);
+        Assert.Contains("No work orders yet.", html);
     }
 
     [Fact]
@@ -99,19 +99,27 @@ public sealed class WorkOrderWebTests(SqlServerFixture fixture) : IAsyncLifetime
         }
 
         var all = await _client.GetStringAsync("/WorkOrders");
-        Assert.Matches(@"Total work orders</span>\s*<span class=""stat-tile__value"">3<", all);
-        Assert.Matches(@"Open critical\s*</span>\s*<span class=""stat-tile__value"">1<", all);
+        Assert.Matches(@"Total work orders</span>\s*<span class=""stat-panel__total-value"">3<", all);
+        Assert.Matches(@"Open critical</span>\s*<span class=""stat-highlight__value"">1<", all);
+        Assert.Matches(@"Open</span>\s*<span class=""stat-share__value"">3</span>\s*<span class=""stat-share__percent"">100%<", all);
+        Assert.Contains("<strong>None</strong>", all);
         Assert.Contains("href=\"/WorkOrders?priority=Critical&amp;open=true\"", all);
-        Assert.Contains("Critical 1 (33%), High 1 (33%), Medium 0 (0%), Low 1 (33%)", all);
-        Assert.Contains("data-tooltip-value=\"1 open work order · 33%\"", WebUtility.HtmlDecode(all));
+        Assert.Contains("Open 3 (100%), In progress 0 (0%), On hold 0 (0%), Completed 0 (0%), Cancelled 0 (0%)", all);
+        Assert.Contains("data-tooltip-value=\"3 work orders · 100%\"", WebUtility.HtmlDecode(all));
+        Assert.DoesNotContain("donut--has-selection", all);
 
         static string Row(string title) => $"<td>{title}</td>";
 
         var critical = await _client.GetStringAsync("/WorkOrders?priority=Critical&open=true");
         Assert.Contains(Row("Wing inspection"), critical);
         Assert.DoesNotContain(Row("Seat cover"), critical);
-        Assert.Contains("donut--has-selection", critical);
+        Assert.DoesNotContain("donut--has-selection", critical);
         Assert.Contains("Showing 1 of 3 work orders · open only", WebUtility.HtmlDecode(critical));
+        Assert.Contains("aria-label=\"Clear filter: Open critical\"", critical);
+
+        var open = await _client.GetStringAsync("/WorkOrders?status=Open");
+        Assert.Contains("donut--has-selection", open);
+        Assert.Contains("donut__segment chart-role--info is-selected", open);
 
         var searched = await _client.GetStringAsync($"/WorkOrders?search=galley");
         Assert.Contains(Row("Galley oven"), searched);

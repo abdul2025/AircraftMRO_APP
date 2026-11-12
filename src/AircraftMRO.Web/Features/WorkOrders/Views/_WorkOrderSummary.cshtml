@@ -9,6 +9,20 @@
     <div><dt>Status</dt><dd><partial name="_WorkOrderStatusBadge" model="Model.Status" /></dd></div>
     <div><dt>Priority</dt><dd><partial name="_PriorityBadge" model="Model.Priority" /></dd></div>
     <div><dt>Due date</dt><dd><partial name="_DueDate" model="(Model.DueDate, Model.IsOverdue)" /></dd></div>
+    <div>
+        <dt>Maintenance</dt>
+        <dd>
+            @if (Model.MaintenanceCount == 0)
+            {
+                <span>None scheduled</span>
+            }
+            else
+            {
+                <a asp-controller="MaintenanceOrders" asp-action="Index" asp-route-workOrderId="@Model.Id">@Model.MaintenanceCount @(Model.MaintenanceCount == 1 ? "order" : "orders")</a>
+                <span class="field-hint">· @Model.CompletedMaintenanceCount completed</span>
+            }
+        </dd>
+    </div>
     @if (Model.CompletedAtUtc is { } completedAt)
     {
         <div>

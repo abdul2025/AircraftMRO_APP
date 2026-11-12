@@ -1,35 +1,23 @@
 @model AircraftListViewModel
 @{
     var statistics = Model.Statistics;
-    var activeStatus = Model.Filter.Status;
     var flightHours = statistics.TotalFlightHours;
+    string ListUrl(Dictionary<string, string> routeValues) => Url.Action("Index", (object)routeValues)!;
+
+    var panel = new StatPanelViewModel(
+        Label: "Fleet summary",
+        TotalLabel: "Total aircraft",
+        AllUrl: ListUrl(Model.RouteValues(keepStatus: false)),
+        Breakdown: FleetStatusChart.From(statistics, Model.Filter.Status, status => ListUrl(Model.RouteValues(status: status, keepStatus: false))),
+        Highlights:
+        [
+            new StatHighlight(
+                "Fleet flight hours",
+                NumberDisplay.Compact(decimal.Round(flightHours)),
+                "neutral",
+                Title: $"{flightHours:N1} hours")
+        ],
+        FacetLabel: Model.Filter.Status is { } status ? AircraftStatusLabels.ToLabel(status) : null);
 }
 
-<section class="stat-row" aria-label="Fleet summary">
-    <a class="stat-tile @(activeStatus is null ? "is-selected" : null)"
-       asp-action="Index" asp-all-route-data="Model.RouteValues(keepStatus: false)"
-       aria-current="@(activeStatus is null ? "true" : null)">
-        <span class="stat-tile__label">Total aircraft</span>
-        <span class="stat-tile__value">@NumberDisplay.Compact(statistics.TotalCount)</span>
-    </a>
-
-    @foreach (var status in Enum.GetValues<AircraftStatus>())
-    {
-        var isSelected = activeStatus == status;
-        <a class="stat-tile @(isSelected ? "is-selected" : null)"
-           asp-action="Index" asp-all-route-data="Model.RouteValues(status: status, keepStatus: false)"
-           aria-current="@(isSelected ? "true" : null)"
-           title="Show @AircraftStatusLabels.ToLabel(status).ToLowerInvariant() aircraft">
-            <span class="stat-tile__label">
-                <span class="status-dot status-dot--@AircraftStatusLabels.ToCssModifier(status)" aria-hidden="true"></span>
-                @AircraftStatusLabels.ToLabel(status)
-            </span>
-            <span class="stat-tile__value">@NumberDisplay.Compact(statistics.CountFor(status))</span>
-        </a>
-    }
-
-    <div class="stat-tile stat-tile--static">
-        <span class="stat-tile__label">Fleet flight hours</span>
-        <span class="stat-tile__value" title="@flightHours.ToString("N1") hours">@NumberDisplay.Compact(decimal.Round(flightHours))</span>
-    </div>
-</section>
+<partial name="_StatOverview" model="panel" />

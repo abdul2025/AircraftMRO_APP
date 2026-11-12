@@ -1,11 +1,13 @@
 using AircraftMRO.Application.Common.Interfaces;
 using AircraftMRO.Application.Features.Aircraft.Ports;
+using AircraftMRO.Application.Features.MaintenanceOrders.Ports;
 using AircraftMRO.Application.Features.Notifications.Ports;
 using AircraftMRO.Application.Features.WorkOrders;
 using AircraftMRO.Application.Features.WorkOrders.Ports;
 using AircraftMRO.Infrastructure.Auditing;
 using AircraftMRO.Infrastructure.Persistence;
 using AircraftMRO.Infrastructure.Persistence.Features.Aircraft;
+using AircraftMRO.Infrastructure.Persistence.Features.MaintenanceOrders;
 using AircraftMRO.Infrastructure.Persistence.Features.Notifications;
 using AircraftMRO.Infrastructure.Persistence.Features.WorkOrders;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IAircraftRepository, AircraftRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IWorkOrderRepository, WorkOrderRepository>();
+        services.AddScoped<IMaintenanceOrderRepository, MaintenanceOrderRepository>();
 
         return services;
     }

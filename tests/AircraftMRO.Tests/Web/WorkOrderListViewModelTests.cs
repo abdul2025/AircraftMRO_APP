@@ -72,4 +72,20 @@ public sealed class WorkOrderListViewModelTests
         Assert.Null(Model(new WorkOrderListFilter(aircraftId: Guid.NewGuid())).SelectedAircraftRegistration);
         Assert.Null(Model(WorkOrderListFilter.None).SelectedAircraftRegistration);
     }
+
+    [Theory]
+    [InlineData(null, null, false, false, null)]
+    [InlineData(WorkOrderStatus.InProgress, null, false, false, "In progress")]
+    [InlineData(null, WorkOrderPriority.Critical, true, false, "Open critical")]
+    [InlineData(null, null, false, true, "Overdue")]
+    [InlineData(null, null, true, false, "Open only")]
+    [InlineData(WorkOrderStatus.OnHold, WorkOrderPriority.High, false, false, "On hold · High priority")]
+    [InlineData(null, WorkOrderPriority.Low, true, true, "Low priority · Overdue")]
+    public void Facet_label_names_the_current_facets(
+        WorkOrderStatus? status, WorkOrderPriority? priority, bool openOnly, bool overdueOnly, string? expected)
+    {
+        var model = Model(new WorkOrderListFilter("brake", status, priority, AircraftId, openOnly: openOnly, overdueOnly: overdueOnly));
+
+        Assert.Equal(expected, model.FacetLabel);
+    }
 }

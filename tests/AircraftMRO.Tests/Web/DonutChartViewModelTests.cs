@@ -78,36 +78,56 @@ public sealed class DonutChartViewModelTests
 
         var grounded = chart.Segments.Single(s => s.Label == "Grounded");
         Assert.Equal("/Aircraft?status=Grounded", grounded.Url);
-        Assert.Equal("chart-status--grounded", grounded.ColorClass);
+        Assert.Equal("danger", grounded.Role);
+        Assert.Equal("chart-role--danger", grounded.ColorClass);
         Assert.Equal("1 aircraft", chart.CountText(1));
     }
 
     [Fact]
-    public void Priority_chart_counts_open_work_by_urgency_and_selects_the_open_priority_facet()
+    public void Status_chart_counts_work_by_status_and_selects_the_status_tile_facet()
     {
         var statistics = new WorkOrderStatisticsDto(
             TotalCount: 9,
-            CountByStatus: new Dictionary<WorkOrderStatus, int> { [WorkOrderStatus.Open] = 6, [WorkOrderStatus.Completed] = 3 },
-            OpenCountByPriority: new Dictionary<WorkOrderPriority, int>
+            CountByStatus: new Dictionary<WorkOrderStatus, int>
             {
-                [WorkOrderPriority.Critical] = 1,
-                [WorkOrderPriority.High] = 2,
-                [WorkOrderPriority.Low] = 3
+                [WorkOrderStatus.Open] = 4,
+                [WorkOrderStatus.InProgress] = 2,
+                [WorkOrderStatus.Completed] = 3
             },
+            OpenCountByPriority: new Dictionary<WorkOrderPriority, int>(),
             OverdueCount: 0);
         var model = new WorkOrderListViewModel(
             new PagedResponse<WorkOrderListItemDto>([], 1, 20, 0),
             statistics,
-            new WorkOrderListFilter(priority: WorkOrderPriority.High, openOnly: true),
+            new WorkOrderListFilter(status: WorkOrderStatus.InProgress),
             []);
 
-        var chart = WorkOrderPriorityChart.From(model, priority => $"/WorkOrders?priority={priority}&open=true");
+        var chart = WorkOrderStatusChart.From(model, status => $"/WorkOrders?status={status}");
 
-        Assert.Equal(["Critical", "High", "Medium", "Low"], chart.Segments.Select(s => s.Label));
-        Assert.Equal([1, 2, 0, 3], chart.Segments.Select(s => s.Count));
-        Assert.Equal(6, chart.Total);
-        Assert.Equal("High", Assert.Single(chart.Segments, s => s.IsSelected).Label);
-        Assert.Equal("1 open work order", chart.CountText(1));
-        Assert.Equal("2 open work orders", chart.CountText(2));
+        Assert.Equal(["Open", "In progress", "On hold", "Completed", "Cancelled"], chart.Segments.Select(s => s.Label));
+        Assert.Equal([4, 2, 0, 3, 0], chart.Segments.Select(s => s.Count));
+        Assert.Equal(9, chart.Total);
+        Assert.Equal("In progress", Assert.Single(chart.Segments, s => s.IsSelected).Label);
+        Assert.Equal("1 work order", chart.CountText(1));
+        Assert.Equal("2 work orders", chart.CountText(2));
+    }
+
+    [Fact]
+    public void Status_chart_has_no_selection_when_a_tile_other_than_a_status_is_active()
+    {
+        var statistics = new WorkOrderStatisticsDto(
+            TotalCount: 1,
+            CountByStatus: new Dictionary<WorkOrderStatus, int> { [WorkOrderStatus.Open] = 1 },
+            OpenCountByPriority: new Dictionary<WorkOrderPriority, int> { [WorkOrderPriority.Critical] = 1 },
+            OverdueCount: 0);
+        var model = new WorkOrderListViewModel(
+            new PagedResponse<WorkOrderListItemDto>([], 1, 20, 0),
+            statistics,
+            new WorkOrderListFilter(priority: WorkOrderPriority.Critical, openOnly: true),
+            []);
+
+        var chart = WorkOrderStatusChart.From(model, status => $"/WorkOrders?status={status}");
+
+        Assert.False(chart.HasSelection);
     }
 }

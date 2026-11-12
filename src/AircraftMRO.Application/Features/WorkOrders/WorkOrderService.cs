@@ -83,8 +83,11 @@ public sealed class WorkOrderService(
             return Result.Failure(WorkOrderErrors.NotFound, WorkOrderErrors.NotFoundMessage);
         }
 
+        // A maintenance order saved after this count also writes the work order, so its row
+        // version rejects a close that missed it.
+        var openMaintenance = await repository.CountOpenMaintenanceOrdersAsync(workOrder.Id, cancellationToken);
         var updated = workOrder.Update(
-            dto.Title, dto.Description, dto.Priority, dto.Status, dto.DueDate, timeProvider.GetUtcNow());
+            dto.Title, dto.Description, dto.Priority, dto.Status, dto.DueDate, openMaintenance, timeProvider.GetUtcNow());
         if (updated.IsFailure)
         {
             return updated;

@@ -1,0 +1,26 @@
+@model MaintenanceOrderDetailsViewModel
+
+<dl class="detail-list">
+    <div><dt>Type</dt><dd>@MaintenanceOrderLabels.ToLabel(Model.Type)</dd></div>
+    <div><dt>Status</dt><dd><partial name="_MaintenanceStatusBadge" model="Model.Status" /></dd></div>
+    <div>
+        <dt>Work order</dt>
+        <dd><a asp-controller="WorkOrders" asp-action="Details" asp-route-id="@Model.WorkOrderId">@Model.WorkOrderNumber</a></dd>
+    </div>
+    <div>
+        <dt>Aircraft</dt>
+        <dd><a asp-controller="Aircraft" asp-action="Details" asp-route-id="@Model.AircraftId">@Model.AircraftRegistration</a></dd>
+    </div>
+    <div><dt>Scheduled date</dt><dd><partial name="_ScheduledDate" model="(Model.ScheduledDate, Model.IsOverdue)" /></dd></div>
+    @if (Model.CompletedAtUtc is { } completedAt)
+    {
+        <div>
+            <dt>Completed</dt>
+            <dd><time datetime="@AuditDisplay.MachineTimestamp(completedAt)">@AuditDisplay.Timestamp(completedAt)</time></dd>
+        </div>
+    }
+    <div class="detail-list__wide">
+        <dt>Notes</dt>
+        <dd class="preserve-lines">@(Model.Notes ?? "No notes")</dd>
+    </div>
+</dl>

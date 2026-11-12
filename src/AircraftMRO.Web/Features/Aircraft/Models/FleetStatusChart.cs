@@ -27,16 +27,8 @@ public static class FleetStatusChart
                 .Select(status => new DonutSlice(
                     AircraftStatusLabels.ToLabel(status),
                     statistics.CountFor(status),
-                    ColorClass(status),
+                    AircraftStatusLabels.ToCssModifier(status),
                     urlFor(status),
                     selectedStatus == status))
                 .ToList());
-
-    public static string ColorClass(AircraftStatus status) => status switch
-    {
-        AircraftStatus.Active => "chart-status--active",
-        AircraftStatus.InMaintenance => "chart-status--maintenance",
-        AircraftStatus.Grounded => "chart-status--grounded",
-        _ => "chart-status--retired"
-    };
 }

@@ -12,6 +12,7 @@ public static class WorkOrderErrors
     public const string AircraftRetired = AircraftEntity.RetiredErrorCode;
     public const string ConcurrencyConflict = "WorkOrder.ConcurrencyConflict";
     public const string OpenCannotBeDeleted = "WorkOrder.OpenCannotBeDeleted";
+    public const string OpenMaintenance = WorkOrderEntity.OpenMaintenanceErrorCode;
 
     /// <summary>
     /// The work order was current but its aircraft, or another of its work orders, changed during

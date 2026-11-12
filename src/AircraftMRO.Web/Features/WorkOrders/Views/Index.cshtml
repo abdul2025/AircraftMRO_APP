@@ -19,10 +19,7 @@
     </div>
 
     <partial name="_StatusMessages" />
-    <div class="fleet-overview">
-        <partial name="_WorkOrderStatistics" model="Model" />
-        <partial name="_WorkOrderPriorityChart" model="Model" />
-    </div>
+    <partial name="_WorkOrderStatistics" model="Model" />
 
     <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter work orders">
         <div class="filter-bar__field filter-bar__field--search">
@@ -108,6 +105,7 @@
                         <th scope="col">Priority</th>
                         <th scope="col">Status</th>
                         <th scope="col">Due</th>
+                        <th scope="col" class="numeric">Maintenance</th>
                         <th scope="col"><span class="visually-hidden">Actions</span></th>
                     </tr>
                 </thead>
@@ -121,6 +119,17 @@
                             <td><partial name="_PriorityBadge" model="workOrder.Priority" /></td>
                             <td><partial name="_WorkOrderStatusBadge" model="workOrder.Status" /></td>
                             <td><partial name="_DueDate" model="(workOrder.DueDate, workOrder.IsOverdue)" /></td>
+                            <td class="numeric">
+                                @if (workOrder.MaintenanceCount == 0)
+                                {
+                                    <span>0</span>
+                                }
+                                else
+                                {
+                                    <a asp-controller="MaintenanceOrders" asp-action="Index" asp-route-workOrderId="@workOrder.Id"
+                                       aria-label="@workOrder.MaintenanceCount maintenance @(workOrder.MaintenanceCount == 1 ? "order" : "orders") for @workOrder.Number">@workOrder.MaintenanceCount</a>
+                                }
+                            </td>
                             <td class="actions-cell">
                                 <partial name="_WorkOrderActions" model="new WorkOrderActionsViewModel(workOrder.Id, workOrder.Number, AircraftMRO.Domain.Entities.WorkOrder.IsOpenStatus(workOrder.Status))" />
                             </td>

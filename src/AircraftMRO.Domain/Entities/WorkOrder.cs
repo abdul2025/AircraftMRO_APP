@@ -6,12 +6,14 @@ namespace AircraftMRO.Domain.Entities;
 
 /// <summary>
 /// A unit of maintenance work raised against one aircraft. While open it holds the aircraft
-/// out of service; see <see cref="Aircraft.ApplyOpenWorkOrder"/>.
+/// out of service; see <see cref="Aircraft.ApplyOpenWorkOrders"/>. Its status also follows its
+/// maintenance orders; see <see cref="FollowMaintenance"/>.
 /// </summary>
 public sealed class WorkOrder : AuditableEntity, IHasDisplayName
 {
     public const string ValidationErrorCode = "WorkOrder.Validation";
     public const string ClosedErrorCode = "WorkOrder.Closed";
+    public const string OpenMaintenanceErrorCode = "WorkOrder.OpenMaintenance";
     public const int NumberMaxLength = 20;
     public const int TitleMaxLength = 150;
     public const int DescriptionMaxLength = 2000;
@@ -75,7 +77,8 @@ public sealed class WorkOrder : AuditableEntity, IHasDisplayName
 
     /// <summary>
     /// Changes the details and status. Completed and cancelled work orders are final and
-    /// can no longer be changed.
+    /// can no longer be changed, and a work order cannot be closed while
+    /// <paramref name="openMaintenanceCount"/> of its maintenance orders are still open.
     /// </summary>
     public Result Update(
         string title,
@@ -83,6 +86,7 @@ public sealed class WorkOrder : AuditableEntity, IHasDisplayName
         WorkOrderPriority priority,
         WorkOrderStatus status,
         DateOnly? dueDate,
+        int openMaintenanceCount,
         DateTimeOffset now)
     {
         if (!IsOpen)
@@ -90,8 +94,45 @@ public sealed class WorkOrder : AuditableEntity, IHasDisplayName
             return Result.Failure(ClosedErrorCode, "This work order is closed and can no longer be changed.");
         }
 
+        // An undefined status falls through to Apply, which reports it as a validation error.
+        if (Enum.IsDefined(status) && !IsOpenStatus(status) && openMaintenanceCount > 0)
+        {
+            return Result.Failure(
+                OpenMaintenanceErrorCode,
+                "This work order has scheduled or in-progress maintenance. Complete or delete it first.");
+        }
+
         var completedAtUtc = status == WorkOrderStatus.Completed ? now : (DateTimeOffset?)null;
         return Apply(title, description, priority, status, dueDate, completedAtUtc);
+    }
+
+    /// <summary>
+    /// Moves an open work order along with its maintenance: once every one of its maintenance
+    /// orders is completed it is completed too, otherwise any maintenance in progress puts it in
+    /// progress. A closed work order, or one without maintenance, is left as it is.
+    /// </summary>
+    /// <returns><c>true</c> when the status changed.</returns>
+    public bool FollowMaintenance(int maintenanceCount, int inProgressCount, int completedCount, DateTimeOffset now)
+    {
+        if (!IsOpen || maintenanceCount == 0)
+        {
+            return false;
+        }
+
+        if (completedCount == maintenanceCount)
+        {
+            Status = WorkOrderStatus.Completed;
+            CompletedAtUtc = now;
+            return true;
+        }
+
+        if (inProgressCount > 0 && Status != WorkOrderStatus.InProgress)
+        {
+            Status = WorkOrderStatus.InProgress;
+            return true;
+        }
+
+        return false;
     }
 
     private Result Apply(

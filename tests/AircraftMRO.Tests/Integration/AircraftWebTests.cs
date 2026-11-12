@@ -227,8 +227,8 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
         }
 
         var all = await _client.GetStringAsync("/Aircraft");
-        Assert.Matches(@"Total aircraft</span>\s*<span class=""stat-tile__value"">3<", all);
-        Assert.Matches(@"Grounded\s*</span>\s*<span class=""stat-tile__value"">1<", all);
+        Assert.Matches(@"Total aircraft</span>\s*<span class=""stat-panel__total-value"">3<", all);
+        Assert.Matches(@"Grounded</span>\s*<span class=""stat-share__value"">1</span>\s*<span class=""stat-share__percent"">33%<", all);
         Assert.Contains("href=\"/Aircraft?status=Grounded\"", all);
 
         // Match table rows only: the notification bell on every page also mentions these registrations.
@@ -238,6 +238,7 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
         Assert.Contains(Row("WF-G1"), grounded);
         Assert.DoesNotContain(Row("WF-A1"), grounded);
         Assert.Contains("Showing 1 of 3 aircraft", grounded);
+        Assert.Contains("aria-label=\"Clear filter: Grounded\"", grounded);
 
         var searched = await _client.GetStringAsync("/Aircraft?search=wf-a2");
         Assert.Contains(Row("WF-A2"), searched);

@@ -14,6 +14,8 @@ public sealed record WorkOrderDto(
     DateOnly? DueDate,
     bool IsOverdue,
     DateTimeOffset? CompletedAtUtc,
+    int MaintenanceCount,
+    int CompletedMaintenanceCount,
     DateTimeOffset CreatedAtUtc,
     string? CreatedBy,
     DateTimeOffset? UpdatedAtUtc,

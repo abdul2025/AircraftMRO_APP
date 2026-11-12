@@ -106,6 +106,71 @@ namespace AircraftMRO.Infrastructure.Persistence.Migrations
                     b.ToTable("Aircraft", (string)null);
                 });
 
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.MaintenanceOrder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateOnly>("ScheduledDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("WorkOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status", "ScheduledDate");
+
+                    b.HasIndex("WorkOrderId", "Status");
+
+                    b.ToTable("MaintenanceOrders", (string)null);
+                });
+
             modelBuilder.Entity("AircraftMRO.Domain.Entities.Notification", b =>
                 {
                     b.Property<long>("Id")
@@ -233,6 +298,15 @@ namespace AircraftMRO.Infrastructure.Persistence.Migrations
                     b.HasIndex("Status", "Priority");
 
                     b.ToTable("WorkOrders", (string)null);
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.MaintenanceOrder", b =>
+                {
+                    b.HasOne("AircraftMRO.Domain.Entities.WorkOrder", null)
+                        .WithMany()
+                        .HasForeignKey("WorkOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AircraftMRO.Domain.Entities.WorkOrder", b =>

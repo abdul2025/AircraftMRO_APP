@@ -55,5 +55,10 @@
     <div class="form-actions">
         <a class="button button--secondary" asp-action="Index">Back to work orders</a>
         <a class="button button--secondary" asp-action="Index" asp-route-aircraftId="@Model.AircraftId">All work for @Model.AircraftRegistration</a>
+        <a class="button button--secondary" asp-controller="MaintenanceOrders" asp-action="Index" asp-route-workOrderId="@Model.Id">View maintenance</a>
+        @if (Model.IsOpen)
+        {
+            <a class="button button--primary" asp-controller="MaintenanceOrders" asp-action="Create" asp-route-workOrderId="@Model.Id" data-modal>Schedule maintenance</a>
+        }
     </div>
 </section>

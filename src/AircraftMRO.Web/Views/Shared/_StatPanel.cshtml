@@ -1,0 +1,88 @@
+@model StatPanelViewModel
+@inject TimeProvider Time
+@{
+    var breakdown = Model.Breakdown;
+}
+
+@* live-status.js keeps the footer's connection state and "updated" time current. *@
+<section class="stat-panel" aria-label="@Model.Label">
+    <div class="stat-panel__head">
+        <div class="stat-panel__total">
+            <span class="stat-panel__total-label">@Model.TotalLabel</span>
+            <span class="stat-panel__total-value">@NumberDisplay.Compact(breakdown.Total)</span>
+        </div>
+
+        @if (Model.Highlights.Count > 0)
+        {
+            <div class="stat-panel__highlights">
+                @foreach (var highlight in Model.Highlights)
+                {
+                    if (highlight.Url is null)
+                    {
+                        <div class="stat-highlight chart-role--@highlight.Role" title="@highlight.Title">
+                            <span class="stat-highlight__label">@highlight.Label</span>
+                            <span class="stat-highlight__value">@highlight.Value</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="stat-highlight chart-role--@highlight.Role @(highlight.IsSelected ? "is-selected" : null)"
+                           href="@highlight.Url" aria-current="@(highlight.IsSelected ? "true" : null)" title="@highlight.Title">
+                            <span class="stat-highlight__label">@highlight.Label</span>
+                            <span class="stat-highlight__value">@highlight.Value</span>
+                        </a>
+                    }
+                }
+            </div>
+        }
+    </div>
+
+    <ul class="stat-shares" role="list">
+        <li>
+            <a class="stat-share stat-share--all @(Model.IsAllSelected ? "is-selected" : null)" href="@Model.AllUrl"
+               aria-current="@(Model.IsAllSelected ? "true" : null)" style="--share: 100%">
+                <span class="stat-share__dot" aria-hidden="true"></span>
+                <span class="stat-share__label">All</span>
+                <span class="stat-share__value">@NumberDisplay.Compact(breakdown.Total)</span>
+                <span class="stat-share__percent">@(breakdown.Total == 0 ? "0%" : "100%")</span>
+            </a>
+        </li>
+        @foreach (var segment in breakdown.Segments)
+        {
+            <li>
+                <a class="stat-share @segment.ColorClass @(segment.IsSelected ? "is-selected" : null)" href="@segment.Url"
+                   aria-current="@(segment.IsSelected ? "true" : null)" style="--share: @StatPanelViewModel.FillWidth(segment.Share)"
+                   title="Show @segment.Label.ToLowerInvariant() @breakdown.Text.UnitPlural">
+                    <span class="stat-share__dot" aria-hidden="true"></span>
+                    <span class="stat-share__label">@segment.Label</span>
+                    <span class="stat-share__value">@NumberDisplay.Compact(segment.Count)</span>
+                    <span class="stat-share__percent">@segment.Percent</span>
+                </a>
+            </li>
+        }
+    </ul>
+
+    <footer class="stat-panel__footer">
+        <span class="stat-panel__status">
+            <span class="live-status" data-live-status data-state="pending">Connecting…</span>
+            <span aria-hidden="true">·</span>
+            <time data-updated-at datetime="@Time.GetUtcNow().ToString("O")">Updated just now</time>
+        </span>
+        <span class="stat-panel__filter">
+            Filter
+            @if (Model.FacetLabel is null)
+            {
+                <strong>None</strong>
+            }
+            else
+            {
+                <span class="filter-pill">
+                    @Model.FacetLabel
+                    <a class="filter-pill__clear" href="@Model.AllUrl" aria-label="Clear filter: @Model.FacetLabel">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                    </a>
+                </span>
+            }
+        </span>
+    </footer>
+</section>

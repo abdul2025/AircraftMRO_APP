@@ -5,7 +5,9 @@ using AircraftMRO.Application.Features.WorkOrders.DTOs;
 using AircraftMRO.Application.Features.WorkOrders.Ports;
 using AircraftMRO.Domain.Common.Results;
 using AircraftMRO.Domain.Entities;
+using AircraftMRO.Domain.Enums.MaintenanceOrders;
 using AircraftMRO.Domain.Enums.WorkOrders;
+using AircraftMRO.Infrastructure.Persistence.Features.MaintenanceOrders;
 using Microsoft.EntityFrameworkCore;
 using AircraftEntity = AircraftMRO.Domain.Entities.Aircraft;
 
@@ -92,7 +94,8 @@ internal sealed class WorkOrderRepository(AircraftMroDbContext dbContext) : IWor
                 row.WorkOrder.Status != WorkOrderStatus.Completed
                     && row.WorkOrder.Status != WorkOrderStatus.Cancelled
                     && row.WorkOrder.DueDate != null
-                    && row.WorkOrder.DueDate < today))
+                    && row.WorkOrder.DueDate < today,
+                dbContext.MaintenanceOrders.Count(maintenanceOrder => maintenanceOrder.WorkOrderId == row.WorkOrder.Id)))
             .ToListAsync(cancellationToken);
 
         return new PagedResponse<WorkOrderListItemDto>(items, request.Page, request.PageSize, totalCount);
@@ -156,6 +159,9 @@ internal sealed class WorkOrderRepository(AircraftMroDbContext dbContext) : IWor
                  && workOrder.DueDate != null
                  && workOrder.DueDate < today,
              workOrder.CompletedAtUtc,
+             dbContext.MaintenanceOrders.Count(maintenanceOrder => maintenanceOrder.WorkOrderId == workOrder.Id),
+             dbContext.MaintenanceOrders.Count(maintenanceOrder => maintenanceOrder.WorkOrderId == workOrder.Id
+                 && maintenanceOrder.Status == MaintenanceStatus.Completed),
              workOrder.CreatedAtUtc,
              workOrder.CreatedBy,
              workOrder.UpdatedAtUtc,
@@ -178,6 +184,13 @@ internal sealed class WorkOrderRepository(AircraftMroDbContext dbContext) : IWor
             .Where(workOrder => workOrder.AircraftId == aircraftId
                 && (excludeWorkOrderId == null || workOrder.Id != excludeWorkOrderId))
             .CountOpenAsync(cancellationToken);
+
+    public Task<int> CountOpenMaintenanceOrdersAsync(Guid workOrderId, CancellationToken cancellationToken) =>
+        dbContext.MaintenanceOrders
+            .AsNoTracking()
+            .Where(maintenanceOrder => maintenanceOrder.WorkOrderId == workOrderId)
+            .WhereOpen()
+            .CountAsync(cancellationToken);
 
     public async Task<string> NextNumberAsync(CancellationToken cancellationToken)
     {

@@ -1,5 +1,7 @@
 using AircraftMRO.Application.Features.Aircraft;
 using AircraftMRO.Application.Features.Aircraft.Interfaces;
+using AircraftMRO.Application.Features.MaintenanceOrders;
+using AircraftMRO.Application.Features.MaintenanceOrders.Interfaces;
 using AircraftMRO.Application.Features.Notifications;
 using AircraftMRO.Application.Features.Notifications.Interfaces;
 using AircraftMRO.Application.Features.WorkOrders;
@@ -18,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationService, NotificationService>();
         services.TryAddSingleton(new WorkOrderOptions());
         services.AddScoped<IWorkOrderService, WorkOrderService>();
+        services.AddScoped<IMaintenanceOrderService, MaintenanceOrderService>();
 
         return services;
     }
