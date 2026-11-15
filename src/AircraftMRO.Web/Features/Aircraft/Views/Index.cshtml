@@ -79,8 +79,8 @@
                     {
                         <tr>
                             <th scope="row"><a asp-action="Details" asp-route-id="@aircraft.Id">@aircraft.RegistrationNumber</a></th>
-                            <td>@aircraft.Manufacturer</td>
-                            <td>@aircraft.Model</td>
+                            <td>@aircraft.ManufacturerName</td>
+                            <td>@aircraft.ModelName</td>
                             <td class="numeric">@aircraft.YearOfManufacture</td>
                             <td class="numeric">@aircraft.TotalFlightHours.ToString("N1")</td>
                             <td><partial name="_StatusBadge" model="aircraft.Status" /></td>

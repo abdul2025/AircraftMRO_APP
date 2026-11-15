@@ -4,8 +4,8 @@ namespace AircraftMRO.Application.Features.Aircraft.DTOs;
 
 public sealed record CreateAircraftDto(
     string RegistrationNumber,
-    string Manufacturer,
-    string Model,
+    Guid ManufacturerId,
+    Guid ModelId,
     string SerialNumber,
     int YearOfManufacture,
     decimal TotalFlightHours,

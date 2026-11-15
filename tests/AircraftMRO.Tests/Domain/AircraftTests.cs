@@ -11,13 +11,13 @@ public sealed class AircraftTests
     [Fact]
     public void Create_normalizes_registration_and_trims_text()
     {
-        var result = Aircraft.Create("  hz-abc ", " Airbus ", " A320 ", " 5123 ", 2012, 100.5m, AircraftStatus.Active, CurrentYear);
+        var result = Aircraft.Create("  hz-abc ", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, " 5123 ", 2012, 100.5m, AircraftStatus.Active, CurrentYear);
 
         Assert.True(result.IsSuccess);
         var aircraft = result.Value!;
         Assert.Equal("HZ-ABC", aircraft.RegistrationNumber);
-        Assert.Equal("Airbus", aircraft.Manufacturer);
-        Assert.Equal("A320", aircraft.Model);
+        Assert.Equal(AircraftTestData.ManufacturerId, aircraft.ManufacturerId);
+        Assert.Equal(AircraftTestData.ModelId, aircraft.ModelId);
         Assert.Equal("5123", aircraft.SerialNumber);
         Assert.Equal(Guid.Empty, aircraft.Id); // assigned by persistence on Add
     }
@@ -30,38 +30,38 @@ public sealed class AircraftTests
     [InlineData("-HZABC")]
     [InlineData("")]
     public void Create_rejects_invalid_registration(string registration) =>
-        AssertInvalid(Aircraft.Create(registration, "Airbus", "A320", "1", 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create(registration, AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
 
     [Theory]
     [InlineData(1902)]
     [InlineData(CurrentYear + 2)]
     public void Create_rejects_year_out_of_range(int year) =>
-        AssertInvalid(Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", year, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", year, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
 
     [Theory]
     [InlineData(1903)]
     [InlineData(CurrentYear + 1)]
     public void Create_accepts_year_boundaries(int year) =>
-        Assert.True(Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", year, 0, AircraftStatus.Active, CurrentYear).IsSuccess);
+        Assert.True(Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", year, 0, AircraftStatus.Active, CurrentYear).IsSuccess);
 
     [Theory]
     [InlineData("-0.1")]
     [InlineData("10.25")]
     [InlineData("100000000.0")]
     public void Create_rejects_invalid_flight_hours(string hours) =>
-        AssertInvalid(Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", 2012, decimal.Parse(hours), AircraftStatus.Active, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", 2012, decimal.Parse(hours), AircraftStatus.Active, CurrentYear).ErrorCode);
 
     [Fact]
-    public void Create_rejects_blank_and_oversized_text()
+    public void Create_rejects_missing_references_and_oversized_text()
     {
-        AssertInvalid(Aircraft.Create("HZ-ABC", " ", "A320", "1", 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
-        AssertInvalid(Aircraft.Create("HZ-ABC", "Airbus", new string('M', 101), "1", 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
-        AssertInvalid(Aircraft.Create("HZ-ABC", "Airbus", "A320", new string('S', 51), 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create("HZ-ABC", Guid.Empty, AircraftTestData.ModelId, "1", 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, Guid.Empty, "1", 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, new string('S', 51), 2012, 0, AircraftStatus.Active, CurrentYear).ErrorCode);
     }
 
     [Fact]
     public void Create_rejects_undefined_status() =>
-        AssertInvalid(Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", 2012, 0, (AircraftStatus)99, CurrentYear).ErrorCode);
+        AssertInvalid(Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", 2012, 0, (AircraftStatus)99, CurrentYear).ErrorCode);
 
     [Fact]
     public void Update_changes_values_and_keeps_id()
@@ -69,7 +69,7 @@ public sealed class AircraftTests
         var aircraft = AircraftTestData.NewAircraft();
         var id = aircraft.Id;
 
-        var result = aircraft.Update("hz-xyz", "Boeing", "737-800", "999", 2015, 42m, AircraftStatus.Grounded, CurrentYear);
+        var result = aircraft.Update("hz-xyz", AircraftTestData.OtherManufacturerId, AircraftTestData.OtherModelId, "999", 2015, 42m, AircraftStatus.Grounded, CurrentYear);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(id, aircraft.Id);
@@ -82,7 +82,7 @@ public sealed class AircraftTests
     {
         var aircraft = AircraftTestData.NewAircraft();
 
-        var result = aircraft.Update("HZ-XYZ", "Boeing", "737", "999", 1800, 42m, AircraftStatus.Grounded, CurrentYear);
+        var result = aircraft.Update("HZ-XYZ", AircraftTestData.OtherManufacturerId, AircraftTestData.OtherModelId, "999", 1800, 42m, AircraftStatus.Grounded, CurrentYear);
 
         Assert.True(result.IsFailure);
         Assert.Equal("HZ-ABC", aircraft.RegistrationNumber);
@@ -104,7 +104,7 @@ public sealed class AircraftTests
         bool anyCritical,
         AircraftStatus after)
     {
-        var aircraft = Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", 2012, 0, before, CurrentYear).Value!;
+        var aircraft = Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", 2012, 0, before, CurrentYear).Value!;
 
         var result = aircraft.ApplyOpenWorkOrders(openCount, anyCritical);
 
@@ -115,7 +115,7 @@ public sealed class AircraftTests
     [Fact]
     public void Open_work_orders_are_rejected_for_a_retired_aircraft()
     {
-        var aircraft = Aircraft.Create("HZ-ABC", "Airbus", "A320", "1", 2012, 0, AircraftStatus.Retired, CurrentYear).Value!;
+        var aircraft = Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "1", 2012, 0, AircraftStatus.Retired, CurrentYear).Value!;
 
         var result = aircraft.ApplyOpenWorkOrders(1, anyCritical: true);
 

@@ -1,5 +1,8 @@
 using AircraftMRO.Application.Common.Interfaces;
 using AircraftMRO.Application.Features.Aircraft.Ports;
+using AircraftMRO.Application.Features.AircraftManufacturers.Ports;
+using AircraftMRO.Application.Features.AircraftModels.Ports;
+using AircraftMRO.Application.Features.Countries.Ports;
 using AircraftMRO.Application.Features.MaintenanceOrders.Ports;
 using AircraftMRO.Application.Features.Notifications.Ports;
 using AircraftMRO.Application.Features.WorkOrders;
@@ -7,6 +10,9 @@ using AircraftMRO.Application.Features.WorkOrders.Ports;
 using AircraftMRO.Infrastructure.Auditing;
 using AircraftMRO.Infrastructure.Persistence;
 using AircraftMRO.Infrastructure.Persistence.Features.Aircraft;
+using AircraftMRO.Infrastructure.Persistence.Features.AircraftManufacturers;
+using AircraftMRO.Infrastructure.Persistence.Features.AircraftModels;
+using AircraftMRO.Infrastructure.Persistence.Features.Countries;
 using AircraftMRO.Infrastructure.Persistence.Features.MaintenanceOrders;
 using AircraftMRO.Infrastructure.Persistence.Features.Notifications;
 using AircraftMRO.Infrastructure.Persistence.Features.WorkOrders;
@@ -54,6 +60,9 @@ public static class DependencyInjection
                 .AddInterceptors(serviceProvider.GetRequiredService<AuditableEntityInterceptor>()));
 
         services.AddScoped<IAircraftRepository, AircraftRepository>();
+        services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<IAircraftManufacturerRepository, AircraftManufacturerRepository>();
+        services.AddScoped<IAircraftModelRepository, AircraftModelRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IWorkOrderRepository, WorkOrderRepository>();
         services.AddScoped<IMaintenanceOrderRepository, MaintenanceOrderRepository>();

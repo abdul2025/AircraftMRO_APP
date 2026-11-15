@@ -161,8 +161,8 @@ public sealed class MaintenanceOrderApiTests(SqlServerFixture fixture) : IAsyncL
         var aircraft = await _client.PostAsJsonAsync("/api/aircraft", new
         {
             registrationNumber = registration,
-            manufacturer = "Airbus",
-            model = "A320-214",
+            manufacturerId = AircraftTestData.ManufacturerId,
+            modelId = AircraftTestData.ModelId,
             serialNumber = registration,
             yearOfManufacture = 2012,
             totalFlightHours = 100m,

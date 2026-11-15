@@ -13,6 +13,9 @@ public static class NotificationLinks
     private static readonly Dictionary<string, string> DetailsControllers = new(StringComparer.Ordinal)
     {
         [nameof(Aircraft)] = "Aircraft",
+        [nameof(AircraftManufacturer)] = "AircraftManufacturers",
+        [nameof(AircraftModel)] = "AircraftModels",
+        [nameof(Country)] = "Countries",
         [nameof(WorkOrder)] = "WorkOrders",
         [nameof(MaintenanceOrder)] = "MaintenanceOrders"
     };

@@ -15,14 +15,29 @@
         <span asp-validation-for="Status" class="field-error"></span>
     </div>
     <div class="form-field">
-        <label asp-for="Manufacturer"></label>
-        <input asp-for="Manufacturer" autocomplete="off" placeholder="Airbus" />
-        <span asp-validation-for="Manufacturer" class="field-error"></span>
+        <label asp-for="ManufacturerId"></label>
+        <select asp-for="ManufacturerId">
+            <option value="">Select a manufacturer</option>
+            @foreach (var manufacturer in Model.Options.Manufacturers)
+            {
+                <option value="@manufacturer.Id" selected="@(Model.ManufacturerId == manufacturer.Id)">@manufacturer.Name@(manufacturer.IsActive ? "" : " (inactive)")</option>
+            }
+        </select>
+        <span asp-validation-for="ManufacturerId" class="field-error"></span>
     </div>
     <div class="form-field">
-        <label asp-for="Model"></label>
-        <input asp-for="Model" autocomplete="off" placeholder="A320-214" />
-        <span asp-validation-for="Model" class="field-error"></span>
+        <label asp-for="ModelId"></label>
+        @* dependent-select.js hides the models of other manufacturers when the manufacturer changes. *@
+        <select asp-for="ModelId" data-depends-on="@Html.IdFor(m => m.ManufacturerId)">
+            <option value="">Select a model</option>
+            @foreach (var option in Model.Options.Models)
+            {
+                var otherManufacturer = Model.ManufacturerId is { } selected && selected != option.ManufacturerId;
+                <option value="@option.Id" data-parent="@option.ManufacturerId" hidden="@otherManufacturer" disabled="@otherManufacturer"
+                        selected="@(Model.ModelId == option.Id)">@option.Name (@option.ModelCode)@(option.IsActive ? "" : " (inactive)")</option>
+            }
+        </select>
+        <span asp-validation-for="ModelId" class="field-error"></span>
     </div>
     <div class="form-field">
         <label asp-for="SerialNumber"></label>

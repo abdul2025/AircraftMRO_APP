@@ -2,7 +2,7 @@ using AircraftMRO.Domain.Enums.Aircraft;
 
 namespace AircraftMRO.Application.Features.Aircraft.DTOs;
 
-/// <summary>Optional list filters; the search term matches registration, manufacturer, model, or serial number.</summary>
+/// <summary>Optional list filters; the search term matches registration, manufacturer name, model name, or serial number.</summary>
 public sealed record AircraftListFilter
 {
     public const int MaxSearchLength = 100;

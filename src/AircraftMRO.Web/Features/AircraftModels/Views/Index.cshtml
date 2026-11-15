@@ -1,0 +1,107 @@
+@model AircraftModelListViewModel
+@{
+    ViewData["Title"] = "Aircraft models";
+    var results = Model.Page;
+    var filter = Model.Filter;
+}
+
+@* live-refresh.js re-renders this page in place when a model changes. *@
+<section aria-labelledby="models-title" data-live-refresh="AircraftModel">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Reference data</p>
+            <h1 id="models-title">Aircraft models</h1>
+        </div>
+        <a class="button button--primary" asp-action="Create" asp-route-manufacturerId="@filter.ManufacturerId" data-modal>Add model</a>
+    </div>
+
+    <partial name="_StatusMessages" />
+
+    <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter aircraft models">
+        <div class="filter-bar__field filter-bar__field--search">
+            <label for="model-search">Search</label>
+            <input id="model-search" type="search" name="search" value="@filter.Search"
+                   maxlength="@AircraftMRO.Application.Features.AircraftModels.DTOs.AircraftModelListFilter.MaxSearchLength"
+                   placeholder="Model, code, or manufacturer" autocomplete="off" />
+        </div>
+        <div class="filter-bar__field">
+            <label for="model-manufacturer">Manufacturer</label>
+            <select id="model-manufacturer" name="manufacturerId">
+                <option value="">All manufacturers</option>
+                @foreach (var manufacturer in Model.Manufacturers)
+                {
+                    <option value="@manufacturer.Id" selected="@(filter.ManufacturerId == manufacturer.Id)">@manufacturer.Name</option>
+                }
+            </select>
+        </div>
+        <div class="filter-bar__field">
+            <label for="model-active">Status</label>
+            <select id="model-active" name="isActive">
+                <option value="">All</option>
+                <option value="true" selected="@(filter.IsActive == true)">Active</option>
+                <option value="false" selected="@(filter.IsActive == false)">Inactive</option>
+            </select>
+        </div>
+        <div class="filter-bar__actions">
+            <button type="submit" class="button button--primary">Apply</button>
+            @if (!filter.IsEmpty)
+            {
+                <a class="button button--secondary" asp-action="Index">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (results.TotalCount == 0)
+    {
+        <p class="empty-state">
+            @(filter.IsEmpty ? "No aircraft models have been added yet." : "No aircraft models match these filters.")
+        </p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Model</th>
+                        <th scope="col">Code</th>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in results.Items)
+                    {
+                        <tr>
+                            <th scope="row"><a asp-action="Details" asp-route-id="@item.Id">@item.Name</a></th>
+                            <td>@item.ModelCode</td>
+                            <td>@item.ManufacturerName</td>
+                            <td>@AircraftModelLabels.ToLabel(item.AircraftCategory)</td>
+                            <td><partial name="_ActiveBadge" model="item.IsActive" /></td>
+                            <td class="actions-cell">
+                                <partial name="_RowActions" model="new RowActionsViewModel(item.Id, item.Name)" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (results.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Aircraft model pages">
+                @if (results.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page - 1)">Previous</a>
+                }
+                <span>Page @results.Page of @results.TotalPages (@results.TotalCount models)</span>
+                @if (results.HasNextPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page + 1)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>

@@ -318,7 +318,7 @@ public sealed class MaintenanceOrderPersistenceIntegrationTests(SqlServerFixture
 
     private async Task<Guid> CreateWorkOrderAsync(string registration)
     {
-        var aircraft = Aircraft.Create(registration, "Airbus", "A320-214", registration, 2012, 0m,
+        var aircraft = Aircraft.Create(registration, AircraftTestData.ManufacturerId, AircraftTestData.ModelId, registration, 2012, 0m,
             AircraftStatus.Active, AircraftTestData.CurrentYear).Value!;
         await using (var context = NewContext())
         {

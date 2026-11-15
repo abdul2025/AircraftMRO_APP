@@ -5,8 +5,8 @@ namespace AircraftMRO.Application.Features.Aircraft.DTOs;
 public sealed record AircraftListItemDto(
     Guid Id,
     string RegistrationNumber,
-    string Manufacturer,
-    string Model,
+    string ManufacturerName,
+    string ModelName,
     int YearOfManufacture,
     decimal TotalFlightHours,
     AircraftStatus Status);

@@ -130,12 +130,12 @@ public sealed class AircraftApiTests(SqlServerFixture fixture) : IAsyncLifetime
         JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
     private static RequestBody Body(string registration, string serial = "5123", string status = "Active") =>
-        new(registration, "Airbus", "A320-214", serial, 2012, 31250.5m, status);
+        new(registration, AircraftTestData.ManufacturerId, AircraftTestData.ModelId, serial, 2012, 31250.5m, status);
 
     private sealed record RequestBody(
         string RegistrationNumber,
-        string Manufacturer,
-        string Model,
+        Guid ManufacturerId,
+        Guid ModelId,
         string SerialNumber,
         int YearOfManufacture,
         decimal TotalFlightHours,

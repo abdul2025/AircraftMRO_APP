@@ -57,8 +57,8 @@ public sealed class RealtimeNotificationTests(SqlServerFixture fixture) : IAsync
         var created = await apiClient.PostAsJsonAsync("/api/aircraft", new
         {
             registrationNumber = registration,
-            manufacturer = "Airbus",
-            model = "A320-214",
+            manufacturerId = AircraftTestData.ManufacturerId,
+            modelId = AircraftTestData.ModelId,
             serialNumber = registration,
             yearOfManufacture = 2012,
             totalFlightHours = 100.5m,

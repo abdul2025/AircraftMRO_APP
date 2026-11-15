@@ -6,8 +6,10 @@ namespace AircraftMRO.Api.Features.Aircraft.Contracts;
 public sealed record AircraftResponse(
     Guid Id,
     string RegistrationNumber,
-    string Manufacturer,
-    string Model,
+    Guid ManufacturerId,
+    string ManufacturerName,
+    Guid ModelId,
+    string ModelName,
     string SerialNumber,
     int YearOfManufacture,
     decimal TotalFlightHours,
@@ -18,7 +20,7 @@ public sealed record AircraftResponse(
     string? UpdatedBy)
 {
     public static AircraftResponse From(AircraftDto dto) => new(
-        dto.Id, dto.RegistrationNumber, dto.Manufacturer, dto.Model, dto.SerialNumber,
+        dto.Id, dto.RegistrationNumber, dto.ManufacturerId, dto.ManufacturerName, dto.ModelId, dto.ModelName, dto.SerialNumber,
         dto.YearOfManufacture, dto.TotalFlightHours, dto.Status,
         dto.CreatedAtUtc, dto.CreatedBy, dto.UpdatedAtUtc, dto.UpdatedBy);
 }
@@ -26,14 +28,14 @@ public sealed record AircraftResponse(
 public sealed record AircraftSummaryResponse(
     Guid Id,
     string RegistrationNumber,
-    string Manufacturer,
-    string Model,
+    string ManufacturerName,
+    string ModelName,
     int YearOfManufacture,
     decimal TotalFlightHours,
     AircraftStatus Status)
 {
     public static AircraftSummaryResponse From(AircraftListItemDto dto) => new(
-        dto.Id, dto.RegistrationNumber, dto.Manufacturer, dto.Model,
+        dto.Id, dto.RegistrationNumber, dto.ManufacturerName, dto.ModelName,
         dto.YearOfManufacture, dto.TotalFlightHours, dto.Status);
 }
 

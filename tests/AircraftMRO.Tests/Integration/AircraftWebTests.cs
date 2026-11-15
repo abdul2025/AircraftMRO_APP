@@ -161,7 +161,7 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
     {
         var html = await (await ModalGetAsync("/Aircraft/Create")).Content.ReadAsStringAsync();
         var form = ValidForm(AircraftTestData.UniqueRegistration());
-        form["Manufacturer"] = "";
+        form["ManufacturerId"] = "";
 
         var response = await ModalPostAsync("/Aircraft/Create", html, form);
 
@@ -343,8 +343,8 @@ public sealed partial class AircraftWebTests(SqlServerFixture fixture) : IAsyncL
     private static Dictionary<string, string> ValidForm(string registration, string serial = "5123") => new()
     {
         ["RegistrationNumber"] = registration,
-        ["Manufacturer"] = "Airbus",
-        ["Model"] = "A320-214",
+        ["ManufacturerId"] = AircraftTestData.ManufacturerId.ToString(),
+        ["ModelId"] = AircraftTestData.ModelId.ToString(),
         ["SerialNumber"] = serial,
         ["YearOfManufacture"] = "2012",
         ["TotalFlightHours"] = "31250.5",

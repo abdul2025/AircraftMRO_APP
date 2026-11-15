@@ -78,7 +78,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
         await using (var other = NewContext())
         {
             var competing = await other.Aircraft.SingleAsync(a => a.Id == aircraft.Id);
-            competing.Update("RC-001", "Airbus", "A320-214", "RC-001", 2012, 1m, AircraftStatus.Active, 2026);
+            competing.Update("RC-001", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "RC-001", 2012, 1m, AircraftStatus.Active, 2026);
             await other.SaveChangesAsync();
         }
 
@@ -300,7 +300,7 @@ public sealed class WorkOrderPersistenceIntegrationTests(SqlServerFixture fixtur
 
     private async Task<Aircraft> AddAircraftAsync(string registration, AircraftStatus status)
     {
-        var aircraft = Aircraft.Create(registration, "Airbus", "A320-214", registration, 2012, 0m, status, AircraftTestData.CurrentYear).Value!;
+        var aircraft = Aircraft.Create(registration, AircraftTestData.ManufacturerId, AircraftTestData.ModelId, registration, 2012, 0m, status, AircraftTestData.CurrentYear).Value!;
         await using var context = NewContext();
         Assert.True((await new AircraftRepository(context).AddAsync(aircraft, CancellationToken.None)).IsSuccess);
         return aircraft;

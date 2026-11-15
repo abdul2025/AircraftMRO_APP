@@ -47,7 +47,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
         await using (var context = NewContext())
         {
             var tracked = await context.Aircraft.SingleAsync(a => a.Id == aircraft.Id);
-            tracked.Update("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 31300m, AircraftStatus.RequiredMaintenance, 2026);
+            tracked.Update("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "5123", 2012, 31300m, AircraftStatus.RequiredMaintenance, 2026);
             var entry = context.Entry(tracked);
             entry.Property(a => a.CreatedAtUtc).CurrentValue = DateTimeOffset.UnixEpoch;
             entry.Property(a => a.CreatedBy).CurrentValue = "attacker";
@@ -109,7 +109,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
         await using (var first = NewContext())
         {
             var tracked = await first.Aircraft.SingleAsync(a => a.Id == aircraft.Id);
-            tracked.Update("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 1m, AircraftStatus.Active, 2026);
+            tracked.Update("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "5123", 2012, 1m, AircraftStatus.Active, 2026);
             await first.SaveChangesAsync();
         }
 
@@ -117,7 +117,7 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
         {
             var repository = new AircraftRepository(second);
             var tracked = (await repository.GetForUpdateAsync(aircraft.Id, CancellationToken.None))!;
-            tracked.Update("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 2m, AircraftStatus.Active, 2026);
+            tracked.Update("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "5123", 2012, 2m, AircraftStatus.Active, 2026);
             var result = await repository.UpdateAsync(tracked, staleRowVersion, CancellationToken.None);
             Assert.Equal(AircraftErrors.ConcurrencyConflict, result.ErrorCode);
         }
@@ -198,9 +198,9 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
     [Fact]
     public async Task List_filters_by_status_and_searches_every_text_column()
     {
-        await AddAsync(Aircraft.Create("FL-ONE", "Airbus", "A320", "MSN-111", 2012, 10m, AircraftStatus.Active, 2026).Value!);
-        await AddAsync(Aircraft.Create("FL-TWO", "Boeing", "737-800", "MSN-222", 2014, 20m, AircraftStatus.Grounded, 2026).Value!);
-        await AddAsync(Aircraft.Create("FL-3", "Embraer", "E190", "SN-50%", 2016, 30m, AircraftStatus.Grounded, 2026).Value!);
+        await AddAsync(Aircraft.Create("FL-ONE", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "MSN-111", 2012, 10m, AircraftStatus.Active, 2026).Value!);
+        await AddAsync(Aircraft.Create("FL-TWO", AircraftTestData.OtherManufacturerId, AircraftTestData.OtherModelId, "MSN-222", 2014, 20m, AircraftStatus.Grounded, 2026).Value!);
+        await AddAsync(Aircraft.Create("FL-3", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "SN-50%", 2016, 30m, AircraftStatus.Grounded, 2026).Value!);
 
         await using var context = NewContext();
         var repository = new AircraftRepository(context);
@@ -210,8 +210,8 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
 
         Assert.Equal(["FL-3", "FL-TWO"], await Find(null, AircraftStatus.Grounded));
         Assert.Equal(["FL-TWO"], await Find("fl-t"));        // registration, case-insensitive
-        Assert.Equal(["FL-ONE"], await Find("airbus"));      // manufacturer
-        Assert.Equal(["FL-TWO"], await Find("737"));         // model
+        Assert.Equal(["FL-3", "FL-ONE"], await Find("airbus")); // manufacturer name
+        Assert.Equal(["FL-TWO"], await Find("737"));         // model name
         Assert.Equal(["FL-ONE"], await Find("MSN-111"));     // serial number
         Assert.Equal(["FL-TWO"], await Find("boeing", AircraftStatus.Grounded));
         Assert.Empty(await Find("boeing", AircraftStatus.Active));
@@ -222,10 +222,10 @@ public sealed class AircraftPersistenceIntegrationTests(SqlServerFixture fixture
     [Fact]
     public async Task Statistics_count_live_aircraft_by_status_and_sum_flight_hours()
     {
-        await AddAsync(Aircraft.Create("ST-1", "Airbus", "A320", "ST-1", 2012, 100.5m, AircraftStatus.Active, 2026).Value!);
-        await AddAsync(Aircraft.Create("ST-2", "Airbus", "A320", "ST-2", 2012, 200m, AircraftStatus.Active, 2026).Value!);
-        await AddAsync(Aircraft.Create("ST-3", "Airbus", "A320", "ST-3", 2012, 50m, AircraftStatus.RequiredMaintenance, 2026).Value!);
-        var deleted = await AddAsync(Aircraft.Create("ST-4", "Airbus", "A320", "ST-4", 2012, 999m, AircraftStatus.Grounded, 2026).Value!);
+        await AddAsync(Aircraft.Create("ST-1", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "ST-1", 2012, 100.5m, AircraftStatus.Active, 2026).Value!);
+        await AddAsync(Aircraft.Create("ST-2", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "ST-2", 2012, 200m, AircraftStatus.Active, 2026).Value!);
+        await AddAsync(Aircraft.Create("ST-3", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "ST-3", 2012, 50m, AircraftStatus.RequiredMaintenance, 2026).Value!);
+        var deleted = await AddAsync(Aircraft.Create("ST-4", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "ST-4", 2012, 999m, AircraftStatus.Grounded, 2026).Value!);
         await DeleteAsync(deleted.Id);
 
         await using var context = NewContext();

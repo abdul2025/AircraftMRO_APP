@@ -269,8 +269,8 @@ public sealed class WorkOrderWebTests(SqlServerFixture fixture) : IAsyncLifetime
     private static Dictionary<string, string> AircraftForm(string registration, string status) => new()
     {
         ["RegistrationNumber"] = registration,
-        ["Manufacturer"] = "Airbus",
-        ["Model"] = "A320-214",
+        ["ManufacturerId"] = AircraftTestData.ManufacturerId.ToString(),
+        ["ModelId"] = AircraftTestData.ModelId.ToString(),
         ["SerialNumber"] = registration,
         ["YearOfManufacture"] = "2012",
         ["TotalFlightHours"] = "31250.5",

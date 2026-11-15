@@ -12,6 +12,9 @@ public sealed class AircraftMroDbContext(DbContextOptions<AircraftMroDbContext> 
     public const int UserIdMaxLength = 450;
 
     public DbSet<Aircraft> Aircraft => Set<Aircraft>();
+    public DbSet<Country> Countries => Set<Country>();
+    public DbSet<AircraftManufacturer> AircraftManufacturers => Set<AircraftManufacturer>();
+    public DbSet<AircraftModel> AircraftModels => Set<AircraftModel>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
     public DbSet<MaintenanceOrder> MaintenanceOrders => Set<MaintenanceOrder>();

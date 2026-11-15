@@ -11,8 +11,6 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
     public const string RetiredErrorCode = "Aircraft.Retired";
     public const int RegistrationNumberMinLength = 2;
     public const int RegistrationNumberMaxLength = 10;
-    public const int ManufacturerMaxLength = 100;
-    public const int ModelMaxLength = 100;
     public const int SerialNumberMaxLength = 50;
     public const int FirstYearOfManufacture = 1903;
     public const decimal MaxTotalFlightHours = 99_999_999.9m;
@@ -22,8 +20,10 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
     }
 
     public string RegistrationNumber { get; private set; } = null!;
-    public string Manufacturer { get; private set; } = null!;
-    public string Model { get; private set; } = null!;
+    public Guid ManufacturerId { get; private set; }
+
+    /// <summary>Always one of <see cref="ManufacturerId"/>'s models; the database enforces the pair.</summary>
+    public Guid ModelId { get; private set; }
     public string SerialNumber { get; private set; } = null!;
     public int YearOfManufacture { get; private set; }
     public decimal TotalFlightHours { get; private set; }
@@ -33,8 +33,8 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
 
     public static Result<Aircraft> Create(
         string registrationNumber,
-        string manufacturer,
-        string model,
+        Guid manufacturerId,
+        Guid modelId,
         string serialNumber,
         int yearOfManufacture,
         decimal totalFlightHours,
@@ -43,7 +43,7 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
     {
         var aircraft = new Aircraft();
         var result = aircraft.Apply(
-            registrationNumber, manufacturer, model, serialNumber,
+            registrationNumber, manufacturerId, modelId, serialNumber,
             yearOfManufacture, totalFlightHours, status, currentYear);
 
         return result.IsSuccess
@@ -53,15 +53,15 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
 
     public Result Update(
         string registrationNumber,
-        string manufacturer,
-        string model,
+        Guid manufacturerId,
+        Guid modelId,
         string serialNumber,
         int yearOfManufacture,
         decimal totalFlightHours,
         AircraftStatus status,
         int currentYear) =>
         Apply(
-            registrationNumber, manufacturer, model, serialNumber,
+            registrationNumber, manufacturerId, modelId, serialNumber,
             yearOfManufacture, totalFlightHours, status, currentYear);
 
     public bool IsRetired => Status == AircraftStatus.Retired;
@@ -101,8 +101,8 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
 
     private Result Apply(
         string registrationNumber,
-        string manufacturer,
-        string model,
+        Guid manufacturerId,
+        Guid modelId,
         string serialNumber,
         int yearOfManufacture,
         decimal totalFlightHours,
@@ -110,8 +110,6 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
         int currentYear)
     {
         var normalizedRegistration = NormalizeRegistrationNumber(registrationNumber);
-        var trimmedManufacturer = manufacturer?.Trim() ?? string.Empty;
-        var trimmedModel = model?.Trim() ?? string.Empty;
         var trimmedSerial = serialNumber?.Trim() ?? string.Empty;
 
         if (normalizedRegistration.Length is < RegistrationNumberMinLength or > RegistrationNumberMaxLength
@@ -121,14 +119,14 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
                 $"Registration number must be {RegistrationNumberMinLength}-{RegistrationNumberMaxLength} letters, digits, or hyphens.");
         }
 
-        if (trimmedManufacturer.Length is 0 or > ManufacturerMaxLength)
+        if (manufacturerId == Guid.Empty)
         {
-            return Invalid($"Manufacturer is required and must be at most {ManufacturerMaxLength} characters.");
+            return Invalid("Manufacturer is required.");
         }
 
-        if (trimmedModel.Length is 0 or > ModelMaxLength)
+        if (modelId == Guid.Empty)
         {
-            return Invalid($"Model is required and must be at most {ModelMaxLength} characters.");
+            return Invalid("Model is required.");
         }
 
         if (trimmedSerial.Length is 0 or > SerialNumberMaxLength)
@@ -153,8 +151,8 @@ public sealed partial class Aircraft : AuditableEntity, IHasDisplayName
         }
 
         RegistrationNumber = normalizedRegistration;
-        Manufacturer = trimmedManufacturer;
-        Model = trimmedModel;
+        ManufacturerId = manufacturerId;
+        ModelId = modelId;
         SerialNumber = trimmedSerial;
         YearOfManufacture = yearOfManufacture;
         TotalFlightHours = totalFlightHours;

@@ -1,0 +1,93 @@
+@model CountryListViewModel
+@{
+    ViewData["Title"] = "Countries";
+    var results = Model.Page;
+    var filter = Model.Filter;
+}
+
+@* live-refresh.js re-renders this page in place when a country changes. *@
+<section aria-labelledby="countries-title" data-live-refresh="Country">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Reference data</p>
+            <h1 id="countries-title">Countries</h1>
+        </div>
+        <a class="button button--primary" asp-action="Create" data-modal>Add country</a>
+    </div>
+
+    <partial name="_StatusMessages" />
+
+    <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter countries">
+        <div class="filter-bar__field filter-bar__field--search">
+            <label for="country-search">Search</label>
+            <input id="country-search" type="search" name="search" value="@filter.Search"
+                   maxlength="@AircraftMRO.Application.Features.Countries.DTOs.CountryListFilter.MaxSearchLength"
+                   placeholder="Name or ISO code" autocomplete="off" />
+        </div>
+        <div class="filter-bar__field">
+            <label for="country-active">Status</label>
+            <select id="country-active" name="isActive">
+                <option value="">All</option>
+                <option value="true" selected="@(filter.IsActive == true)">Active</option>
+                <option value="false" selected="@(filter.IsActive == false)">Inactive</option>
+            </select>
+        </div>
+        <div class="filter-bar__actions">
+            <button type="submit" class="button button--primary">Apply</button>
+            @if (!filter.IsEmpty)
+            {
+                <a class="button button--secondary" asp-action="Index">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (results.TotalCount == 0)
+    {
+        <p class="empty-state">
+            @(filter.IsEmpty ? "No countries have been added yet." : "No countries match these filters.")
+        </p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">ISO code</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var country in results.Items)
+                    {
+                        <tr>
+                            <th scope="row"><a asp-action="Details" asp-route-id="@country.Id">@country.Name</a></th>
+                            <td>@country.Code</td>
+                            <td><partial name="_ActiveBadge" model="country.IsActive" /></td>
+                            <td class="actions-cell">
+                                <partial name="_RowActions" model="new RowActionsViewModel(country.Id, country.Name)" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (results.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Country pages">
+                @if (results.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page - 1)">Previous</a>
+                }
+                <span>Page @results.Page of @results.TotalPages (@results.TotalCount countries)</span>
+                @if (results.HasNextPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page + 1)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>

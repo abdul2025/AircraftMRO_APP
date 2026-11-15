@@ -1,0 +1,42 @@
+@model AircraftManufacturerDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@* live-refresh.js re-renders this page when this manufacturer changes, and returns to the list if it is deleted. *@
+<section class="form-card" aria-labelledby="details-title"
+         data-live-refresh="AircraftManufacturer" data-live-refresh-id="@Model.Id" data-live-refresh-gone="@Url.Action("Index")">
+    <div class="card-heading">
+        <div>
+            <p class="eyebrow">Manufacturer</p>
+            <h1 id="details-title">@Model.Name</h1>
+        </div>
+        <partial name="_RowActions" model="new RowActionsViewModel(Model.Id, Model.Name)" />
+    </div>
+
+    <partial name="_StatusMessages" />
+    @if (Model.CountryId is null)
+    {
+        <p class="notice notice--danger" role="status">
+            This manufacturer was carried over from earlier aircraft records without a country. Edit it to set one.
+        </p>
+    }
+    <partial name="_AircraftManufacturerSummary" model="Model" />
+
+    <section class="audit-panel" aria-labelledby="models-title">
+        <h2 id="models-title" class="subheading">Aircraft models</h2>
+        <div class="form-actions">
+            <a class="button button--secondary" asp-controller="AircraftModels" asp-action="Index" asp-route-manufacturerId="@Model.Id">View models</a>
+            @if (Model.IsActive)
+            {
+                <a class="button button--primary" asp-controller="AircraftModels" asp-action="Create" asp-route-manufacturerId="@Model.Id" data-modal>New model</a>
+            }
+        </div>
+    </section>
+
+    <partial name="_AuditTrail" model="new AuditTrailViewModel(Model.Id, Model.CreatedAtUtc, Model.CreatedBy, Model.UpdatedAtUtc, Model.UpdatedBy)" />
+
+    <div class="form-actions">
+        <a class="button button--secondary" asp-action="Index">Back to manufacturers</a>
+    </div>
+</section>

@@ -1,0 +1,35 @@
+@model AircraftManufacturerFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="notice notice--danger" role="alert"></div>
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="form-grid">
+    <div class="form-field">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" autocomplete="off" placeholder="Airbus" />
+        <span asp-validation-for="Name" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="Code"></label>
+        <input asp-for="Code" autocomplete="off" placeholder="AIB" />
+        <span asp-validation-for="Code" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="CountryId"></label>
+        <select asp-for="CountryId">
+            <option value="">Select a country</option>
+            @foreach (var country in Model.CountryOptions)
+            {
+                <option value="@country.Id" selected="@(Model.CountryId == country.Id)">@country.Name (@country.Code)@(country.IsActive ? "" : " (inactive)")</option>
+            }
+        </select>
+        <span asp-validation-for="CountryId" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label class="form-check">
+            <input asp-for="IsActive" type="checkbox" />
+            <span>Active — inactive manufacturers cannot be chosen for new models or aircraft</span>
+        </label>
+        <span asp-validation-for="IsActive" class="field-error"></span>
+    </div>
+</div>

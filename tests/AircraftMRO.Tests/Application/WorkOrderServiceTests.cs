@@ -265,7 +265,7 @@ public sealed class WorkOrderServiceTests
 
     private Aircraft AircraftWithStatus(AircraftStatus status)
     {
-        var aircraft = Aircraft.Create("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 0m, status, AircraftTestData.CurrentYear).Value!;
+        var aircraft = Aircraft.Create("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "5123", 2012, 0m, status, AircraftTestData.CurrentYear).Value!;
         _repository.Setup(r => r.GetAircraftForUpdateAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(aircraft);
         return aircraft;
     }

@@ -194,8 +194,8 @@ public sealed class MaintenanceOrderWebTests(SqlServerFixture fixture) : IAsyncL
         var aircraft = await PostFormAsync("/Aircraft/Create", "/Aircraft/Create", new Dictionary<string, string>
         {
             ["RegistrationNumber"] = registration,
-            ["Manufacturer"] = "Airbus",
-            ["Model"] = "A320-214",
+            ["ManufacturerId"] = AircraftTestData.ManufacturerId.ToString(),
+            ["ModelId"] = AircraftTestData.ModelId.ToString(),
             ["SerialNumber"] = registration,
             ["YearOfManufacture"] = "2012",
             ["TotalFlightHours"] = "31250.5",
