@@ -208,8 +208,8 @@ public sealed class WorkOrderApiTests(SqlServerFixture fixture) : IAsyncLifetime
     private static object AircraftBody(string registration, string status) => new
     {
         registrationNumber = registration,
-        manufacturer = "Airbus",
-        model = "A320-214",
+        manufacturerId = AircraftTestData.ManufacturerId,
+        modelId = AircraftTestData.ModelId,
         serialNumber = registration,
         yearOfManufacture = 2012,
         totalFlightHours = 100m,

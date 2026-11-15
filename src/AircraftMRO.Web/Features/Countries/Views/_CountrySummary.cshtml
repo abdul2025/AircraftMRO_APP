@@ -1,0 +1,7 @@
+@model CountryDetailsViewModel
+
+<dl class="detail-list">
+    <div><dt>Name</dt><dd>@Model.Name</dd></div>
+    <div><dt>ISO code</dt><dd>@Model.Code</dd></div>
+    <div><dt>Status</dt><dd><partial name="_ActiveBadge" model="Model.IsActive" /></dd></div>
+</dl>

@@ -3,6 +3,47 @@
 # Interactive reference (Development only): {{AircraftMRO.Api_HostAddress}}/scalar
 # OpenAPI document: {{AircraftMRO.Api_HostAddress}}/openapi/v1.json
 
+### Find a country id (ISO 3166-1 list, seeded by the migration)
+GET {{AircraftMRO.Api_HostAddress}}/api/countries?search=France
+
+### Create a manufacturer (countryId from the country list)
+POST {{AircraftMRO.Api_HostAddress}}/api/aircraft-manufacturers
+Content-Type: application/json
+
+{
+  "name": "Airbus",
+  "code": "AIB",
+  "countryId": "{{countryId}}",
+  "isActive": true
+}
+
+### Create a model under that manufacturer (categories: NarrowBody, WideBody, RegionalJet, Turboprop, BusinessJet, Helicopter, Other)
+POST {{AircraftMRO.Api_HostAddress}}/api/aircraft-models
+Content-Type: application/json
+
+{
+  "manufacturerId": "{{manufacturerId}}",
+  "name": "A320-214",
+  "modelCode": "A320-214",
+  "aircraftCategory": "NarrowBody",
+  "isActive": true
+}
+
+### List a manufacturer's models
+GET {{AircraftMRO.Api_HostAddress}}/api/aircraft-models?manufacturerId={{manufacturerId}}&isActive=true
+
+### Deactivate a model (existing aircraft keep it; new aircraft cannot choose it)
+PUT {{AircraftMRO.Api_HostAddress}}/api/aircraft-models/{{modelId}}
+Content-Type: application/json
+If-Match: "{{etag}}"
+
+{
+  "name": "A320-214",
+  "modelCode": "A320-214",
+  "aircraftCategory": "NarrowBody",
+  "isActive": false
+}
+
 ### List aircraft
 GET {{AircraftMRO.Api_HostAddress}}/api/aircraft?page=1&pageSize=20
 Accept: application/json
@@ -13,8 +54,8 @@ Content-Type: application/json
 
 {
   "registrationNumber": "HZ-ABC",
-  "manufacturer": "Airbus",
-  "model": "A320-214",
+  "manufacturerId": "{{manufacturerId}}",
+  "modelId": "{{modelId}}",
   "serialNumber": "5123",
   "yearOfManufacture": 2012,
   "totalFlightHours": 31250.5,
@@ -31,8 +72,8 @@ If-Match: "{{etag}}"
 
 {
   "registrationNumber": "HZ-ABC",
-  "manufacturer": "Airbus",
-  "model": "A320-214",
+  "manufacturerId": "{{manufacturerId}}",
+  "modelId": "{{modelId}}",
   "serialNumber": "5123",
   "yearOfManufacture": 2012,
   "totalFlightHours": 31300.0,

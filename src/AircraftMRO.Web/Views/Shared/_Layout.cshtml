@@ -7,6 +7,9 @@
     var isAircraft = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Aircraft", StringComparison.OrdinalIgnoreCase);
     var isWorkOrders = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "WorkOrders", StringComparison.OrdinalIgnoreCase);
     var isMaintenance = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "MaintenanceOrders", StringComparison.OrdinalIgnoreCase);
+    var isManufacturers = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "AircraftManufacturers", StringComparison.OrdinalIgnoreCase);
+    var isModels = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "AircraftModels", StringComparison.OrdinalIgnoreCase);
+    var isCountries = string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), "Countries", StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -60,6 +63,17 @@
                     </a>
                     <a class="sidebar-nav__link @(isMaintenance ? "is-active" : null)" asp-controller="MaintenanceOrders" asp-action="Index" aria-current="@(isMaintenance ? "page" : null)">
                         <span aria-hidden="true">⚙</span><span>Maintenance</span>
+                    </a>
+
+                    <p class="sidebar-nav__label">Reference data</p>
+                    <a class="sidebar-nav__link @(isManufacturers ? "is-active" : null)" asp-controller="AircraftManufacturers" asp-action="Index" aria-current="@(isManufacturers ? "page" : null)">
+                        <span aria-hidden="true">⌘</span><span>Manufacturers</span>
+                    </a>
+                    <a class="sidebar-nav__link @(isModels ? "is-active" : null)" asp-controller="AircraftModels" asp-action="Index" aria-current="@(isModels ? "page" : null)">
+                        <span aria-hidden="true">≡</span><span>Aircraft models</span>
+                    </a>
+                    <a class="sidebar-nav__link @(isCountries ? "is-active" : null)" asp-controller="Countries" asp-action="Index" aria-current="@(isCountries ? "page" : null)">
+                        <span aria-hidden="true">◎</span><span>Countries</span>
                     </a>
                 </nav>
 
@@ -115,6 +129,7 @@
     <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/modal-forms.js" asp-append-version="true"></script>
+    <script src="~/js/dependent-select.js" asp-append-version="true"></script>
     <script src="~/js/clock.js" asp-append-version="true"></script>
     <script src="~/js/live-status.js" asp-append-version="true"></script>
     <script src="~/js/notifications.js" asp-append-version="true"></script>

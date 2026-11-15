@@ -21,7 +21,16 @@ public interface IAircraftRepository
 
     Task<bool> RegistrationNumberExistsAsync(string registrationNumber, Guid? excludeId, CancellationToken cancellationToken);
 
-    Task<bool> SerialNumberExistsAsync(string manufacturer, string serialNumber, Guid? excludeId, CancellationToken cancellationToken);
+    Task<bool> SerialNumberExistsAsync(Guid manufacturerId, string serialNumber, Guid? excludeId, CancellationToken cancellationToken);
+
+    /// <summary>The live model with its manufacturer's state, or null when either was deleted or never existed.</summary>
+    Task<AircraftModelReference?> GetModelReferenceAsync(Guid modelId, CancellationToken cancellationToken);
+
+    /// <summary>Active manufacturers and models, plus the given current ones even when inactive.</summary>
+    Task<AircraftFormOptionsDto> ListFormOptionsAsync(
+        Guid? currentManufacturerId,
+        Guid? currentModelId,
+        CancellationToken cancellationToken);
 
     Task<OpenWorkOrderCounts> GetOpenWorkOrderCountsAsync(Guid aircraftId, CancellationToken cancellationToken);
 

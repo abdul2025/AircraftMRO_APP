@@ -1,0 +1,11 @@
+@model AircraftManufacturerDetailsViewModel
+
+<dl class="detail-list">
+    <div><dt>Name</dt><dd>@Model.Name</dd></div>
+    <div><dt>Code</dt><dd>@Model.Code</dd></div>
+    <div>
+        <dt>Country</dt>
+        <dd>@(Model.CountryName is { } country ? $"{country} ({Model.CountryCode})" : AircraftManufacturerListViewModel.NoCountry)</dd>
+    </div>
+    <div><dt>Status</dt><dd><partial name="_ActiveBadge" model="Model.IsActive" /></dd></div>
+</dl>

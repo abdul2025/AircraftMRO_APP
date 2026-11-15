@@ -66,8 +66,8 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
         var created = await aircraftService.CreateAsync(
             new CreateAircraftDto(
                 request.RegistrationNumber,
-                request.Manufacturer,
-                request.Model,
+                request.ManufacturerId!.Value,
+                request.ModelId!.Value,
                 request.SerialNumber,
                 request.YearOfManufacture!.Value,
                 request.TotalFlightHours!.Value,
@@ -105,8 +105,8 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
             id,
             new UpdateAircraftDto(
                 request.RegistrationNumber,
-                request.Manufacturer,
-                request.Model,
+                request.ManufacturerId!.Value,
+                request.ModelId!.Value,
                 request.SerialNumber,
                 request.YearOfManufacture!.Value,
                 request.TotalFlightHours!.Value,
@@ -140,7 +140,8 @@ public sealed class AircraftController(IAircraftService aircraftService) : Contr
         var statusCode = errorCode switch
         {
             AircraftErrors.NotFound => StatusCodes.Status404NotFound,
-            AircraftErrors.Validation => StatusCodes.Status400BadRequest,
+            AircraftErrors.Validation or AircraftErrors.ModelNotFound or AircraftErrors.ModelManufacturerMismatch
+                or AircraftErrors.ManufacturerInactive or AircraftErrors.ModelInactive => StatusCodes.Status400BadRequest,
             AircraftErrors.DuplicateRegistration or AircraftErrors.DuplicateSerialNumber
                 or AircraftErrors.OpenCriticalWorkOrders or AircraftErrors.OpenWorkOrders
                 or AircraftErrors.HasOpenWorkOrders => StatusCodes.Status409Conflict,

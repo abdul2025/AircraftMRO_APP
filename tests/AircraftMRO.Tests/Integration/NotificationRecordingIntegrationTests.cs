@@ -31,7 +31,7 @@ public sealed class NotificationRecordingIntegrationTests(SqlServerFixture fixtu
         await using (var context = NewContext())
         {
             var tracked = await context.Aircraft.SingleAsync(a => a.Id == aircraft.Id);
-            tracked.Update("NT-1", "Airbus", "A320-214", "NT-1", 2012, 31250.5m, AircraftStatus.Grounded, 2026);
+            tracked.Update("NT-1", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "NT-1", 2012, 31250.5m, AircraftStatus.Grounded, 2026);
             await context.SaveChangesAsync();
         }
 
@@ -73,7 +73,7 @@ public sealed class NotificationRecordingIntegrationTests(SqlServerFixture fixtu
         await using (var context = NewContext())
         {
             var tracked = await context.Aircraft.SingleAsync(a => a.Id == aircraft.Id);
-            tracked.Update("nt-2", "Airbus", "A320-214", "NT-2", 2012, 31250.5m, AircraftStatus.Active, 2026);
+            tracked.Update("nt-2", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "NT-2", 2012, 31250.5m, AircraftStatus.Active, 2026);
             await context.SaveChangesAsync();
         }
 
@@ -100,7 +100,7 @@ public sealed class NotificationRecordingIntegrationTests(SqlServerFixture fixtu
         {
             var repository = new AircraftRepository(context);
             var tracked = (await repository.GetForUpdateAsync(aircraft.Id, CancellationToken.None))!;
-            tracked.Update(registration, "Airbus", "A320-214", "NT-3", 2012, 1m, AircraftStatus.Retired, 2026);
+            tracked.Update(registration, AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "NT-3", 2012, 1m, AircraftStatus.Retired, 2026);
             var stale = await repository.UpdateAsync(tracked, [0, 0, 0, 0, 0, 0, 0, 1], CancellationToken.None);
             Assert.Equal(AircraftErrors.ConcurrencyConflict, stale.ErrorCode);
         }

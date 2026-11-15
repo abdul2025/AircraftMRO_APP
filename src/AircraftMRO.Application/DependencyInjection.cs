@@ -1,5 +1,11 @@
 using AircraftMRO.Application.Features.Aircraft;
 using AircraftMRO.Application.Features.Aircraft.Interfaces;
+using AircraftMRO.Application.Features.AircraftManufacturers;
+using AircraftMRO.Application.Features.AircraftManufacturers.Interfaces;
+using AircraftMRO.Application.Features.AircraftModels;
+using AircraftMRO.Application.Features.AircraftModels.Interfaces;
+using AircraftMRO.Application.Features.Countries;
+using AircraftMRO.Application.Features.Countries.Interfaces;
 using AircraftMRO.Application.Features.MaintenanceOrders;
 using AircraftMRO.Application.Features.MaintenanceOrders.Interfaces;
 using AircraftMRO.Application.Features.Notifications;
@@ -17,6 +23,9 @@ public static class DependencyInjection
     {
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IAircraftService, AircraftService>();
+        services.AddScoped<ICountryService, CountryService>();
+        services.AddScoped<IAircraftManufacturerService, AircraftManufacturerService>();
+        services.AddScoped<IAircraftModelService, AircraftModelService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.TryAddSingleton(new WorkOrderOptions());
         services.AddScoped<IWorkOrderService, WorkOrderService>();

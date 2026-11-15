@@ -1,0 +1,24 @@
+@model AircraftModelDetailsViewModel
+@{
+    ViewData["Title"] = Model.DisplayName;
+}
+
+@* live-refresh.js re-renders this page when this model changes, and returns to the list if it is deleted. *@
+<section class="form-card" aria-labelledby="details-title"
+         data-live-refresh="AircraftModel" data-live-refresh-id="@Model.Id" data-live-refresh-gone="@Url.Action("Index")">
+    <div class="card-heading">
+        <div>
+            <p class="eyebrow">Aircraft model</p>
+            <h1 id="details-title">@Model.DisplayName</h1>
+        </div>
+        <partial name="_RowActions" model="new RowActionsViewModel(Model.Id, Model.DisplayName)" />
+    </div>
+
+    <partial name="_StatusMessages" />
+    <partial name="_AircraftModelSummary" model="Model" />
+    <partial name="_AuditTrail" model="new AuditTrailViewModel(Model.Id, Model.CreatedAtUtc, Model.CreatedBy, Model.UpdatedAtUtc, Model.UpdatedBy)" />
+
+    <div class="form-actions">
+        <a class="button button--secondary" asp-action="Index">Back to aircraft models</a>
+    </div>
+</section>

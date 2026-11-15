@@ -21,6 +21,8 @@ public sealed class AircraftServiceTests
         _repository.Setup(r => r.UpdateAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
         _repository.Setup(r => r.DeleteAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result.Success());
         _repository.Setup(r => r.GetOpenWorkOrderCountsAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(OpenWorkOrderCounts.None);
+        _repository.Setup(r => r.GetModelReferenceAsync(AircraftTestData.ModelId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AircraftTestData.ModelReference());
         _service = new AircraftService(_repository.Object, new FakeTimeProvider());
     }
 
@@ -54,7 +56,7 @@ public sealed class AircraftServiceTests
     [Fact]
     public async Task Create_rejects_duplicate_serial_number()
     {
-        _repository.Setup(r => r.SerialNumberExistsAsync("Airbus", "5123", null, It.IsAny<CancellationToken>())).ReturnsAsync(true);
+        _repository.Setup(r => r.SerialNumberExistsAsync(AircraftTestData.ManufacturerId, "5123", null, It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
         var result = await _service.CreateAsync(AircraftTestData.CreateDto(), CancellationToken.None);
 
@@ -223,6 +225,72 @@ public sealed class AircraftServiceTests
         Assert.True(request.Skip >= 0);
     }
 
+    [Fact]
+    public async Task Create_rejects_a_model_that_does_not_exist()
+    {
+        var dto = AircraftTestData.CreateDto() with { ModelId = Guid.NewGuid() };
+
+        var result = await _service.CreateAsync(dto, CancellationToken.None);
+
+        Assert.Equal(AircraftErrors.ModelNotFound, result.ErrorCode);
+        _repository.Verify(r => r.AddAsync(It.IsAny<Aircraft>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Create_rejects_a_model_from_another_manufacturer()
+    {
+        var dto = AircraftTestData.CreateDto() with { ManufacturerId = AircraftTestData.OtherManufacturerId };
+
+        var result = await _service.CreateAsync(dto, CancellationToken.None);
+
+        Assert.Equal(AircraftErrors.ModelManufacturerMismatch, result.ErrorCode);
+        _repository.Verify(r => r.AddAsync(It.IsAny<Aircraft>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(false, true, AircraftErrors.ModelInactive)]
+    [InlineData(true, false, AircraftErrors.ManufacturerInactive)]
+    public async Task Create_rejects_an_inactive_model_or_manufacturer(bool modelActive, bool manufacturerActive, string expected)
+    {
+        _repository.Setup(r => r.GetModelReferenceAsync(AircraftTestData.ModelId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AircraftTestData.ModelReference(isActive: modelActive, manufacturerIsActive: manufacturerActive));
+
+        var result = await _service.CreateAsync(AircraftTestData.CreateDto(), CancellationToken.None);
+
+        Assert.Equal(expected, result.ErrorCode);
+    }
+
+    [Fact]
+    public async Task Update_keeps_an_inactive_model_the_aircraft_already_has()
+    {
+        TrackedAircraft(OpenWorkOrderCounts.None);
+        _repository.Setup(r => r.GetModelReferenceAsync(AircraftTestData.ModelId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AircraftTestData.ModelReference(isActive: false, manufacturerIsActive: false));
+
+        var result = await _service.UpdateAsync(Guid.Empty, UpdateDto(), CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public async Task Update_rejects_switching_to_an_inactive_model()
+    {
+        var aircraft = TrackedAircraft(OpenWorkOrderCounts.None);
+        _repository.Setup(r => r.GetModelReferenceAsync(AircraftTestData.OtherModelId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AircraftTestData.ModelReference(
+                AircraftTestData.OtherModelId, AircraftTestData.OtherManufacturerId, isActive: false));
+        var dto = UpdateDto() with
+        {
+            ManufacturerId = AircraftTestData.OtherManufacturerId,
+            ModelId = AircraftTestData.OtherModelId
+        };
+
+        var result = await _service.UpdateAsync(aircraft.Id, dto, CancellationToken.None);
+
+        Assert.Equal(AircraftErrors.ModelInactive, result.ErrorCode);
+        _repository.Verify(r => r.UpdateAsync(It.IsAny<Aircraft>(), It.IsAny<byte[]>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     private Aircraft TrackedAircraft(OpenWorkOrderCounts openWorkOrders)
     {
         var aircraft = AircraftTestData.NewAircraft();
@@ -232,5 +300,5 @@ public sealed class AircraftServiceTests
     }
 
     private static UpdateAircraftDto UpdateDto(byte[]? rowVersion = null) =>
-        new("HZ-ABC", "Airbus", "A320-214", "5123", 2012, 31300m, AircraftStatus.Active, rowVersion ?? [1]);
+        new("HZ-ABC", AircraftTestData.ManufacturerId, AircraftTestData.ModelId, "5123", 2012, 31300m, AircraftStatus.Active, rowVersion ?? [1]);
 }

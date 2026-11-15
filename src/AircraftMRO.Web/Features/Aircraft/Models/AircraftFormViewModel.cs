@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using AircraftMRO.Application.Features.Aircraft.DTOs;
 using AircraftMRO.Domain.Enums.Aircraft;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using AircraftEntity = AircraftMRO.Domain.Entities.Aircraft;
 
 namespace AircraftMRO.Web.Features.Aircraft.Models;
@@ -13,12 +15,12 @@ public sealed class AircraftFormViewModel
     public string RegistrationNumber { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(AircraftEntity.ManufacturerMaxLength)]
-    public string Manufacturer { get; set; } = string.Empty;
+    [Display(Name = "Manufacturer")]
+    public Guid? ManufacturerId { get; set; }
 
     [Required]
-    [StringLength(AircraftEntity.ModelMaxLength)]
-    public string Model { get; set; } = string.Empty;
+    [Display(Name = "Model")]
+    public Guid? ModelId { get; set; }
 
     [Required]
     [Display(Name = "Serial number (MSN)")]
@@ -40,4 +42,8 @@ public sealed class AircraftFormViewModel
 
     /// <summary>Base64 row version captured when the edit form was loaded.</summary>
     public string? RowVersion { get; set; }
+
+    /// <summary>Manufacturer and model choices, reloaded by the controller on every render, never posted.</summary>
+    [BindNever]
+    public AircraftFormOptionsDto Options { get; set; } = AircraftFormOptionsDto.Empty;
 }

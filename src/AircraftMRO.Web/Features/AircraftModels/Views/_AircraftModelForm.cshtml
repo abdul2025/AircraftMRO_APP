@@ -1,0 +1,55 @@
+@model AircraftModelFormViewModel
+@{
+    var isEdit = Model.ManufacturerName is not null;
+}
+
+<div asp-validation-summary="ModelOnly" class="notice notice--danger" role="alert"></div>
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="form-grid">
+    @if (isEdit)
+    {
+        <div class="form-field">
+            <span class="form-field__label">Manufacturer</span>
+            <span class="form-field__value">@Model.ManufacturerName</span>
+        </div>
+    }
+    else
+    {
+        <div class="form-field">
+            <label asp-for="ManufacturerId"></label>
+            <select asp-for="ManufacturerId">
+                <option value="">Select a manufacturer</option>
+                @foreach (var manufacturer in Model.ManufacturerOptions.Where(m => m.IsActive))
+                {
+                    <option value="@manufacturer.Id" selected="@(Model.ManufacturerId == manufacturer.Id)">@manufacturer.Name</option>
+                }
+            </select>
+            <span asp-validation-for="ManufacturerId" class="field-error"></span>
+        </div>
+    }
+    <div class="form-field">
+        <label asp-for="AircraftCategory"></label>
+        <select asp-for="AircraftCategory" asp-items="AircraftModelLabels.CategoryOptions()">
+            <option value="">Select a category</option>
+        </select>
+        <span asp-validation-for="AircraftCategory" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" autocomplete="off" placeholder="A320neo" />
+        <span asp-validation-for="Name" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="ModelCode"></label>
+        <input asp-for="ModelCode" autocomplete="off" placeholder="A320-251N" />
+        <span asp-validation-for="ModelCode" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label class="form-check">
+            <input asp-for="IsActive" type="checkbox" />
+            <span>Active — inactive models cannot be chosen for new aircraft</span>
+        </label>
+        <span asp-validation-for="IsActive" class="field-error"></span>
+    </div>
+</div>

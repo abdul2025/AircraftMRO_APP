@@ -29,10 +29,17 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
             : Result<AircraftDto>.Success(aircraft);
     }
 
+    public async Task<Result<AircraftFormOptionsDto>> GetFormOptionsAsync(
+        Guid? currentManufacturerId,
+        Guid? currentModelId,
+        CancellationToken cancellationToken) =>
+        Result<AircraftFormOptionsDto>.Success(
+            await repository.ListFormOptionsAsync(currentManufacturerId, currentModelId, cancellationToken));
+
     public async Task<Result<Guid>> CreateAsync(CreateAircraftDto dto, CancellationToken cancellationToken)
     {
         var created = AircraftEntity.Create(
-            dto.RegistrationNumber, dto.Manufacturer, dto.Model, dto.SerialNumber,
+            dto.RegistrationNumber, dto.ManufacturerId, dto.ModelId, dto.SerialNumber,
             dto.YearOfManufacture, dto.TotalFlightHours, dto.Status, CurrentYear);
         if (created.IsFailure)
         {
@@ -40,6 +47,12 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
         }
 
         var aircraft = created.Value!;
+        var reference = await CheckModelAsync(aircraft, current: null, cancellationToken);
+        if (reference.IsFailure)
+        {
+            return Result<Guid>.Failure(reference.ErrorCode!, reference.ErrorMessage!);
+        }
+
         var uniqueness = await CheckUniquenessAsync(aircraft, excludeId: null, cancellationToken);
         if (uniqueness.IsFailure)
         {
@@ -61,12 +74,19 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
             return Result.Failure(AircraftErrors.NotFound, AircraftErrors.NotFoundMessage);
         }
 
+        var current = (aircraft.ManufacturerId, aircraft.ModelId);
         var updated = aircraft.Update(
-            dto.RegistrationNumber, dto.Manufacturer, dto.Model, dto.SerialNumber,
+            dto.RegistrationNumber, dto.ManufacturerId, dto.ModelId, dto.SerialNumber,
             dto.YearOfManufacture, dto.TotalFlightHours, dto.Status, CurrentYear);
         if (updated.IsFailure)
         {
             return updated;
+        }
+
+        var reference = await CheckModelAsync(aircraft, current, cancellationToken);
+        if (reference.IsFailure)
+        {
+            return reference;
         }
 
         var uniqueness = await CheckUniquenessAsync(aircraft, excludeId: id, cancellationToken);
@@ -130,6 +150,39 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
 
     private int CurrentYear => timeProvider.GetUtcNow().Year;
 
+    /// <summary>
+    /// The model must exist and be made by the chosen manufacturer. A manufacturer or model being
+    /// chosen must be active; one the aircraft already had may stay after it was deactivated.
+    /// </summary>
+    private async Task<Result> CheckModelAsync(
+        AircraftEntity aircraft,
+        (Guid ManufacturerId, Guid ModelId)? current,
+        CancellationToken cancellationToken)
+    {
+        var model = await repository.GetModelReferenceAsync(aircraft.ModelId, cancellationToken);
+        if (model is null)
+        {
+            return Result.Failure(AircraftErrors.ModelNotFound, AircraftErrors.ModelNotFoundMessage);
+        }
+
+        if (model.ManufacturerId != aircraft.ManufacturerId)
+        {
+            return Result.Failure(AircraftErrors.ModelManufacturerMismatch, AircraftErrors.ModelManufacturerMismatchMessage);
+        }
+
+        if (!model.ManufacturerIsActive && current?.ManufacturerId != aircraft.ManufacturerId)
+        {
+            return Result.Failure(AircraftErrors.ManufacturerInactive, AircraftErrors.ManufacturerInactiveMessage);
+        }
+
+        if (!model.IsActive && current?.ModelId != aircraft.ModelId)
+        {
+            return Result.Failure(AircraftErrors.ModelInactive, AircraftErrors.ModelInactiveMessage);
+        }
+
+        return Result.Success();
+    }
+
     private async Task<Result> CheckUniquenessAsync(
         AircraftEntity aircraft,
         Guid? excludeId,
@@ -140,7 +193,7 @@ public sealed class AircraftService(IAircraftRepository repository, TimeProvider
             return Result.Failure(AircraftErrors.DuplicateRegistration, AircraftErrors.DuplicateRegistrationMessage);
         }
 
-        if (await repository.SerialNumberExistsAsync(aircraft.Manufacturer, aircraft.SerialNumber, excludeId, cancellationToken))
+        if (await repository.SerialNumberExistsAsync(aircraft.ManufacturerId, aircraft.SerialNumber, excludeId, cancellationToken))
         {
             return Result.Failure(AircraftErrors.DuplicateSerialNumber, AircraftErrors.DuplicateSerialNumberMessage);
         }

@@ -12,6 +12,10 @@ public static class AircraftErrors
     public const string OpenCriticalWorkOrders = "Aircraft.OpenCriticalWorkOrders";
     public const string OpenWorkOrders = "Aircraft.OpenWorkOrders";
     public const string HasOpenWorkOrders = "Aircraft.HasOpenWorkOrders";
+    public const string ModelNotFound = "Aircraft.ModelNotFound";
+    public const string ModelManufacturerMismatch = "Aircraft.ModelManufacturerMismatch";
+    public const string ManufacturerInactive = "Aircraft.ManufacturerInactive";
+    public const string ModelInactive = "Aircraft.ModelInactive";
 
     public const string NotFoundMessage = "The aircraft was not found.";
     public const string OpenCriticalWorkOrdersMessage =
@@ -22,6 +26,11 @@ public static class AircraftErrors
         "This aircraft has open work orders. Complete or cancel them before deleting it.";
     public const string DuplicateRegistrationMessage = "An aircraft with this registration number already exists.";
     public const string DuplicateSerialNumberMessage = "An aircraft with this manufacturer and serial number already exists.";
+    public const string ModelNotFoundMessage = "The selected model was not found.";
+    public const string ModelManufacturerMismatchMessage = "The selected model is not made by the selected manufacturer.";
+    public const string ManufacturerInactiveMessage =
+        "The selected manufacturer is inactive. Choose an active manufacturer.";
+    public const string ModelInactiveMessage = "The selected model is inactive. Choose an active model.";
     public const string ConcurrencyConflictMessage =
         "This aircraft was changed by someone else after you opened it. Reload and try again.";
 }

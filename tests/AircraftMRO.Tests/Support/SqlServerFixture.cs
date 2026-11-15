@@ -19,15 +19,20 @@ public sealed class SqlServerFixture : IAsyncLifetime
 
     public Task DisposeAsync() => _container.DisposeAsync().AsTask();
 
-    public async Task<string> CreateDatabaseAsync()
-    {
-        var connectionString = new SqlConnectionStringBuilder(_container.GetConnectionString())
+    /// <summary>A connection string for a new, not yet created database, for tests that migrate it themselves.</summary>
+    public string NewDatabaseConnectionString() =>
+        new SqlConnectionStringBuilder(_container.GetConnectionString())
         {
             InitialCatalog = $"AircraftMRO_Test_{Guid.NewGuid():N}"
         }.ConnectionString;
 
+    public async Task<string> CreateDatabaseAsync()
+    {
+        var connectionString = NewDatabaseConnectionString();
+
         await using var context = CreateContext(connectionString, new TestCurrentUser(), new FakeTimeProvider());
         await context.Database.MigrateAsync();
+        await AircraftTestData.SeedReferenceDataAsync(context);
 
         return connectionString;
     }

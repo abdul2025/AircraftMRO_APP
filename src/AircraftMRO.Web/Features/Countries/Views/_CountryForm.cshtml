@@ -1,0 +1,24 @@
+@model CountryFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="notice notice--danger" role="alert"></div>
+<input type="hidden" asp-for="RowVersion" />
+
+<div class="form-grid">
+    <div class="form-field">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" autocomplete="off" placeholder="Saudi Arabia" />
+        <span asp-validation-for="Name" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label asp-for="Code"></label>
+        <input asp-for="Code" autocomplete="off" placeholder="SA" maxlength="2" />
+        <span asp-validation-for="Code" class="field-error"></span>
+    </div>
+    <div class="form-field">
+        <label class="form-check">
+            <input asp-for="IsActive" type="checkbox" />
+            <span>Active — inactive countries cannot be chosen for new manufacturers</span>
+        </label>
+        <span asp-validation-for="IsActive" class="field-error"></span>
+    </div>
+</div>

@@ -34,21 +34,27 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
     }
 
     [HttpGet]
-    public IActionResult Create() => FormView(nameof(Create), new AircraftFormViewModel());
+    public async Task<IActionResult> Create(CancellationToken cancellationToken)
+    {
+        var form = new AircraftFormViewModel();
+        await LoadOptionsAsync(form, cancellationToken);
+        return FormView(nameof(Create), form);
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create(AircraftFormViewModel form, CancellationToken cancellationToken)
     {
         if (!ModelState.IsValid)
         {
+            await LoadOptionsAsync(form, cancellationToken);
             return FormView(nameof(Create), form, StatusCodes.Status422UnprocessableEntity);
         }
 
         var result = await aircraftService.CreateAsync(
             new CreateAircraftDto(
                 form.RegistrationNumber,
-                form.Manufacturer,
-                form.Model,
+                form.ManufacturerId!.Value,
+                form.ModelId!.Value,
                 form.SerialNumber,
                 form.YearOfManufacture!.Value,
                 form.TotalFlightHours!.Value,
@@ -58,6 +64,7 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
         if (result.IsFailure)
         {
             AddError(result.ErrorCode!, result.ErrorMessage!);
+            await LoadOptionsAsync(form, cancellationToken);
             return FormView(nameof(Create), form, StatusFor(result.ErrorCode!));
         }
 
@@ -74,17 +81,19 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
         }
 
         var aircraft = result.Value!;
-        return FormView(nameof(Edit), new AircraftFormViewModel
+        var form = new AircraftFormViewModel
         {
             RegistrationNumber = aircraft.RegistrationNumber,
-            Manufacturer = aircraft.Manufacturer,
-            Model = aircraft.Model,
+            ManufacturerId = aircraft.ManufacturerId,
+            ModelId = aircraft.ModelId,
             SerialNumber = aircraft.SerialNumber,
             YearOfManufacture = aircraft.YearOfManufacture,
             TotalFlightHours = aircraft.TotalFlightHours,
             Status = aircraft.Status,
             RowVersion = Convert.ToBase64String(aircraft.RowVersion)
-        });
+        };
+        await LoadOptionsAsync(form, cancellationToken);
+        return FormView(nameof(Edit), form);
     }
 
     [HttpPost]
@@ -97,6 +106,7 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
 
         if (!ModelState.IsValid)
         {
+            await LoadOptionsAsync(form, cancellationToken);
             return FormView(nameof(Edit), form, StatusCodes.Status422UnprocessableEntity);
         }
 
@@ -104,8 +114,8 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
             id,
             new UpdateAircraftDto(
                 form.RegistrationNumber,
-                form.Manufacturer,
-                form.Model,
+                form.ManufacturerId!.Value,
+                form.ModelId!.Value,
                 form.SerialNumber,
                 form.YearOfManufacture!.Value,
                 form.TotalFlightHours!.Value,
@@ -121,6 +131,7 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
         if (result.IsFailure)
         {
             AddError(result.ErrorCode!, result.ErrorMessage!);
+            await LoadOptionsAsync(form, cancellationToken);
             return FormView(nameof(Edit), form, StatusFor(result.ErrorCode!));
         }
 
@@ -181,9 +192,16 @@ public sealed class AircraftController(IAircraftService aircraftService) : Modal
             AircraftErrors.DuplicateRegistration => nameof(AircraftFormViewModel.RegistrationNumber),
             AircraftErrors.DuplicateSerialNumber => nameof(AircraftFormViewModel.SerialNumber),
             AircraftErrors.OpenCriticalWorkOrders or AircraftErrors.OpenWorkOrders => nameof(AircraftFormViewModel.Status),
+            AircraftErrors.ManufacturerInactive => nameof(AircraftFormViewModel.ManufacturerId),
+            AircraftErrors.ModelNotFound or AircraftErrors.ModelManufacturerMismatch
+                or AircraftErrors.ModelInactive => nameof(AircraftFormViewModel.ModelId),
             _ => string.Empty
         };
 
         ModelState.AddModelError(key, errorMessage);
     }
+
+    /// <summary>The selected values stay listed even when inactive, so an edit form can still show them.</summary>
+    private async Task LoadOptionsAsync(AircraftFormViewModel form, CancellationToken cancellationToken) =>
+        form.Options = (await aircraftService.GetFormOptionsAsync(form.ManufacturerId, form.ModelId, cancellationToken)).Value!;
 }

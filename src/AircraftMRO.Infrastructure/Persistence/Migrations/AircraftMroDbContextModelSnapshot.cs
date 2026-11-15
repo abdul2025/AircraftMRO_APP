@@ -49,15 +49,11 @@ namespace AircraftMRO.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<string>("Manufacturer")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<Guid>("ManufacturerId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<Guid>("ModelId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RegistrationNumber")
                         .IsRequired()
@@ -98,12 +94,210 @@ namespace AircraftMRO.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("IX_Aircraft_RegistrationNumber")
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.HasIndex("Manufacturer", "SerialNumber")
+                    b.HasIndex("ManufacturerId", "ModelId");
+
+                    b.HasIndex("ManufacturerId", "SerialNumber")
                         .IsUnique()
-                        .HasDatabaseName("IX_Aircraft_Manufacturer_SerialNumber")
+                        .HasDatabaseName("IX_Aircraft_ManufacturerId_SerialNumber")
                         .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Aircraft", (string)null);
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.AircraftManufacturer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<Guid?>("CountryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AircraftManufacturers_Code")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("AircraftManufacturers", (string)null);
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.AircraftModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AircraftCategory")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid>("ManufacturerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ModelCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManufacturerId", "ModelCode")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AircraftModels_ManufacturerId_ModelCode")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("AircraftModels", (string)null);
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.Country", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nchar(2)")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset>("CreatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset?>("DeletedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Countries_Code")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("AircraftMRO.Domain.Entities.MaintenanceOrder", b =>
@@ -298,6 +492,39 @@ namespace AircraftMRO.Infrastructure.Persistence.Migrations
                     b.HasIndex("Status", "Priority");
 
                     b.ToTable("WorkOrders", (string)null);
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.Aircraft", b =>
+                {
+                    b.HasOne("AircraftMRO.Domain.Entities.AircraftManufacturer", null)
+                        .WithMany()
+                        .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AircraftMRO.Domain.Entities.AircraftModel", null)
+                        .WithMany()
+                        .HasForeignKey("ManufacturerId", "ModelId")
+                        .HasPrincipalKey("ManufacturerId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.AircraftManufacturer", b =>
+                {
+                    b.HasOne("AircraftMRO.Domain.Entities.Country", null)
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("AircraftMRO.Domain.Entities.AircraftModel", b =>
+                {
+                    b.HasOne("AircraftMRO.Domain.Entities.AircraftManufacturer", null)
+                        .WithMany()
+                        .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AircraftMRO.Domain.Entities.MaintenanceOrder", b =>

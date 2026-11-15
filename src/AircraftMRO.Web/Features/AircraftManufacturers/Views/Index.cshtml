@@ -1,0 +1,95 @@
+@model AircraftManufacturerListViewModel
+@{
+    ViewData["Title"] = "Manufacturers";
+    var results = Model.Page;
+    var filter = Model.Filter;
+}
+
+@* live-refresh.js re-renders this page in place when a manufacturer changes. *@
+<section aria-labelledby="manufacturers-title" data-live-refresh="AircraftManufacturer">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Reference data</p>
+            <h1 id="manufacturers-title">Manufacturers</h1>
+        </div>
+        <a class="button button--primary" asp-action="Create" data-modal>Add manufacturer</a>
+    </div>
+
+    <partial name="_StatusMessages" />
+
+    <form class="filter-bar" asp-action="Index" method="get" role="search" aria-label="Filter manufacturers">
+        <div class="filter-bar__field filter-bar__field--search">
+            <label for="manufacturer-search">Search</label>
+            <input id="manufacturer-search" type="search" name="search" value="@filter.Search"
+                   maxlength="@AircraftMRO.Application.Features.AircraftManufacturers.DTOs.AircraftManufacturerListFilter.MaxSearchLength"
+                   placeholder="Name, code, or country" autocomplete="off" />
+        </div>
+        <div class="filter-bar__field">
+            <label for="manufacturer-active">Status</label>
+            <select id="manufacturer-active" name="isActive">
+                <option value="">All</option>
+                <option value="true" selected="@(filter.IsActive == true)">Active</option>
+                <option value="false" selected="@(filter.IsActive == false)">Inactive</option>
+            </select>
+        </div>
+        <div class="filter-bar__actions">
+            <button type="submit" class="button button--primary">Apply</button>
+            @if (!filter.IsEmpty)
+            {
+                <a class="button button--secondary" asp-action="Index">Clear</a>
+            }
+        </div>
+    </form>
+
+    @if (results.TotalCount == 0)
+    {
+        <p class="empty-state">
+            @(filter.IsEmpty ? "No manufacturers have been added yet." : "No manufacturers match these filters.")
+        </p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Code</th>
+                        <th scope="col">Country</th>
+                        <th scope="col">Status</th>
+                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var manufacturer in results.Items)
+                    {
+                        <tr>
+                            <th scope="row"><a asp-action="Details" asp-route-id="@manufacturer.Id">@manufacturer.Name</a></th>
+                            <td>@manufacturer.Code</td>
+                            <td>@(manufacturer.CountryName ?? AircraftManufacturerListViewModel.NoCountry)</td>
+                            <td><partial name="_ActiveBadge" model="manufacturer.IsActive" /></td>
+                            <td class="actions-cell">
+                                <partial name="_RowActions" model="new RowActionsViewModel(manufacturer.Id, manufacturer.Name)" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (results.TotalPages > 1)
+        {
+            <nav class="pager" aria-label="Manufacturer pages">
+                @if (results.HasPreviousPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page - 1)">Previous</a>
+                }
+                <span>Page @results.Page of @results.TotalPages (@results.TotalCount manufacturers)</span>
+                @if (results.HasNextPage)
+                {
+                    <a asp-action="Index" asp-all-route-data="Model.RouteValues(page: results.Page + 1)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>

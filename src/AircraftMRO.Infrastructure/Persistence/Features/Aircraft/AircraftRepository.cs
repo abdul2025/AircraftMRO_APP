@@ -14,43 +14,50 @@ internal sealed class AircraftRepository(AircraftMroDbContext dbContext) : IAirc
 {
     private const int UniqueIndexViolation = 2601;
     private const int UniqueConstraintViolation = 2627;
+    public const int MaxFormOptions = 1000;
 
     public async Task<PagedResponse<AircraftListItemDto>> ListAsync(
         AircraftListFilter filter,
         PagedRequest request,
         CancellationToken cancellationToken)
     {
-        var query = dbContext.Aircraft.AsNoTracking();
+        var aircraftQuery = dbContext.Aircraft.AsNoTracking();
 
         if (filter.Status is { } status)
         {
-            query = query.Where(aircraft => aircraft.Status == status);
+            aircraftQuery = aircraftQuery.Where(aircraft => aircraft.Status == status);
         }
+
+        var query =
+            from aircraft in aircraftQuery
+            join manufacturer in dbContext.AircraftManufacturers on aircraft.ManufacturerId equals manufacturer.Id
+            join model in dbContext.AircraftModels on aircraft.ModelId equals model.Id
+            select new { Aircraft = aircraft, ManufacturerName = manufacturer.Name, ModelName = model.Name };
 
         if (filter.Search is { } search)
         {
             // EF Core escapes LIKE wildcards in the term; the column collation makes it case-insensitive.
-            query = query.Where(aircraft =>
-                aircraft.RegistrationNumber.Contains(search)
-                || aircraft.Manufacturer.Contains(search)
-                || aircraft.Model.Contains(search)
-                || aircraft.SerialNumber.Contains(search));
+            query = query.Where(row =>
+                row.Aircraft.RegistrationNumber.Contains(search)
+                || row.ManufacturerName.Contains(search)
+                || row.ModelName.Contains(search)
+                || row.Aircraft.SerialNumber.Contains(search));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
-            .OrderBy(aircraft => aircraft.RegistrationNumber)
-            .ThenBy(aircraft => aircraft.Id)
+            .OrderBy(row => row.Aircraft.RegistrationNumber)
+            .ThenBy(row => row.Aircraft.Id)
             .Skip(request.Skip)
             .Take(request.PageSize)
-            .Select(aircraft => new AircraftListItemDto(
-                aircraft.Id,
-                aircraft.RegistrationNumber,
-                aircraft.Manufacturer,
-                aircraft.Model,
-                aircraft.YearOfManufacture,
-                aircraft.TotalFlightHours,
-                aircraft.Status))
+            .Select(row => new AircraftListItemDto(
+                row.Aircraft.Id,
+                row.Aircraft.RegistrationNumber,
+                row.ManufacturerName,
+                row.ModelName,
+                row.Aircraft.YearOfManufacture,
+                row.Aircraft.TotalFlightHours,
+                row.Aircraft.Status))
             .ToListAsync(cancellationToken);
 
         return new PagedResponse<AircraftListItemDto>(items, request.Page, request.PageSize, totalCount);
@@ -76,24 +83,27 @@ internal sealed class AircraftRepository(AircraftMroDbContext dbContext) : IAirc
     }
 
     public Task<AircraftDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
-        dbContext.Aircraft
-            .AsNoTracking()
-            .Where(aircraft => aircraft.Id == id)
-            .Select(aircraft => new AircraftDto(
-                aircraft.Id,
-                aircraft.RegistrationNumber,
-                aircraft.Manufacturer,
-                aircraft.Model,
-                aircraft.SerialNumber,
-                aircraft.YearOfManufacture,
-                aircraft.TotalFlightHours,
-                aircraft.Status,
-                aircraft.CreatedAtUtc,
-                aircraft.CreatedBy,
-                aircraft.UpdatedAtUtc,
-                aircraft.UpdatedBy,
-                EF.Property<byte[]>(aircraft, AircraftMroDbContext.RowVersionPropertyName)))
-            .SingleOrDefaultAsync(cancellationToken);
+        (from aircraft in dbContext.Aircraft.AsNoTracking()
+         join manufacturer in dbContext.AircraftManufacturers on aircraft.ManufacturerId equals manufacturer.Id
+         join model in dbContext.AircraftModels on aircraft.ModelId equals model.Id
+         where aircraft.Id == id
+         select new AircraftDto(
+             aircraft.Id,
+             aircraft.RegistrationNumber,
+             aircraft.ManufacturerId,
+             manufacturer.Name,
+             aircraft.ModelId,
+             model.Name,
+             aircraft.SerialNumber,
+             aircraft.YearOfManufacture,
+             aircraft.TotalFlightHours,
+             aircraft.Status,
+             aircraft.CreatedAtUtc,
+             aircraft.CreatedBy,
+             aircraft.UpdatedAtUtc,
+             aircraft.UpdatedBy,
+             EF.Property<byte[]>(aircraft, AircraftMroDbContext.RowVersionPropertyName)))
+        .SingleOrDefaultAsync(cancellationToken);
 
     public Task<AircraftEntity?> GetForUpdateAsync(Guid id, CancellationToken cancellationToken) =>
         dbContext.Aircraft.SingleOrDefaultAsync(aircraft => aircraft.Id == id, cancellationToken);
@@ -110,17 +120,50 @@ internal sealed class AircraftRepository(AircraftMroDbContext dbContext) : IAirc
                 cancellationToken);
 
     public Task<bool> SerialNumberExistsAsync(
-        string manufacturer,
+        Guid manufacturerId,
         string serialNumber,
         Guid? excludeId,
         CancellationToken cancellationToken) =>
         dbContext.Aircraft
             .AsNoTracking()
             .AnyAsync(
-                aircraft => aircraft.Manufacturer == manufacturer
+                aircraft => aircraft.ManufacturerId == manufacturerId
                     && aircraft.SerialNumber == serialNumber
                     && (excludeId == null || aircraft.Id != excludeId),
                 cancellationToken);
+
+    public Task<AircraftModelReference?> GetModelReferenceAsync(Guid modelId, CancellationToken cancellationToken) =>
+        (from model in dbContext.AircraftModels.AsNoTracking()
+         join manufacturer in dbContext.AircraftManufacturers on model.ManufacturerId equals manufacturer.Id
+         where model.Id == modelId
+         select new AircraftModelReference(model.Id, model.ManufacturerId, model.IsActive, manufacturer.IsActive))
+        .SingleOrDefaultAsync(cancellationToken);
+
+    public async Task<AircraftFormOptionsDto> ListFormOptionsAsync(
+        Guid? currentManufacturerId,
+        Guid? currentModelId,
+        CancellationToken cancellationToken)
+    {
+        var manufacturers = await dbContext.AircraftManufacturers
+            .AsNoTracking()
+            .Where(manufacturer => manufacturer.IsActive || manufacturer.Id == currentManufacturerId)
+            .OrderBy(manufacturer => manufacturer.Name)
+            .Take(MaxFormOptions)
+            .Select(manufacturer => new AircraftManufacturerOptionDto(manufacturer.Id, manufacturer.Name, manufacturer.IsActive))
+            .ToListAsync(cancellationToken);
+
+        // A model is offered when it and its manufacturer are active, or when it is the current one.
+        var models = await (
+                from model in dbContext.AircraftModels.AsNoTracking()
+                join manufacturer in dbContext.AircraftManufacturers on model.ManufacturerId equals manufacturer.Id
+                where (model.IsActive && manufacturer.IsActive) || model.Id == currentModelId
+                orderby manufacturer.Name, model.Name
+                select new AircraftModelOptionDto(model.Id, model.ManufacturerId, model.Name, model.ModelCode, model.IsActive))
+            .Take(MaxFormOptions)
+            .ToListAsync(cancellationToken);
+
+        return new AircraftFormOptionsDto(manufacturers, models);
+    }
 
     public Task<OpenWorkOrderCounts> GetOpenWorkOrderCountsAsync(Guid aircraftId, CancellationToken cancellationToken) =>
         dbContext.WorkOrders

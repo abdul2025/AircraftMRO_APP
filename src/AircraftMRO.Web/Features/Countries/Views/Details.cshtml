@@ -1,0 +1,24 @@
+@model CountryDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@* live-refresh.js re-renders this page when this country changes, and returns to the list if it is deleted. *@
+<section class="form-card" aria-labelledby="details-title"
+         data-live-refresh="Country" data-live-refresh-id="@Model.Id" data-live-refresh-gone="@Url.Action("Index")">
+    <div class="card-heading">
+        <div>
+            <p class="eyebrow">Country</p>
+            <h1 id="details-title">@Model.Name</h1>
+        </div>
+        <partial name="_RowActions" model="new RowActionsViewModel(Model.Id, Model.Name)" />
+    </div>
+
+    <partial name="_StatusMessages" />
+    <partial name="_CountrySummary" model="Model" />
+    <partial name="_AuditTrail" model="new AuditTrailViewModel(Model.Id, Model.CreatedAtUtc, Model.CreatedBy, Model.UpdatedAtUtc, Model.UpdatedBy)" />
+
+    <div class="form-actions">
+        <a class="button button--secondary" asp-action="Index">Back to countries</a>
+    </div>
+</section>
