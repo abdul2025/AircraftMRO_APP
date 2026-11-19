@@ -22,7 +22,7 @@ yarn-error.log*
 
 
 # Eng Standers 
-dotnet10-engineering-standards/
+# dotnet10-engineering-standards/
 
 # NuGet packages
 
