@@ -4,7 +4,7 @@ The solution targets .NET 10 and uses SQL Server for persistence. A database con
 built from `mcr.microsoft.com/mssql/server` is a supported local runtime.
 
 ## Local database configuration
-
+test
 Keep the database password outside source control. Configure both ASP.NET Core hosts
 with the `ConnectionStrings__AircraftMRO` environment variable or their existing user
 secrets IDs. When the application runs on the host and SQL Server publishes port 1433,
